@@ -1,0 +1,9 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node modules / Build artifacts if any
+node_modules/
+dist/
+build/

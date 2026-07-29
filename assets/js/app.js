@@ -473,7 +473,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="card-custom">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="fw-bold m-0">Input Presensi: ${jadwal.nama_kelas} - ${jadwal.nama_mapel}</h5>
-                        <button id="btn-save-absensi" class="btn btn-success fw-bold"><i class="fas fa-save me-1"></i> Simpan Absensi Massal</button>
+                        <div>
+                            <button id="btn-generate-qr" class="btn btn-primary fw-bold me-2"><i class="fas fa-qrcode me-1"></i> Generate QR Presensi</button>
+                            <button id="btn-save-absensi" class="btn btn-success fw-bold"><i class="fas fa-save me-1"></i> Simpan Absensi Massal</button>
+                        </div>
                     </div>
 
                     <div class="table-responsive">
@@ -525,6 +528,103 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (saveRes.status === 'success') {
                     showToast('Absensi berhasil disimpan!');
                 } else showToast(saveRes.message, 'error');
+            };
+
+            document.getElementById('btn-generate-qr').onclick = () => {
+                const modal = new bootstrap.Modal(document.getElementById('app-modal'));
+                document.getElementById('modal-title').textContent = 'Generate QR Code Presensi';
+                document.getElementById('modal-body').innerHTML = `
+                    <form id="form-generate-qr">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Pilih Durasi Kedaluwarsa QR Code</label>
+                            <select class="form-select" name="durasi" required>
+                                <option value="5">5 Menit</option>
+                                <option value="15" selected>15 Menit</option>
+                                <option value="30">30 Menit</option>
+                                <option value="60">60 Menit</option>
+                                <option value="120">2 Jam</option>
+                            </select>
+                            <small class="text-muted">Setelah waktu habis, QR Code tidak dapat dipindai lagi oleh siswa.</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold"><i class="fas fa-qrcode me-2"></i> Tampilkan QR Code</button>
+                    </form>
+                `;
+
+                document.getElementById('form-generate-qr').onsubmit = async (e) => {
+                    e.preventDefault();
+                    const durasi = new FormData(e.target).get('durasi');
+                    const btn = e.target.querySelector('button');
+                    btn.disabled = true;
+                    btn.innerHTML = 'Memproses...';
+
+                    const res = await API.post('/absensi/generate_qr.php', {
+                        jadwal_id: jId,
+                        tanggal: tgl,
+                        durasi: durasi
+                    });
+
+                    if (res.status === 'success') {
+                        const token = res.data.token;
+                        const expiresAt = new Date(res.data.expires_at).getTime();
+
+                        // Render QR Code View
+                        document.getElementById('modal-title').innerHTML = '<i class="fas fa-qrcode text-primary"></i> Scan Presensi Sekarang';
+                        document.getElementById('modal-body').innerHTML = `
+                            <div class="text-center">
+                                <h4 class="fw-bold mb-1">${jadwal.nama_mapel}</h4>
+                                <p class="text-muted mb-4">Kelas ${jadwal.nama_kelas} | ${tgl}</p>
+                                
+                                <div id="qrcode-display" class="d-inline-block p-3 bg-white rounded-4 shadow-sm mb-4"></div>
+                                
+                                <div class="alert alert-warning mb-0">
+                                    <h5 class="fw-bold mb-1" id="qr-timer">00:00</h5>
+                                    <small>Waktu tersisa sebelum QR Code kedaluwarsa</small>
+                                </div>
+                            </div>
+                        `;
+
+                        // Generate QR Code Image
+                        new QRCode(document.getElementById("qrcode-display"), {
+                            text: token,
+                            width: 250,
+                            height: 250,
+                            colorDark : "#000000",
+                            colorLight : "#ffffff",
+                            correctLevel : QRCode.CorrectLevel.H
+                        });
+
+                        // Timer logic
+                        const timerInterval = setInterval(() => {
+                            const now = new Date().getTime();
+                            const distance = expiresAt - now;
+
+                            if (distance < 0) {
+                                clearInterval(timerInterval);
+                                document.getElementById('qr-timer').textContent = "WAKTU HABIS";
+                                document.getElementById('qr-timer').parentElement.className = "alert alert-danger mb-0";
+                                document.getElementById('qrcode-display').style.opacity = "0.2";
+                            } else {
+                                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                                document.getElementById('qr-timer').textContent = 
+                                    minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
+                            }
+                        }, 1000);
+
+                        // Cleanup timer when modal is closed
+                        document.getElementById('app-modal').addEventListener('hidden.bs.modal', function onModalHide() {
+                            clearInterval(timerInterval);
+                            document.getElementById('app-modal').removeEventListener('hidden.bs.modal', onModalHide);
+                            document.getElementById('btn-load-attendees').click(); // Refresh data
+                        });
+                    } else {
+                        showToast(res.message, 'error');
+                        btn.disabled = false;
+                        btn.innerHTML = 'Tampilkan QR Code';
+                    }
+                };
+
+                modal.show();
             };
         };
     }

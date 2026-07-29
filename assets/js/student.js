@@ -93,8 +93,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         async function onScanSuccess(decodedText) {
             try {
-                // Expected payload in QR Code: JSON or URL query (jadwal_id=X&tanggal=YYYY-MM-DD)
-                let payload = {};
+                // Now QR Code text is simply the token
+                let payload = { token: decodedText };
+                
+                // Keep backward compatibility if they scan old static QRs
                 if (decodedText.startsWith('{')) {
                     payload = JSON.parse(decodedText);
                 } else if (decodedText.includes('jadwal_id=')) {
@@ -105,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     };
                 }
 
-                if (payload.jadwal_id) {
+                if (payload.token || payload.jadwal_id) {
                     const scanRes = await API.post('/absensi/scan.php', payload);
                     const resBox = document.getElementById('scan-result');
                     resBox.classList.remove('d-none', 'alert-danger', 'alert-success');

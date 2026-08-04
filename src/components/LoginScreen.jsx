@@ -1,3 +1,5 @@
+import { FormField } from '../components/FormField';
+
 export function LoginScreen({ form, onChange, onSubmit, message }) {
   return (
     <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)' }}>
@@ -14,13 +16,9 @@ export function LoginScreen({ form, onChange, onSubmit, message }) {
           {message ? <div className="alert alert-danger">{message}</div> : null}
 
           <form onSubmit={onSubmit}>
-            <div className="mb-3">
-              <label className="form-label fw-semibold">Username</label>
-              <input className="form-control form-control-lg" value={form.username} onChange={(e) => onChange('username', e.target.value)} placeholder="Masukkan username" required />
-            </div>
+            <FormField label="Username" name="username" value={form.username} onChange={onChange} placeholder="Masukkan username" autoComplete="username" />
             <div className="mb-4">
-              <label className="form-label fw-semibold">Password</label>
-              <input type="password" className="form-control form-control-lg" value={form.password} onChange={(e) => onChange('password', e.target.value)} placeholder="Masukkan password" required />
+              <FormField label="Password" name="password" value={form.password} onChange={onChange} type="password" placeholder="Masukkan password" autoComplete="current-password" />
             </div>
             <button className="btn btn-primary btn-lg w-100 fw-bold" type="submit">Masuk Sekarang</button>
           </form>

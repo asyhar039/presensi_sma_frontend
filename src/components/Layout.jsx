@@ -1,4 +1,5 @@
 import { menuItems } from '../constants/menu';
+import { getInitials } from '../utils/formatters';
 
 export function Layout({ title, user, activeView, onNavigate, onLogout, children }) {
   return (
@@ -14,7 +15,7 @@ export function Layout({ title, user, activeView, onNavigate, onLogout, children
               key={item.key}
               type="button"
               className={`nav-link ${activeView === item.key ? 'active' : ''}`}
-              onClick={() => onNavigate(item.key)}
+              onClick={() => onNavigate?.(item.key)}
               style={{ background: 'transparent', border: 0, textAlign: 'left' }}
             >
               <i className={`fas fa-${item.icon}`}></i>

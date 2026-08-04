@@ -1,1 +1,2 @@
-export { apiRequest } from '../api';
+export { apiRequest } from './apiClient';
+export { resolveApiBase } from './apiBase';

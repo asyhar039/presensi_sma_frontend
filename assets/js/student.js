@@ -14,16 +14,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check Student Session
     async function loadStudentData() {
-        const res = await API.get('/student/profile.php');
-        if (res.status === 'success' && res.data.student) {
-            currentStudent = res.data.student;
+        const res = await API.get('/student/me');
+        if (res && res.student) {
+            currentStudent = res.student;
 
             document.getElementById('student-login-card').classList.add('d-none');
             document.getElementById('student-dashboard').classList.remove('d-none');
             document.getElementById('student-header-info').classList.remove('d-none');
             document.getElementById('student-name-display').textContent = currentStudent.nama_lengkap;
 
-            const { stats, history } = res.data;
+            const { stats, history } = res;
             document.getElementById('stat-hadir').textContent = stats.Hadir || 0;
             document.getElementById('stat-izin').textContent = stats.Izin || 0;
             document.getElementById('stat-sakit').textContent = stats.Sakit || 0;
@@ -63,14 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Student Login
     document.getElementById('form-student-login').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const username = document.getElementById('stud-username').value;
-        const password = document.getElementById('stud-password').value;
+        const nama = document.getElementById('stud-username').value;
+        const nisn = document.getElementById('stud-password').value;
         const alertBox = document.getElementById('student-login-alert');
 
         alertBox.classList.add('d-none');
-        const res = await API.post('/auth/student_login.php', { username, password });
+        const res = await API.post('/student/login', { nama_lengkap: nama, nisn });
 
-        if (res.status === 'success') {
+        if (res && res.token) {
+            localStorage.setItem('api_token', res.token);
             loadStudentData();
         } else {
             alertBox.textContent = res.message || 'Login gagal';
@@ -80,7 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Student Logout
     document.getElementById('btn-student-logout').addEventListener('click', async () => {
-        await API.get('/auth/logout.php');
+        await API.post('/student/logout');
+        localStorage.removeItem('api_token');
         if (html5QrcodeScanner) html5QrcodeScanner.clear();
         loadStudentData();
     });
@@ -107,8 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     };
                 }
 
-                if (payload.token || payload.jadwal_id) {
-                    const scanRes = await API.post('/absensi/scan.php', payload);
+                    if (payload.token || payload.jadwal_id) {
+                    const scanRes = await API.post('/absensi/scan', payload);
                     const resBox = document.getElementById('scan-result');
                     resBox.classList.remove('d-none', 'alert-danger', 'alert-success');
 

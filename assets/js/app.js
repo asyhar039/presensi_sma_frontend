@@ -3,6 +3,19 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
     let currentUser = null;
+    const loginScreen = document.getElementById('login-screen');
+    const appWrapper = document.getElementById('app-wrapper');
+
+    function showLoginScreen() {
+        loginScreen.classList.remove('d-none');
+        appWrapper.classList.add('d-none');
+        window.location.hash = '';
+    }
+
+    function showAppScreen() {
+        loginScreen.classList.add('d-none');
+        appWrapper.classList.remove('d-none');
+    }
 
     // Toast helper
     window.showToast = function(msg, type = 'success') {
@@ -16,19 +29,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check Auth State
     async function checkAuth() {
-        const res = await API.get('/auth/me.php');
-        if (res.status === 'success' && res.data.user) {
-            currentUser = res.data.user;
-            document.getElementById('login-screen').classList.add('d-none');
-            document.getElementById('user-fullname').textContent = currentUser.nama_lengkap;
-            document.getElementById('user-role').textContent = `Role: ${currentUser.role.toUpperCase()}`;
-            document.getElementById('user-avatar').textContent = currentUser.nama_lengkap.charAt(0).toUpperCase();
-            
-            // Handle Navigation
-            handleRoute();
-        } else {
-            document.getElementById('login-screen').classList.remove('d-none');
+        const res = await API.get('/auth/me');
+        if (!res) {
+            currentUser = null;
+            showLoginScreen();
+            return;
         }
+
+        if (res.user) {
+            currentUser = res.user;
+        } else if (res.data && res.data.user) {
+            currentUser = res.data.user;
+        } else if (res.nama_lengkap) {
+            currentUser = res;
+        } else {
+            currentUser = null;
+            showLoginScreen();
+            return;
+        }
+
+        showAppScreen();
+        document.getElementById('user-fullname').textContent = currentUser.nama_lengkap;
+        document.getElementById('user-role').textContent = `Role: ${currentUser.role.toUpperCase()}`;
+        document.getElementById('user-avatar').textContent = currentUser.nama_lengkap.charAt(0).toUpperCase();
+
+        // Handle Navigation
+        handleRoute();
     }
 
     // Login Form Submit
@@ -39,10 +65,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const alertBox = document.getElementById('login-alert');
 
         alertBox.classList.add('d-none');
-        const res = await API.post('/auth/login.php', { username, password });
-
-        if (res.status === 'success') {
-            checkAuth();
+        const res = await API.post('/auth/login', { username, password });
+        if (res && res.token) {
+            localStorage.setItem('api_token', res.token);
+            await checkAuth();
         } else {
             alertBox.textContent = res.message || 'Login gagal';
             alertBox.classList.remove('d-none');
@@ -51,15 +77,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Logout
     document.getElementById('btn-logout').addEventListener('click', async () => {
-        await API.get('/auth/logout.php');
+        await API.post('/auth/logout');
+        localStorage.removeItem('api_token');
         currentUser = null;
-        document.getElementById('login-screen').classList.remove('d-none');
+        showLoginScreen();
     });
 
     // Navigation Router
     window.addEventListener('hashchange', handleRoute);
 
     function handleRoute() {
+        if (!currentUser) {
+            showLoginScreen();
+            return;
+        }
+
         const hash = window.location.hash.replace('#', '') || 'dashboard';
         document.querySelectorAll('.sidebar .nav-link').forEach(link => {
             link.classList.toggle('active', link.getAttribute('data-view') === hash);
@@ -96,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('view-container');
         container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
 
-        const res = await API.get('/dashboard/stats.php');
+        const res = await API.get('/dashboard/stats');
         if (res.status !== 'success') {
             container.innerHTML = `<div class="alert alert-danger">${res.message}</div>`;
             return;
@@ -182,8 +214,8 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
 
         const [resSiswa, resKelas] = await Promise.all([
-            API.get('/siswa/index.php'),
-            API.get('/kelas/index.php')
+            API.get('/siswa'),
+            API.get('/kelas')
         ]);
 
         const siswaList = resSiswa.data || [];
@@ -268,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     e.preventDefault();
                     const formData = new FormData(e.target);
                     const data = Object.fromEntries(formData.entries());
-                    const res = await API.post('/siswa/index.php', data);
+                    const res = await API.post('/siswa', data);
                     if (res.status === 'success') {
                         modal.hide();
                         showToast('Siswa berhasil ditambahkan');
@@ -283,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.btn-delete-siswa').forEach(btn => {
             btn.onclick = async () => {
                 if (confirm('Yakin ingin menghapus siswa ini?')) {
-                    const res = await API.delete(`/siswa/index.php?id=${btn.dataset.id}`);
+                    const res = await API.delete(`/siswa?id=${btn.dataset.id}`);
                     if (res.status === 'success') {
                         showToast('Siswa berhasil dihapus');
                         renderSiswa();
@@ -298,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('view-container');
         container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
 
-        const res = await API.get('/guru/index.php');
+        const res = await API.get('/guru');
         const guruList = res.data || [];
 
         container.innerHTML = `
@@ -333,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('view-container');
         container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
 
-        const res = await API.get('/kelas/index.php');
+        const res = await API.get('/kelas');
         const kelasList = res.data || [];
 
         container.innerHTML = `
@@ -366,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('view-container');
         container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
 
-        const res = await API.get('/mapel/index.php');
+        const res = await API.get('/mapel');
         const mapelList = res.data || [];
 
         container.innerHTML = `
@@ -398,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('view-container');
         container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
 
-        const res = await API.get('/jadwal/index.php');
+        const res = await API.get('/jadwal');
         const jadwalList = res.data || [];
 
         container.innerHTML = `
@@ -432,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('view-container');
         container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
 
-        const resJadwal = await API.get('/jadwal/index.php');
+                    const resJadwal = await API.get('/jadwal');
         const jadwalList = resJadwal.data || [];
 
         container.innerHTML = `
@@ -519,7 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 });
 
-                const saveRes = await API.post('/absensi/input.php', {
+                const saveRes = await API.post('/absensi', {
                     jadwal_id: jId,
                     tanggal: tgl,
                     attendees: payload
@@ -557,7 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.disabled = true;
                     btn.innerHTML = 'Memproses...';
 
-                    const res = await API.post('/absensi/generate_qr.php', {
+                    const res = await API.post('/absensi/generate-qr', {
                         jadwal_id: jId,
                         tanggal: tgl,
                         durasi: durasi
@@ -634,7 +666,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('view-container');
         container.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
 
-        const resKelas = await API.get('/kelas/index.php');
+        const resKelas = await API.get('/kelas');
         const kelasList = resKelas.data || [];
 
         container.innerHTML = `

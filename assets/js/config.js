@@ -2,6 +2,6 @@
  * Frontend Global Configuration
  */
 const CONFIG = {
-    // Dynamic base URL for backend API endpoint
-    API_BASE_URL: 'http://localhost/presensi_sma_backend/api'
+    // Backend API endpoint (Laravel public folder)
+    API_BASE_URL: 'http://localhost/PRESENSI/presensi_sma_backend/laravel/public/api'
 };

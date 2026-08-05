@@ -8,9 +8,14 @@ const API = {
             method: method,
             headers: {
                 'Accept': 'application/json'
-            },
-            credentials: 'include'
+            }
         };
+
+        // Attach Bearer token if present
+        const token = localStorage.getItem('api_token');
+        if (token) {
+            options.headers['Authorization'] = `Bearer ${token}`;
+        }
 
         if (data) {
             options.headers['Content-Type'] = 'application/json';

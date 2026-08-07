@@ -23,8 +23,7 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       input: {
-        index: 'index.html',
-        student: 'student.html'
+        index: 'index.html'
       }
     }
   }

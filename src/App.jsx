@@ -1,95 +1,153 @@
-import { LoginScreen } from './components/LoginScreen';
-import { Layout } from './components/Layout';
-import { menuItems } from './constants/menu';
-import { useAuth } from './hooks/useAuth';
-import { useAdminDashboard } from './hooks/useAdminDashboard';
-import { DashboardView } from './components/admin/DashboardView';
-import { TableView } from './components/admin/TableView';
-import { ClassView } from './components/admin/views/ClassView';
-import { SubjectView } from './components/admin/views/SubjectView';
-import { ScheduleView } from './components/admin/views/ScheduleView';
-import { ReportView } from './components/admin/views/ReportView';
-import { AttendanceView } from './components/admin/views/AttendanceView';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAppSelector } from './app/hooks';
+import { LoginScreen } from './features/auth/components/LoginScreen';
+import MainLayout from './layouts/MainLayout';
+import { selectIsAuthenticated, selectUserRole } from './features/auth/authSelectors';
+import { useGetCurrentUserQuery } from './features/auth/authAPI';
+import { useGetStudentProfileQuery } from './features/student/studentAPI';
+import { PermissionGuard } from './shared/components/PermissionGuard';
+import { LoadingState } from './shared/components/LoadingState';
+
+// Route Components
+import { DashboardView } from './features/dashboard/components/DashboardView';
+import { StudentTableView } from './features/student/components/StudentTableView';
+import { TeacherTableView } from './features/teacher/components/TeacherTableView';
+import { ClassView } from './features/master/components/ClassView';
+import { SubjectView } from './features/master/components/SubjectView';
+import { ScheduleView } from './features/schedule/components/ScheduleView';
+import { AttendanceView } from './features/attendance/components/AttendanceView';
+import { ReportView } from './features/attendance/components/ReportView';
+import { StudentPortalView } from './features/student/components/StudentPortalView';
+
+function AuthBootstrap({ children }) {
+  const { data: userResponse, isLoading: loadingUser } = useGetCurrentUserQuery();
+  const isUserSessionActive = userResponse?.status === 'success' && userResponse?.data?.user;
+  const { isLoading: loadingStudent } = useGetStudentProfileQuery(undefined, {
+    skip: isUserSessionActive,
+  });
+
+  if (loadingUser || loadingStudent) {
+    return <LoadingState message="Memuat aplikasi React..." />;
+  }
+
+  return children;
+}
+
+function IndexRoute() {
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const userRole = useAppSelector(selectUserRole);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const defaultRoute = userRole === 'student' ? '/profil' : '/dashboard';
+  return <Navigate to={defaultRoute} replace />;
+}
 
 export default function App() {
-  const { user, loading, setUser } = useAuth();
-  const {
-    stats,
-    activeView,
-    setActiveView,
-    message,
-    form,
-    setForm,
-    siswa,
-    guru,
-    kelas,
-    mapel,
-    jadwal,
-    laporan,
-    handleLogin,
-    handleLogout
-  } = useAdminDashboard(user, setUser);
-
-  if (loading) {
-    return <div className="text-center py-5">Memuat aplikasi React...</div>;
-  }
-
-  if (!user) {
-    return <LoginScreen form={form} onChange={(field, value) => setForm((prev) => ({ ...prev, [field]: value }))} onSubmit={handleLogin} message={message} />;
-  }
-
   return (
-    <Layout
-      title={menuItems.find((item) => item.key === activeView)?.label || 'Dashboard'}
-      user={user}
-      activeView={activeView}
-      onNavigate={setActiveView}
-      onLogout={handleLogout}
-    >
-      {message ? <div className="alert alert-danger mb-3">{message}</div> : null}
+    <AuthBootstrap>
+      <Routes>
+        <Route path="/login" element={<LoginScreen />} />
 
-      {activeView === 'dashboard' && <DashboardView stats={stats} />}
+        <Route element={<MainLayout />}>
+          <Route index element={<IndexRoute />} />
 
-      {activeView === 'siswa' && (
-        <TableView
-          title="Data Siswa"
-          icon="user-graduate"
-          columns={[
-            { key: 'nisn', label: 'NISN' },
-            { key: 'nama_lengkap', label: 'Nama' },
-            { key: 'jenis_kelamin', label: 'Jenis Kelamin' },
-            { key: 'nama_kelas', label: 'Kelas', render: (row) => row.nama_kelas || '-' },
-            { key: 'no_telp', label: 'No. Telp', render: (row) => row.no_telp || '-' }
-          ]}
-          rows={siswa}
-          emptyMessage="Belum ada data siswa"
-        />
-      )}
+          {/* Dashboard - hanya untuk admin/guru */}
+          <Route
+            path="/dashboard"
+            element={
+              <PermissionGuard permission="dashboard.view">
+                <DashboardView />
+              </PermissionGuard>
+            }
+          />
 
-      {activeView === 'guru' && (
-        <TableView
-          title="Data Guru"
-          icon="chalkboard-teacher"
-          columns={[
-            { key: 'nama_lengkap', label: 'Nama' },
-            { key: 'nip', label: 'NIP' },
-            { key: 'email', label: 'Email' },
-            { key: 'no_telp', label: 'No. Telp', render: (row) => row.no_telp || '-' }
-          ]}
-          rows={guru}
-          emptyMessage="Belum ada data guru"
-        />
-      )}
+          {/* Data Siswa */}
+          <Route
+            path="/siswa"
+            element={
+              <PermissionGuard permission="siswa.view">
+                <StudentTableView />
+              </PermissionGuard>
+            }
+          />
 
-      {activeView === 'kelas' && <ClassView items={kelas} />}
+          {/* Data Guru */}
+          <Route
+            path="/guru"
+            element={
+              <PermissionGuard permission="guru.view">
+                <TeacherTableView />
+              </PermissionGuard>
+            }
+          />
 
-      {activeView === 'mapel' && <SubjectView items={mapel} />}
+          {/* Data Kelas */}
+          <Route
+            path="/kelas"
+            element={
+              <PermissionGuard permission="kelas.view">
+                <ClassView />
+              </PermissionGuard>
+            }
+          />
 
-      {activeView === 'jadwal' && <ScheduleView items={jadwal} />}
+          {/* Mata Pelajaran */}
+          <Route
+            path="/mapel"
+            element={
+              <PermissionGuard permission="mapel.view">
+                <SubjectView />
+              </PermissionGuard>
+            }
+          />
 
-      {activeView === 'absensi' && <AttendanceView />}
+          {/* Jadwal */}
+          <Route
+            path="/jadwal"
+            element={
+              <PermissionGuard permission="jadwal.view">
+                <ScheduleView />
+              </PermissionGuard>
+            }
+          />
 
-      {activeView === 'laporan' && <ReportView report={laporan} />}
-    </Layout>
+          {/* Absensi */}
+          <Route
+            path="/absensi"
+            element={
+              <PermissionGuard permission="absensi.view">
+                <AttendanceView />
+              </PermissionGuard>
+            }
+          />
+
+          {/* Laporan */}
+          <Route
+            path="/laporan"
+            element={
+              <PermissionGuard permission="laporan.view">
+                <ReportView />
+              </PermissionGuard>
+            }
+          />
+
+          {/* Portal Siswa */}
+          <Route
+            path="/profil"
+            element={
+              <PermissionGuard permission="profil.view">
+                <StudentPortalView />
+              </PermissionGuard>
+            }
+          />
+
+          {/* Catch-all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </AuthBootstrap>
   );
 }

@@ -1,3 +1,8 @@
+export function capitalize(value) {
+  if (!value) return '';
+  return String(value).charAt(0).toUpperCase() + String(value).slice(1);
+}
+
 export function getDisplayValue(value, fallback = '-') {
   if (value === null || value === undefined || value === '') return fallback;
   return value;

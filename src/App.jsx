@@ -8,7 +8,6 @@ import { useGetStudentProfileQuery } from './features/student/studentAPI';
 import { PermissionGuard } from './shared/components/PermissionGuard';
 import { LoadingState } from './shared/components/LoadingState';
 
-// Route Components
 import { DashboardView } from './features/dashboard/components/DashboardView';
 import { StudentTableView } from './features/student/components/StudentTableView';
 import { TeacherTableView } from './features/teacher/components/TeacherTableView';
@@ -18,6 +17,18 @@ import { ScheduleView } from './features/schedule/components/ScheduleView';
 import { AttendanceView } from './features/attendance/components/AttendanceView';
 import { ReportView } from './features/attendance/components/ReportView';
 import { StudentPortalView } from './features/student/components/StudentPortalView';
+
+const PROTECTED_ROUTES = [
+  { path: '/dashboard', element: <DashboardView />, permission: 'dashboard.view' },
+  { path: '/siswa', element: <StudentTableView />, permission: 'siswa.view' },
+  { path: '/guru', element: <TeacherTableView />, permission: 'guru.view' },
+  { path: '/kelas', element: <ClassView />, permission: 'kelas.view' },
+  { path: '/mapel', element: <SubjectView />, permission: 'mapel.view' },
+  { path: '/jadwal', element: <ScheduleView />, permission: 'jadwal.view' },
+  { path: '/absensi', element: <AttendanceView />, permission: 'absensi.view' },
+  { path: '/laporan', element: <ReportView />, permission: 'laporan.view' },
+  { path: '/profil', element: <StudentPortalView />, permission: 'profil.view' },
+];
 
 function AuthBootstrap({ children }) {
   const { data: userResponse, isLoading: loadingUser } = useGetCurrentUserQuery();
@@ -54,97 +65,18 @@ export default function App() {
         <Route element={<MainLayout />}>
           <Route index element={<IndexRoute />} />
 
-          {/* Dashboard - hanya untuk admin/guru */}
-          <Route
-            path="/dashboard"
-            element={
-              <PermissionGuard permission="dashboard.view">
-                <DashboardView />
-              </PermissionGuard>
-            }
-          />
+          {PROTECTED_ROUTES.map(({ path, element, permission }) => (
+            <Route
+              key={path}
+              path={path}
+              element={
+                <PermissionGuard permission={permission}>
+                  {element}
+                </PermissionGuard>
+              }
+            />
+          ))}
 
-          {/* Data Siswa */}
-          <Route
-            path="/siswa"
-            element={
-              <PermissionGuard permission="siswa.view">
-                <StudentTableView />
-              </PermissionGuard>
-            }
-          />
-
-          {/* Data Guru */}
-          <Route
-            path="/guru"
-            element={
-              <PermissionGuard permission="guru.view">
-                <TeacherTableView />
-              </PermissionGuard>
-            }
-          />
-
-          {/* Data Kelas */}
-          <Route
-            path="/kelas"
-            element={
-              <PermissionGuard permission="kelas.view">
-                <ClassView />
-              </PermissionGuard>
-            }
-          />
-
-          {/* Mata Pelajaran */}
-          <Route
-            path="/mapel"
-            element={
-              <PermissionGuard permission="mapel.view">
-                <SubjectView />
-              </PermissionGuard>
-            }
-          />
-
-          {/* Jadwal */}
-          <Route
-            path="/jadwal"
-            element={
-              <PermissionGuard permission="jadwal.view">
-                <ScheduleView />
-              </PermissionGuard>
-            }
-          />
-
-          {/* Absensi */}
-          <Route
-            path="/absensi"
-            element={
-              <PermissionGuard permission="absensi.view">
-                <AttendanceView />
-              </PermissionGuard>
-            }
-          />
-
-          {/* Laporan */}
-          <Route
-            path="/laporan"
-            element={
-              <PermissionGuard permission="laporan.view">
-                <ReportView />
-              </PermissionGuard>
-            }
-          />
-
-          {/* Portal Siswa */}
-          <Route
-            path="/profil"
-            element={
-              <PermissionGuard permission="profil.view">
-                <StudentPortalView />
-              </PermissionGuard>
-            }
-          />
-
-          {/* Catch-all route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

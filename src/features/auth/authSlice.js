@@ -10,6 +10,27 @@ const initialState = {
   error: null,
 };
 
+function normalizeUser(raw) {
+  return {
+    id: raw.id,
+    username: raw.username,
+    nama_lengkap: raw.nama_lengkap,
+    role: raw.role,
+    permissions: raw.permissions || ROLE_PERMISSIONS[raw.role] || [],
+  };
+}
+
+function normalizeStudent(raw) {
+  return {
+    id: raw.id,
+    nama_lengkap: raw.nama_lengkap,
+    nisn: raw.nisn,
+    kelas_id: raw.kelas_id,
+    role: 'student',
+    permissions: ROLE_PERMISSIONS.student || [],
+  };
+}
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -40,58 +61,28 @@ const authSlice = createSlice({
       })
       .addMatcher(authAPI.endpoints.loginUser.matchFulfilled, (state, { payload }) => {
         if (payload?.status === 'success' && payload?.data?.user) {
-          const raw = payload.data.user;
-          state.user = {
-            id: raw.id,
-            username: raw.username,
-            nama_lengkap: raw.nama_lengkap,
-            role: raw.role,
-            permissions: raw.permissions || ROLE_PERMISSIONS[raw.role] || [],
-          };
+          state.user = normalizeUser(payload.data.user);
           state.authType = 'user';
           state.error = null;
         }
       })
       .addMatcher(authAPI.endpoints.loginStudent.matchFulfilled, (state, { payload }) => {
         if (payload?.status === 'success' && payload?.data?.student) {
-          const raw = payload.data.student;
-          state.user = {
-            id: raw.id,
-            nama_lengkap: raw.nama_lengkap,
-            nisn: raw.nisn,
-            kelas_id: raw.kelas_id,
-            role: 'student',
-            permissions: ROLE_PERMISSIONS.student || [],
-          };
+          state.user = normalizeStudent(payload.data.student);
           state.authType = 'student';
           state.error = null;
         }
       })
       .addMatcher(authAPI.endpoints.getCurrentUser.matchFulfilled, (state, { payload }) => {
         if (payload?.status === 'success' && payload?.data?.user) {
-          const raw = payload.data.user;
-          state.user = {
-            id: raw.id,
-            username: raw.username,
-            nama_lengkap: raw.nama_lengkap,
-            role: raw.role,
-            permissions: raw.permissions || ROLE_PERMISSIONS[raw.role] || [],
-          };
+          state.user = normalizeUser(payload.data.user);
           state.authType = 'user';
           state.error = null;
         }
       })
       .addMatcher(studentAPI.endpoints.getStudentProfile.matchFulfilled, (state, { payload }) => {
         if (payload?.status === 'success' && payload?.data?.student) {
-          const raw = payload.data.student;
-          state.user = {
-            id: raw.id,
-            nama_lengkap: raw.nama_lengkap,
-            nisn: raw.nisn,
-            kelas_id: raw.kelas_id,
-            role: 'student',
-            permissions: ROLE_PERMISSIONS.student || [],
-          };
+          state.user = normalizeStudent(payload.data.student);
           state.authType = 'student';
           state.error = null;
         }

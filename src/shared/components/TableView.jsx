@@ -1,6 +1,7 @@
 export function TableView({
   title,
   icon,
+  description,
   columns,
   rows,
   emptyMessage,
@@ -23,6 +24,7 @@ export function TableView({
           </button>
         ) : null}
       </div>
+      {description ? <div className="mb-3 text-muted">{description}</div> : null}
       <div className="table-responsive">
         <table className="table table-hover align-middle">
           <thead>

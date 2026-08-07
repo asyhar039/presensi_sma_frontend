@@ -2,14 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLoginUserMutation, useLoginStudentMutation } from '../authAPI';
 import { FormField } from '../../../shared/components/FormField';
-
-function getErrorMessage(error) {
-  const data = error?.data;
-  if (data?.message) return data.message;
-  if (error?.status === 401) return 'Username atau password salah';
-  if (error?.status === 'FETCH_ERROR') return 'Backend tidak tersedia. Pastikan server PHP berjalan di http://127.0.0.1:8000.';
-  return 'Terjadi kesalahan. Silakan coba lagi.';
-}
+import { getErrorMessage } from '../../../shared/utils/errors';
 
 export function LoginScreen() {
   const navigate = useNavigate();

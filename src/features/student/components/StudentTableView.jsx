@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   useGetStudentsQuery,
   useCreateStudentMutation,
@@ -6,10 +5,11 @@ import {
   useDeleteStudentMutation,
 } from '../studentAPI';
 import { useGetClassesQuery } from '../../master/masterAPI';
-import { useAppSelector } from '../../../app/hooks';
-import { selectUserPermissions } from '../../auth/authSelectors';
+import { useResourcePermissions } from '../../../shared/hooks/useResourcePermissions';
+import { useCrud } from '../../../shared/hooks/useCrud';
 import { TableView } from '../../../shared/components/TableView';
 import { FormModal } from '../../../shared/components/FormModal';
+import { FeedbackBanner } from '../../../shared/components/FeedbackBanner';
 import { LoadingState } from '../../../shared/components/LoadingState';
 import { ErrorState } from '../../../shared/components/ErrorState';
 
@@ -35,10 +35,7 @@ const COLUMNS = [
 ];
 
 export function StudentTableView() {
-  const permissions = useAppSelector(selectUserPermissions);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [feedback, setFeedback] = useState(null);
+  const { canCreate, canEdit, canDelete } = useResourcePermissions('siswa');
 
   const { data: response, isLoading, error } = useGetStudentsQuery();
   const { data: classResponse } = useGetClassesQuery();
@@ -46,9 +43,19 @@ export function StudentTableView() {
   const [updateStudent] = useUpdateStudentMutation();
   const [deleteStudent] = useDeleteStudentMutation();
 
-  const canCreate = permissions.includes('siswa.create');
-  const canEdit = permissions.includes('siswa.edit');
-  const canDelete = permissions.includes('siswa.delete');
+  const crud = useCrud({
+    create: createStudent,
+    update: updateStudent,
+    remove: deleteStudent,
+    confirmMessage: (row) => `Hapus siswa "${row.nama_lengkap}"?`,
+    messages: {
+      updated: 'Data siswa berhasil diperbarui.',
+      added: 'Data siswa berhasil ditambahkan.',
+      deleted: 'Data siswa berhasil dihapus.',
+      saveError: 'Terjadi kesalahan saat menyimpan data siswa.',
+      deleteError: 'Terjadi kesalahan saat menghapus data siswa.',
+    },
+  });
 
   const classes = classResponse?.data || [];
   const fields = FIELDS.map((field) =>
@@ -57,49 +64,12 @@ export function StudentTableView() {
       : field
   );
 
-  const handleOpenCreate = () => {
-    setEditing(null);
-    setModalOpen(true);
-  };
-
-  const handleOpenEdit = (row) => {
-    setEditing(row);
-    setModalOpen(true);
-  };
-
-  const handleSubmit = async (values) => {
-    try {
-      if (editing?.id) {
-        await updateStudent({ ...values, id: editing.id }).unwrap();
-        setFeedback('Data siswa berhasil diperbarui.');
-      } else {
-        await createStudent(values).unwrap();
-        setFeedback('Data siswa berhasil ditambahkan.');
-      }
-      setModalOpen(false);
-    } catch (e) {
-      setFeedback(e?.data?.message || 'Terjadi kesalahan saat menyimpan data siswa.');
-    }
-    setTimeout(() => setFeedback(null), 4000);
-  };
-
-  const handleDelete = async (row) => {
-    if (!window.confirm(`Hapus siswa "${row.nama_lengkap}"?`)) return;
-    try {
-      await deleteStudent(row.id).unwrap();
-      setFeedback('Data siswa berhasil dihapus.');
-    } catch (e) {
-      setFeedback(e?.data?.message || 'Terjadi kesalahan saat menghapus data siswa.');
-    }
-    setTimeout(() => setFeedback(null), 4000);
-  };
-
   if (isLoading) return <LoadingState message="Memuat data siswa..." />;
   if (error) return <ErrorState message="Gagal memuat data siswa. Pastikan backend tersedia." />;
 
   return (
     <>
-      {feedback ? <div className="alert alert-info mb-3">{feedback}</div> : null}
+      <FeedbackBanner message={crud.feedback} />
       <TableView
         title="Data Siswa"
         icon="user-graduate"
@@ -109,17 +79,17 @@ export function StudentTableView() {
         columns={COLUMNS}
         rows={response?.data || []}
         emptyMessage="Belum ada data siswa"
-        onCreate={canCreate ? handleOpenCreate : undefined}
-        onEdit={canEdit ? handleOpenEdit : undefined}
-        onDelete={canDelete ? handleDelete : undefined}
+        onCreate={canCreate ? crud.openCreate : undefined}
+        onEdit={canEdit ? crud.openEdit : undefined}
+        onDelete={canDelete ? crud.removeRow : undefined}
       />
       <FormModal
-        open={modalOpen}
-        title={editing ? 'Edit Siswa' : 'Tambah Siswa'}
+        open={crud.modalOpen}
+        title={crud.editing ? 'Edit Siswa' : 'Tambah Siswa'}
         fields={fields}
-        initialValues={editing || {}}
-        onSubmit={handleSubmit}
-        onClose={() => setModalOpen(false)}
+        initialValues={crud.editing || {}}
+        onSubmit={crud.submit}
+        onClose={crud.close}
       />
     </>
   );

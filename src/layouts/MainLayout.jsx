@@ -1,9 +1,9 @@
-import { Outlet, Navigate, useLocation } from 'react-router-dom';
+import { Outlet, Navigate, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../app/hooks';
 import { selectIsAuthenticated, selectUser } from '../features/auth/authSelectors';
 import { useLogoutMutation } from '../features/auth/authAPI';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { menuItems } from '../shared/constants/menu';
+import { menuItems, getFilteredMenuItems } from '../shared/constants/menu';
+import { getInitials } from '../shared/utils/formatters';
 
 function getRouteTitle(pathname) {
   const key = pathname.replace('/', '');
@@ -23,7 +23,7 @@ export default function MainLayout() {
   }
 
   const permissions = user?.permissions || [];
-  const visibleMenu = menuItems.filter((item) => permissions.includes(item.permission));
+  const visibleMenu = getFilteredMenuItems(permissions);
   const title = getRouteTitle(location.pathname);
 
   const handleLogout = async () => {
@@ -72,7 +72,7 @@ export default function MainLayout() {
             <h4>{title}</h4>
           </div>
           <div className="topbar-user">
-            <div className="avatar">{user?.nama_lengkap?.charAt(0).toUpperCase() || 'A'}</div>
+            <div className="avatar">{getInitials(user?.nama_lengkap)}</div>
             <div>
               <div className="fw-bold small text-dark">{user?.nama_lengkap || 'User'}</div>
               <div className="text-muted" style={{ fontSize: 11 }}>{user?.role?.toUpperCase() || 'USER'}</div>

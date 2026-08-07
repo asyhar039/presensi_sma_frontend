@@ -1,6 +1,16 @@
 import { useGetAttendanceReportQuery } from '../attendanceAPI';
+import { TableView } from '../../../shared/components/TableView';
 import { LoadingState } from '../../../shared/components/LoadingState';
 import { ErrorState } from '../../../shared/components/ErrorState';
+
+const COLUMNS = [
+  { key: 'nama_lengkap', label: 'Nama Siswa', render: (row) => row.nama_lengkap || '-' },
+  { key: 'total_hadir', label: 'Hadir', render: (row) => row.total_hadir ?? 0 },
+  { key: 'total_izin', label: 'Izin', render: (row) => row.total_izin ?? 0 },
+  { key: 'total_sakit', label: 'Sakit', render: (row) => row.total_sakit ?? 0 },
+  { key: 'total_alfa', label: 'Alfa', render: (row) => row.total_alfa ?? 0 },
+  { key: 'persentase_hadir', label: '% Hadir', render: (row) => `${row.persentase_hadir ?? 0}%` },
+];
 
 export function ReportView() {
   const { data: response, isLoading, error } = useGetAttendanceReportQuery();
@@ -11,30 +21,13 @@ export function ReportView() {
   const report = response?.data || null;
 
   return (
-    <div className="card-custom">
-      <h5 className="fw-bold mb-3"><i className="fas fa-file-invoice text-primary me-2"></i> Laporan Absensi</h5>
-      {report ? (
-        <div>
-          <div className="mb-3 text-muted">Bulan {report.bulan_nama} {report.tahun} • Kelas {report.kelas?.nama_kelas || '-'}</div>
-          <div className="table-responsive">
-            <table className="table table-hover align-middle">
-              <thead><tr><th>Nama Siswa</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Alfa</th><th>% Hadir</th></tr></thead>
-              <tbody>
-                {(report?.laporan || []).map((item) => (
-                  <tr key={item?.siswa_id || item?.nama_lengkap}>
-                    <td>{item?.nama_lengkap || '-'}</td>
-                    <td>{item?.total_hadir ?? 0}</td>
-                    <td>{item?.total_izin ?? 0}</td>
-                    <td>{item?.total_sakit ?? 0}</td>
-                    <td>{item?.total_alfa ?? 0}</td>
-                    <td>{item?.persentase_hadir ?? 0}%</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      ) : <div className="text-muted">Memuat laporan...</div>}
-    </div>
+    <TableView
+      title="Laporan Absensi"
+      icon="file-invoice"
+      description={report ? `Bulan ${report.bulan_nama} ${report.tahun} • Kelas ${report.kelas?.nama_kelas || '-'}` : undefined}
+      columns={COLUMNS}
+      rows={report?.laporan || []}
+      emptyMessage="Belum ada data laporan"
+    />
   );
 }

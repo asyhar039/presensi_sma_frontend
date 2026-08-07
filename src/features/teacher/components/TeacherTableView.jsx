@@ -1,14 +1,14 @@
-import { useState } from 'react';
 import {
   useGetTeachersQuery,
   useCreateTeacherMutation,
   useUpdateTeacherMutation,
   useDeleteTeacherMutation,
 } from '../teacherAPI';
-import { useAppSelector } from '../../../app/hooks';
-import { selectUserPermissions } from '../../auth/authSelectors';
+import { useResourcePermissions } from '../../../shared/hooks/useResourcePermissions';
+import { useCrud } from '../../../shared/hooks/useCrud';
 import { TableView } from '../../../shared/components/TableView';
 import { FormModal } from '../../../shared/components/FormModal';
+import { FeedbackBanner } from '../../../shared/components/FeedbackBanner';
 import { LoadingState } from '../../../shared/components/LoadingState';
 import { ErrorState } from '../../../shared/components/ErrorState';
 
@@ -34,67 +34,37 @@ const COLUMNS = [
 ];
 
 export function TeacherTableView() {
-  const permissions = useAppSelector(selectUserPermissions);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [feedback, setFeedback] = useState(null);
+  const { canCreate, canEdit, canDelete } = useResourcePermissions('guru');
 
   const { data: response, isLoading, error } = useGetTeachersQuery();
   const [createTeacher] = useCreateTeacherMutation();
   const [updateTeacher] = useUpdateTeacherMutation();
   const [deleteTeacher] = useDeleteTeacherMutation();
 
-  const canCreate = permissions.includes('guru.create');
-  const canEdit = permissions.includes('guru.edit');
-  const canDelete = permissions.includes('guru.delete');
+  const crud = useCrud({
+    create: createTeacher,
+    update: updateTeacher,
+    remove: deleteTeacher,
+    confirmMessage: (row) => `Hapus guru "${row.nama_lengkap}"?`,
+    messages: {
+      updated: 'Data guru berhasil diperbarui.',
+      added: 'Data guru berhasil ditambahkan.',
+      deleted: 'Data guru berhasil dihapus.',
+      saveError: 'Terjadi kesalahan saat menyimpan data guru.',
+      deleteError: 'Terjadi kesalahan saat menghapus data guru.',
+    },
+  });
 
-  const fields = editing
+  const fields = crud.editing
     ? FIELDS.filter((f) => !['username', 'password'].includes(f.key))
     : FIELDS;
-
-  const handleOpenCreate = () => {
-    setEditing(null);
-    setModalOpen(true);
-  };
-
-  const handleOpenEdit = (row) => {
-    setEditing(row);
-    setModalOpen(true);
-  };
-
-  const handleSubmit = async (values) => {
-    try {
-      if (editing?.id) {
-        await updateTeacher({ ...values, id: editing.id }).unwrap();
-        setFeedback('Data guru berhasil diperbarui.');
-      } else {
-        await createTeacher(values).unwrap();
-        setFeedback('Data guru berhasil ditambahkan.');
-      }
-      setModalOpen(false);
-    } catch (e) {
-      setFeedback(e?.data?.message || 'Terjadi kesalahan saat menyimpan data guru.');
-    }
-    setTimeout(() => setFeedback(null), 4000);
-  };
-
-  const handleDelete = async (row) => {
-    if (!window.confirm(`Hapus guru "${row.nama_lengkap}"?`)) return;
-    try {
-      await deleteTeacher(row.id).unwrap();
-      setFeedback('Data guru berhasil dihapus.');
-    } catch (e) {
-      setFeedback(e?.data?.message || 'Terjadi kesalahan saat menghapus data guru.');
-    }
-    setTimeout(() => setFeedback(null), 4000);
-  };
 
   if (isLoading) return <LoadingState message="Memuat data guru..." />;
   if (error) return <ErrorState message="Gagal memuat data guru." />;
 
   return (
     <>
-      {feedback ? <div className="alert alert-info mb-3">{feedback}</div> : null}
+      <FeedbackBanner message={crud.feedback} />
       <TableView
         title="Data Guru"
         icon="chalkboard-teacher"
@@ -104,17 +74,17 @@ export function TeacherTableView() {
         columns={COLUMNS}
         rows={response?.data || []}
         emptyMessage="Belum ada data guru"
-        onCreate={canCreate ? handleOpenCreate : undefined}
-        onEdit={canEdit ? handleOpenEdit : undefined}
-        onDelete={canDelete ? handleDelete : undefined}
+        onCreate={canCreate ? crud.openCreate : undefined}
+        onEdit={canEdit ? crud.openEdit : undefined}
+        onDelete={canDelete ? crud.removeRow : undefined}
       />
       <FormModal
-        open={modalOpen}
-        title={editing ? 'Edit Guru' : 'Tambah Guru'}
+        open={crud.modalOpen}
+        title={crud.editing ? 'Edit Guru' : 'Tambah Guru'}
         fields={fields}
-        initialValues={editing || {}}
-        onSubmit={handleSubmit}
-        onClose={() => setModalOpen(false)}
+        initialValues={crud.editing || {}}
+        onSubmit={crud.submit}
+        onClose={crud.close}
       />
     </>
   );

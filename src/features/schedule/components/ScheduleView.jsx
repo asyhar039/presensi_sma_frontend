@@ -1,20 +1,28 @@
-import { useState } from 'react';
 import {
   useGetSchedulesQuery,
   useCreateScheduleMutation,
   useUpdateScheduleMutation,
   useDeleteScheduleMutation,
 } from '../scheduleAPI';
-import { useGetClassesQuery } from '../../master/masterAPI';
-import { useGetSubjectsQuery } from '../../master/masterAPI';
+import { useGetClassesQuery, useGetSubjectsQuery } from '../../master/masterAPI';
 import { useGetTeachersQuery } from '../../teacher/teacherAPI';
-import { useAppSelector } from '../../../app/hooks';
-import { selectUserPermissions } from '../../auth/authSelectors';
+import { useResourcePermissions } from '../../../shared/hooks/useResourcePermissions';
+import { useCrud } from '../../../shared/hooks/useCrud';
+import { TableView } from '../../../shared/components/TableView';
 import { FormModal } from '../../../shared/components/FormModal';
+import { FeedbackBanner } from '../../../shared/components/FeedbackBanner';
 import { LoadingState } from '../../../shared/components/LoadingState';
 import { ErrorState } from '../../../shared/components/ErrorState';
 
 const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+
+const COLUMNS = [
+  { key: 'hari', label: 'Hari', render: (row) => row.hari || '-' },
+  { key: 'nama_kelas', label: 'Kelas', render: (row) => row.nama_kelas || '-' },
+  { key: 'nama_mapel', label: 'Mata Pelajaran', render: (row) => row.nama_mapel || '-' },
+  { key: 'guru_nama', label: 'Guru', render: (row) => row.guru_nama || '-' },
+  { key: 'jam', label: 'Jam', render: (row) => `${row.jam_mulai || '-'} - ${row.jam_selesai || '-'}` },
+];
 
 function buildFields(classes, subjects, teachers) {
   return [
@@ -28,10 +36,7 @@ function buildFields(classes, subjects, teachers) {
 }
 
 export function ScheduleView() {
-  const permissions = useAppSelector(selectUserPermissions);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [feedback, setFeedback] = useState(null);
+  const { canCreate, canEdit, canDelete } = useResourcePermissions('jadwal');
 
   const { data: response, isLoading, error } = useGetSchedulesQuery();
   const { data: classResponse } = useGetClassesQuery();
@@ -41,114 +46,52 @@ export function ScheduleView() {
   const [updateSchedule] = useUpdateScheduleMutation();
   const [deleteSchedule] = useDeleteScheduleMutation();
 
-  const canCreate = permissions.includes('jadwal.create');
-  const canEdit = permissions.includes('jadwal.edit');
-  const canDelete = permissions.includes('jadwal.delete');
+  const crud = useCrud({
+    create: createSchedule,
+    update: updateSchedule,
+    remove: deleteSchedule,
+    confirmMessage: (row) => `Hapus jadwal ${row.hari} - ${row.nama_mapel}?`,
+    messages: {
+      updated: 'Jadwal berhasil diperbarui.',
+      added: 'Jadwal berhasil ditambahkan.',
+      deleted: 'Jadwal berhasil dihapus.',
+      saveError: 'Terjadi kesalahan saat menyimpan jadwal.',
+      deleteError: 'Terjadi kesalahan saat menghapus jadwal.',
+    },
+  });
 
-  const items = response?.data || [];
   const fields = buildFields(
     classResponse?.data || [],
     subjectResponse?.data || [],
     teacherResponse?.data || []
   );
 
-  const handleOpenCreate = () => {
-    setEditing(null);
-    setModalOpen(true);
-  };
-
-  const handleOpenEdit = (row) => {
-    setEditing(row);
-    setModalOpen(true);
-  };
-
-  const handleSubmit = async (values) => {
-    try {
-      if (editing?.id) {
-        await updateSchedule({ ...values, id: editing.id }).unwrap();
-        setFeedback('Jadwal berhasil diperbarui.');
-      } else {
-        await createSchedule(values).unwrap();
-        setFeedback('Jadwal berhasil ditambahkan.');
-      }
-      setModalOpen(false);
-    } catch (e) {
-      setFeedback(e?.data?.message || 'Terjadi kesalahan saat menyimpan jadwal.');
-    }
-    setTimeout(() => setFeedback(null), 4000);
-  };
-
-  const handleDelete = async (row) => {
-    if (!window.confirm(`Hapus jadwal ${row.hari} - ${row.nama_mapel}?`)) return;
-    try {
-      await deleteSchedule(row.id).unwrap();
-      setFeedback('Jadwal berhasil dihapus.');
-    } catch (e) {
-      setFeedback(e?.data?.message || 'Terjadi kesalahan saat menghapus jadwal.');
-    }
-    setTimeout(() => setFeedback(null), 4000);
-  };
-
   if (isLoading) return <LoadingState message="Memuat jadwal pelajaran..." />;
   if (error) return <ErrorState message="Gagal memuat jadwal pelajaran." />;
 
   return (
     <>
-      {feedback ? <div className="alert alert-info mb-3">{feedback}</div> : null}
-      <div className="card-custom">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="fw-bold mb-0"><i className="fas fa-calendar-alt text-primary me-2"></i> Jadwal Pelajaran</h5>
-          {canCreate ? (
-            <button className="btn btn-sm btn-primary" onClick={handleOpenCreate}>
-              <i className="fas fa-plus me-1"></i> Tambah
-            </button>
-          ) : null}
-        </div>
-        <div className="table-responsive">
-          <table className="table table-hover align-middle">
-            <thead>
-              <tr>
-                <th>Hari</th><th>Kelas</th><th>Mata Pelajaran</th><th>Guru</th><th>Jam</th>
-                {(canEdit || canDelete) ? <th className="text-end">Aksi</th> : null}
-              </tr>
-            </thead>
-            <tbody>
-              {items.length > 0 ? items.map((item) => (
-                <tr key={item?.id || item?.hari + item?.nama_kelas}>
-                  <td>{item?.hari || '-'}</td>
-                  <td>{item?.nama_kelas || '-'}</td>
-                  <td>{item?.nama_mapel || '-'}</td>
-                  <td>{item?.guru_nama || '-'}</td>
-                  <td>{item?.jam_mulai || '-'} - {item?.jam_selesai || '-'}</td>
-                  {(canEdit || canDelete) ? (
-                    <td className="text-end">
-                      <div className="btn-group btn-group-sm">
-                        {canEdit ? (
-                          <button className="btn btn-outline-warning" title="Edit" onClick={() => handleOpenEdit(item)}>
-                            <i className="fas fa-edit"></i>
-                          </button>
-                        ) : null}
-                        {canDelete ? (
-                          <button className="btn btn-outline-danger" title="Hapus" onClick={() => handleDelete(item)}>
-                            <i className="fas fa-trash"></i>
-                          </button>
-                        ) : null}
-                      </div>
-                    </td>
-                  ) : null}
-                </tr>
-              )) : <tr><td colSpan={5 + ((canEdit || canDelete) ? 1 : 0)} className="text-muted">Belum ada data jadwal</td></tr>}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <FeedbackBanner message={crud.feedback} />
+      <TableView
+        title="Jadwal Pelajaran"
+        icon="calendar-alt"
+        canCreate={canCreate}
+        canEdit={canEdit}
+        canDelete={canDelete}
+        columns={COLUMNS}
+        rows={response?.data || []}
+        emptyMessage="Belum ada data jadwal"
+        onCreate={canCreate ? crud.openCreate : undefined}
+        onEdit={canEdit ? crud.openEdit : undefined}
+        onDelete={canDelete ? crud.removeRow : undefined}
+      />
       <FormModal
-        open={modalOpen}
-        title={editing ? 'Edit Jadwal' : 'Tambah Jadwal'}
+        open={crud.modalOpen}
+        title={crud.editing ? 'Edit Jadwal' : 'Tambah Jadwal'}
         fields={fields}
-        initialValues={editing || {}}
-        onSubmit={handleSubmit}
-        onClose={() => setModalOpen(false)}
+        initialValues={crud.editing || {}}
+        onSubmit={crud.submit}
+        onClose={crud.close}
       />
     </>
   );

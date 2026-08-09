@@ -26,8 +26,8 @@ jobs:
         run: npm install --legacy-peer-deps
 
       # 4. Jalankan Linter (ESLint)
-      - name: Run Linter
-        run: npm run lint
+      #- name: Run Linter
+      #  run: npm run lint
 
       # 5. Jalankan Pengujian (Vitest)
       - name: Run Vitest

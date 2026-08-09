@@ -23,7 +23,7 @@ jobs:
 
       # 3. Install dependencies
       - name: Install Dependencies
-        run: npm ci
+        run: npm install
 
       # 4. Jalankan Linter (ESLint)
       - name: Run Linter

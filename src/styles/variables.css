@@ -1,0 +1,13 @@
+:root {
+  --primary: #6366f1;
+  --primary-hover: #1367F7;
+  --secondary: #0053e1;
+  --bg-main: #f8fafc;
+  --card-bg: #ffffff;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --sidebar-bg: linear-gradient(135deg, #005eff 0%, #7EB4FA 100%);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
+}

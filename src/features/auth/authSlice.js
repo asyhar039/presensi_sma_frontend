@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { authAPI } from './authAPI';
-import { studentAPI } from '../student/studentAPI';
-import { ROLE_PERMISSIONS } from '../../shared/constants/permissions';
+import { authAPI } from './services/authAPI';
+import { studentsAPI } from '../students/services/studentsAPI';
+import { ROLE_PERMISSIONS } from '../../constants/roles';
 
 const initialState = {
   user: null,
@@ -80,7 +80,7 @@ const authSlice = createSlice({
           state.error = null;
         }
       })
-      .addMatcher(studentAPI.endpoints.getStudentProfile.matchFulfilled, (state, { payload }) => {
+      .addMatcher(studentsAPI.endpoints.getStudentProfile.matchFulfilled, (state, { payload }) => {
         if (payload?.status === 'success' && payload?.data?.student) {
           state.user = normalizeStudent(payload.data.student);
           state.authType = 'student';

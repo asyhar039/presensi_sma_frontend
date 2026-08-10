@@ -1,14 +1,16 @@
-import { useGetDashboardStatsQuery } from '../dashboardAPI';
-import { LoadingState } from '../../../shared/components/LoadingState';
-import { ErrorState } from '../../../shared/components/ErrorState';
+import { useGetDashboardStatsQuery } from '../services/dashboardAPI';
+import { Loading } from '../../../components/common/Loading/Loading';
+import { ErrorMessage } from '../../../components/common/ErrorMessage/ErrorMessage';
+import { Card } from '../../../components/ui/Card/Card';
+import { ATTENDANCE_LABELS } from '../../../constants/status';
 
 export function DashboardView() {
   const { data: response, isLoading, error } = useGetDashboardStatsQuery();
 
-  if (isLoading) return <LoadingState message="Memuat statistik dashboard..." />;
+  if (isLoading) return <Loading message="Memuat statistik dashboard..." />;
   
   if (error) {
-    return <ErrorState message="Fitur dashboard sedang dikembangkan. Statistik akan segera tersedia." />;
+    return <ErrorMessage message="Fitur dashboard sedang dikembangkan. Statistik akan segera tersedia." />;
   }
 
   const stats = response?.data || {};
@@ -20,6 +22,7 @@ export function DashboardView() {
   ];
 
   const todayAttendance = stats?.today_attendance || {};
+  const tones = ['bg-success bg-opacity-10 text-success', 'bg-info bg-opacity-10 text-info', 'bg-warning bg-opacity-10 text-warning', 'bg-danger bg-opacity-10 text-danger'];
 
   return (
     <div>
@@ -37,19 +40,18 @@ export function DashboardView() {
         ))}
       </div>
 
-      <div className="card-custom">
-        <h5 className="fw-bold mb-3"><i className="fas fa-clipboard-list text-primary me-2"></i> Ringkasan Absensi Hari Ini</h5>
+      <Card title="Ringkasan Absensi Hari Ini" icon="clipboard-list">
         <div className="row text-center g-3">
-          {['Hadir', 'Izin', 'Sakit', 'Alfa'].map((label, index) => (
+          {ATTENDANCE_LABELS.map((label, index) => (
             <div className="col-3" key={label}>
-              <div className={`p-3 rounded-3 ${index === 0 ? 'bg-success bg-opacity-10 text-success' : index === 1 ? 'bg-info bg-opacity-10 text-info' : index === 2 ? 'bg-warning bg-opacity-10 text-warning' : 'bg-danger bg-opacity-10 text-danger'}`}>
+              <div className={`p-3 rounded-3 ${tones[index] || 'bg-secondary bg-opacity-10 text-secondary'}`}>
                 <div className="fs-2 fw-bold">{todayAttendance[label] ?? 0}</div>
                 <div className="small fw-semibold">{label}</div>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

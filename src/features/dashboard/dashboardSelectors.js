@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { dashboardAPI } from './dashboardAPI';
+import { dashboardAPI } from './services/dashboardAPI';
 
 const selectDashboardStatsResult = dashboardAPI.endpoints.getDashboardStats.select();
 

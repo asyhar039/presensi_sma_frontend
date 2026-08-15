@@ -9,11 +9,12 @@ import { useResourcePermissions } from '../../../hooks/useResourcePermissions';
 import { useCrud } from '../../../hooks/useCrud';
 import { Button } from '../../../components/ui/Button/Button';
 import { Card } from '../../../components/ui/Card/Card';
-import { CardGrid } from '../../../components/common/CardGrid/CardGrid';
-import { Modal } from '../../../components/ui/Modal/Modal';
-import { FeedbackBanner } from '../../../components/common/Feedback/FeedbackBanner';
-import { Loading } from '../../../components/common/Loading/Loading';
-import { ErrorMessage } from '../../../components/common/ErrorMessage/ErrorMessage';
+import { CardGrid } from '../../../components/data-display/CardGrid/CardGrid';
+import { Modal } from '../../../components/feedback/Modal/Modal';
+import { Form } from '../../../components/feedback/Form/Form';
+import { ConfirmDialog } from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
+import { Loading } from '../../../components/feedback/Loading/Loading';
+import { ErrorState } from '../../../components/feedback/ErrorState/ErrorState';
 
 const FIELDS = [
   { key: 'nama_mapel', label: 'Nama Mata Pelajaran', required: true },
@@ -54,17 +55,15 @@ export function SubjectList() {
   const items = response?.data || [];
 
   if (isLoading) return <Loading message="Memuat mata pelajaran..." />;
-  if (error) return <ErrorMessage message="Gagal memuat data mata pelajaran." />;
+  if (error) return <ErrorState message="Gagal memuat data mata pelajaran." />;
 
   return (
     <>
-      <FeedbackBanner message={crud.feedback} />
-      <Card title="Mata Pelajaran" icon="book-open">
-        <div className="d-flex justify-content-end mb-3">
-          {canCreate ? (
-            <Button icon="plus" onClick={crud.openCreate}>Tambah</Button>
-          ) : null}
-        </div>
+      <Card
+        title="Mata Pelajaran"
+        icon="book-open"
+        actions={canCreate ? <Button icon="plus" onClick={crud.openCreate}>Tambah</Button> : undefined}
+      >
         <CardGrid
           items={items}
           getKey={(item) => item?.id || item?.kode_mapel}
@@ -74,18 +73,23 @@ export function SubjectList() {
           canEdit={canEdit}
           canDelete={canDelete}
           onEdit={crud.openEdit}
-          onDelete={crud.removeRow}
+          onDelete={crud.requestRemove}
           emptyMessage="Belum ada data mata pelajaran"
         />
       </Card>
       <Modal
         open={crud.modalOpen}
         title={crud.editing ? 'Edit Mata Pelajaran' : 'Tambah Mata Pelajaran'}
-        fields={fields}
-        initialValues={crud.editing || {}}
-        onSubmit={crud.submit}
         onClose={crud.close}
-      />
+      >
+        <Form
+          fields={fields}
+          initialValues={crud.editing || {}}
+          onSubmit={crud.submit}
+          onCancel={crud.close}
+        />
+      </Modal>
+      <ConfirmDialog {...crud.confirmDialog} confirmLabel="Hapus" />
     </>
   );
 }

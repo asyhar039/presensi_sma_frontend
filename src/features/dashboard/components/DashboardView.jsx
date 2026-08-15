@@ -1,16 +1,17 @@
 import { useGetDashboardStatsQuery } from '../services/dashboardAPI';
-import { Loading } from '../../../components/common/Loading/Loading';
-import { ErrorMessage } from '../../../components/common/ErrorMessage/ErrorMessage';
+import { Loading } from '../../../components/feedback/Loading/Loading';
+import { ErrorState } from '../../../components/feedback/ErrorState/ErrorState';
 import { Card } from '../../../components/ui/Card/Card';
+import { StatisticCard } from '../../../components/data-display/StatisticCard/StatisticCard';
 import { ATTENDANCE_LABELS } from '../../../constants/status';
 
 export function DashboardView() {
   const { data: response, isLoading, error } = useGetDashboardStatsQuery();
 
   if (isLoading) return <Loading message="Memuat statistik dashboard..." />;
-  
+
   if (error) {
-    return <ErrorMessage message="Fitur dashboard sedang dikembangkan. Statistik akan segera tersedia." />;
+    return <ErrorState message="Fitur dashboard sedang dikembangkan. Statistik akan segera tersedia." />;
   }
 
   const stats = response?.data || {};
@@ -22,33 +23,20 @@ export function DashboardView() {
   ];
 
   const todayAttendance = stats?.today_attendance || {};
-  const tones = ['bg-success bg-opacity-10 text-success', 'bg-info bg-opacity-10 text-info', 'bg-warning bg-opacity-10 text-warning', 'bg-danger bg-opacity-10 text-danger'];
+  const tones = ['success', 'info', 'warning', 'danger'];
 
   return (
     <div>
-      <div className="row g-4 mb-4">
+      <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-4">
         {cards.map((card) => (
-          <div className="col-md-3" key={card.label}>
-            <div className="stat-card">
-              <div className={`icon-box bg-${card.tone}`}><i className={`fas fa-${card.icon}`}></i></div>
-              <div>
-                <div className={`val text-${card.tone}`}>{card.value}</div>
-                <div className="lbl">{card.label}</div>
-              </div>
-            </div>
-          </div>
+          <StatisticCard key={card.label} label={card.label} value={card.value} icon={card.icon} tone={card.tone} layout="icon" />
         ))}
       </div>
 
       <Card title="Ringkasan Absensi Hari Ini" icon="clipboard-list">
-        <div className="row text-center g-3">
+        <div className="grid grid-cols-4 gap-4 text-center">
           {ATTENDANCE_LABELS.map((label, index) => (
-            <div className="col-3" key={label}>
-              <div className={`p-3 rounded-3 ${tones[index] || 'bg-secondary bg-opacity-10 text-secondary'}`}>
-                <div className="fs-2 fw-bold">{todayAttendance[label] ?? 0}</div>
-                <div className="small fw-semibold">{label}</div>
-              </div>
-            </div>
+            <StatisticCard key={label} label={label} value={todayAttendance[label] ?? 0} tone={tones[index] || 'secondary'} layout="flat" />
           ))}
         </div>
       </Card>

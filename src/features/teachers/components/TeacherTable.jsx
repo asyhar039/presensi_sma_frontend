@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import {
   useGetTeachersQuery,
   useCreateTeacherMutation,
@@ -5,12 +6,16 @@ import {
   useDeleteTeacherMutation,
 } from '../services/teachersAPI';
 import { useResourcePermissions } from '../../../hooks/useResourcePermissions';
+import { useDebounce } from '../../../hooks/useDebounce';
 import { useCrud } from '../../../hooks/useCrud';
-import { Table } from '../../../components/ui/Table/Table';
-import { Modal } from '../../../components/ui/Modal/Modal';
-import { FeedbackBanner } from '../../../components/common/Feedback/FeedbackBanner';
-import { Loading } from '../../../components/common/Loading/Loading';
-import { ErrorMessage } from '../../../components/common/ErrorMessage/ErrorMessage';
+import { Button } from '../../../components/ui/Button/Button';
+import { SearchInput } from '../../../components/ui/SearchInput/SearchInput';
+import { DataTable } from '../../../components/data-display/DataTable/DataTable';
+import { Modal } from '../../../components/feedback/Modal/Modal';
+import { Form } from '../../../components/feedback/Form/Form';
+import { ConfirmDialog } from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
+import { Loading } from '../../../components/feedback/Loading/Loading';
+import { ErrorState } from '../../../components/feedback/ErrorState/ErrorState';
 
 const FIELDS = [
   { key: 'nip', label: 'NIP', required: true },
@@ -35,6 +40,8 @@ const COLUMNS = [
 
 export function TeacherTable() {
   const { canCreate, canEdit, canDelete } = useResourcePermissions('guru');
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
 
   const { data: response, isLoading, error } = useGetTeachersQuery();
   const [createTeacher] = useCreateTeacherMutation();
@@ -59,34 +66,51 @@ export function TeacherTable() {
     ? FIELDS.filter((f) => !['username', 'password'].includes(f.key))
     : FIELDS;
 
+  const rows = useMemo(() => {
+    const data = response?.data || [];
+    const query = debouncedSearch.trim().toLowerCase();
+    if (!query) return data;
+    return data.filter((row) =>
+      [row.nama_lengkap, row.nip, row.email].some((value) =>
+        value && value.toLowerCase().includes(query)
+      )
+    );
+  }, [response, debouncedSearch]);
+
+  const rowActions = [
+    ...(canEdit ? [{ key: 'edit', icon: 'edit', variant: 'outline-warning', label: 'Edit', onClick: crud.openEdit }] : []),
+    ...(canDelete ? [{ key: 'delete', icon: 'trash', variant: 'outline-danger', label: 'Hapus', onClick: crud.requestRemove }] : []),
+  ];
+
   if (isLoading) return <Loading message="Memuat data guru..." />;
-  if (error) return <ErrorMessage message="Gagal memuat data guru." />;
+  if (error) return <ErrorState message="Gagal memuat data guru." />;
 
   return (
     <>
-      <FeedbackBanner message={crud.feedback} />
-      <Table
+      <DataTable
         title="Data Guru"
         icon="chalkboard-teacher"
-        canCreate={canCreate}
-        canEdit={canEdit}
-        canDelete={canDelete}
         columns={COLUMNS}
-        rows={response?.data || []}
+        rows={rows}
         emptyMessage="Belum ada data guru"
-        onCreate={canCreate ? crud.openCreate : undefined}
-        onEdit={canEdit ? crud.openEdit : undefined}
-        onDelete={canDelete ? crud.removeRow : undefined}
+        headerActions={canCreate ? <Button icon="plus" onClick={crud.openCreate}>Tambah</Button> : undefined}
+        toolbar={<SearchInput value={search} onChange={setSearch} placeholder="Cari nama, NIP, atau email..." />}
+        rowActions={rowActions}
         paginated
       />
       <Modal
         open={crud.modalOpen}
         title={crud.editing ? 'Edit Guru' : 'Tambah Guru'}
-        fields={fields}
-        initialValues={crud.editing || {}}
-        onSubmit={crud.submit}
         onClose={crud.close}
-      />
+      >
+        <Form
+          fields={fields}
+          initialValues={crud.editing || {}}
+          onSubmit={crud.submit}
+          onCancel={crud.close}
+        />
+      </Modal>
+      <ConfirmDialog {...crud.confirmDialog} confirmLabel="Hapus" />
     </>
   );
 }

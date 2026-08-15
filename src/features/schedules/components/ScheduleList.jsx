@@ -9,11 +9,13 @@ import { useGetSubjectsQuery } from '../../subjects/services/subjectsAPI';
 import { useGetTeachersQuery } from '../../teachers/services/teachersAPI';
 import { useResourcePermissions } from '../../../hooks/useResourcePermissions';
 import { useCrud } from '../../../hooks/useCrud';
-import { Table } from '../../../components/ui/Table/Table';
-import { Modal } from '../../../components/ui/Modal/Modal';
-import { FeedbackBanner } from '../../../components/common/Feedback/FeedbackBanner';
-import { Loading } from '../../../components/common/Loading/Loading';
-import { ErrorMessage } from '../../../components/common/ErrorMessage/ErrorMessage';
+import { Button } from '../../../components/ui/Button/Button';
+import { DataTable } from '../../../components/data-display/DataTable/DataTable';
+import { Modal } from '../../../components/feedback/Modal/Modal';
+import { Form } from '../../../components/feedback/Form/Form';
+import { ConfirmDialog } from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
+import { Loading } from '../../../components/feedback/Loading/Loading';
+import { ErrorState } from '../../../components/feedback/ErrorState/ErrorState';
 
 const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
 
@@ -67,33 +69,38 @@ export function ScheduleList() {
     teacherResponse?.data || []
   );
 
+  const rowActions = [
+    ...(canEdit ? [{ key: 'edit', icon: 'edit', variant: 'outline-warning', label: 'Edit', onClick: crud.openEdit }] : []),
+    ...(canDelete ? [{ key: 'delete', icon: 'trash', variant: 'outline-danger', label: 'Hapus', onClick: crud.requestRemove }] : []),
+  ];
+
   if (isLoading) return <Loading message="Memuat jadwal pelajaran..." />;
-  if (error) return <ErrorMessage message="Gagal memuat jadwal pelajaran." />;
+  if (error) return <ErrorState message="Gagal memuat jadwal pelajaran." />;
 
   return (
     <>
-      <FeedbackBanner message={crud.feedback} />
-      <Table
+      <DataTable
         title="Jadwal Pelajaran"
         icon="calendar-alt"
-        canCreate={canCreate}
-        canEdit={canEdit}
-        canDelete={canDelete}
         columns={COLUMNS}
         rows={response?.data || []}
         emptyMessage="Belum ada data jadwal"
-        onCreate={canCreate ? crud.openCreate : undefined}
-        onEdit={canEdit ? crud.openEdit : undefined}
-        onDelete={canDelete ? crud.removeRow : undefined}
+        headerActions={canCreate ? <Button icon="plus" onClick={crud.openCreate}>Tambah</Button> : undefined}
+        rowActions={rowActions}
       />
       <Modal
         open={crud.modalOpen}
         title={crud.editing ? 'Edit Jadwal' : 'Tambah Jadwal'}
-        fields={fields}
-        initialValues={crud.editing || {}}
-        onSubmit={crud.submit}
         onClose={crud.close}
-      />
+      >
+        <Form
+          fields={fields}
+          initialValues={crud.editing || {}}
+          onSubmit={crud.submit}
+          onCancel={crud.close}
+        />
+      </Modal>
+      <ConfirmDialog {...crud.confirmDialog} confirmLabel="Hapus" />
     </>
   );
 }

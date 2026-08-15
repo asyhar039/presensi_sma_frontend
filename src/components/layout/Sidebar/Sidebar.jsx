@@ -17,32 +17,33 @@ export function Sidebar() {
     navigate(ROUTES.LOGIN, { replace: true });
   };
 
+  const linkClass = ({ isActive }) =>
+    `flex items-center justify-center gap-3 rounded-[10px] px-2 py-3 text-sm font-semibold text-white/80 transition-all hover:translate-x-1 hover:bg-white/20 hover:text-white lg:justify-start lg:px-4 no-underline ${
+      isActive ? 'translate-x-1 bg-white/20 text-white' : ''
+    }`;
+
   return (
-    <div className="sidebar">
-      <div className="brand">
-        <div className="brand-icon"><i className="fas fa-graduation-cap"></i></div>
-        <div className="brand-text">ABSENSI SMA</div>
+    <div className="fixed z-[100] flex h-screen w-[80px] flex-col overflow-y-auto bg-[linear-gradient(135deg,#005eff_0%,#7EB4FA_100%)] p-4 text-white shadow-[4px_0_20px_rgba(0,0,0,0.15)] lg:w-[260px]">
+      <div className="mb-5 flex items-center justify-center gap-3 border-b border-white/15 pb-5 lg:justify-start">
+        <div className="flex size-[42px] items-center justify-center rounded-xl bg-white/20 text-xl">
+          <i className="fas fa-graduation-cap"></i>
+        </div>
+        <div className="hidden text-lg font-extrabold tracking-wide lg:block">ABSENSI SMA</div>
       </div>
-      <nav>
+      <nav className="flex flex-col">
         {visibleMenu.map((item) => (
-          <NavLink
-            key={item.key}
-            to={`/${item.key}`}
-            className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-            style={{ textDecoration: 'none' }}
-          >
+          <NavLink key={item.key} to={`/${item.key}`} className={linkClass}>
             <i className={`fas fa-${item.icon}`}></i>
-            <span>{item.label}</span>
+            <span className="hidden lg:inline">{item.label}</span>
           </NavLink>
         ))}
-        <hr style={{ borderColor: 'rgba(255,255,255,0.2)' }} />
+        <hr className="my-3 border-white/20" />
         <button
           type="button"
-          className="nav-link text-warning"
+          className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-[10px] border-0 bg-transparent px-2 py-3 text-left text-sm font-semibold text-warning hover:bg-white/10 hover:text-warning lg:justify-start lg:px-4"
           onClick={handleLogout}
-          style={{ background: 'transparent', border: 0, textAlign: 'left', cursor: 'pointer' }}
         >
-          <i className="fas fa-sign-out-alt"></i><span>Keluar</span>
+          <i className="fas fa-sign-out-alt"></i><span className="hidden lg:inline">Keluar</span>
         </button>
       </nav>
     </div>

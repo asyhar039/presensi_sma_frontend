@@ -1,11 +1,19 @@
-export function Card({ title, icon, children, className = 'card-custom' }) {
-  return (
+export function Card({
+  title,
+  icon,
+  actions,
+  children,
+  className = 'mb-6 rounded-2xl border border-card-border bg-card-bg p-6 shadow-sm',
+}) {  return (
     <div className={className}>
       {title ? (
-        <h5 className="fw-bold mb-3">
-          {icon ? <i className={`fas fa-${icon} text-primary me-2`}></i> : null}
-          {title}
-        </h5>
+        <div className={actions ? 'mb-4 flex items-center justify-between' : 'mb-4'}>
+          <h5 className="mb-0 text-xl font-bold">
+            {icon ? <i className={`fas fa-${icon} text-primary mr-2`}></i> : null}
+            {title}
+          </h5>
+          {actions ? <div>{actions}</div> : null}
+        </div>
       ) : null}
       {children}
     </div>

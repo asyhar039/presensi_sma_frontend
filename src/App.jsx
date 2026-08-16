@@ -1,6 +1,6 @@
 import { useGetCurrentUserQuery } from './features/auth/services/authAPI';
 import { useGetStudentProfileQuery } from './features/students/services/studentsAPI';
-import { Loading } from './components/common/Loading/Loading';
+import { Loading } from './components/feedback/Loading/Loading';
 import AppRoutes from './routes/AppRoutes';
 
 function AuthBootstrap({ children }) {

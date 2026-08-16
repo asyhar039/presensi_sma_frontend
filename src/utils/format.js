@@ -1,4 +1,4 @@
-import { ATTENDANCE_BADGE_CLASSES } from '../constants/status';
+import { getStatusTone } from '../constants/status';
 
 export function capitalize(value) {
   if (!value) return '';
@@ -16,5 +16,5 @@ export function getInitials(name, fallback = 'A') {
 }
 
 export function getStatusBadgeClass(status) {
-  return ATTENDANCE_BADGE_CLASSES[String(status || '').toLowerCase()] || 'bg-secondary';
+  return `bg-${getStatusTone(status)}`;
 }

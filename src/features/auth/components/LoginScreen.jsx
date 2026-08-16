@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLoginUserMutation, useLoginStudentMutation } from '../services/authAPI';
 import { Input } from '../../../components/ui/Input/Input';
+import { Alert } from '../../../components/feedback/Alert/Alert';
 import { getErrorMessage } from '../../../utils/errors';
 import { ROUTES } from '../../../constants/routes';
 
@@ -30,40 +31,36 @@ export function LoginScreen() {
     }
   };
 
+  const tabClass = (active) =>
+    `flex-1 rounded-md px-3 py-2 text-sm font-medium transition ${
+      active ? 'bg-primary text-white' : 'text-secondary hover:bg-white hover:shadow'
+    }`;
+
+  const submitClass =
+    'w-full rounded-lg border border-primary bg-primary px-4 py-2 text-lg font-bold text-white transition-colors hover:bg-primary-hover disabled:pointer-events-none disabled:opacity-65 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25';
+
   return (
     <>
-      <div className="text-center mb-4">
-        <div className="mx-auto mb-3 text-primary d-flex align-items-center justify-content-center rounded-circle" style={{ width: 64, height: 64, background: 'rgba(99, 102, 241, 0.1)', fontSize: 32 }}>
+      <div className="mb-4 text-center">
+        <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-[rgba(99,102,241,0.1)] text-[32px] text-primary">
           <i className="fas fa-graduation-cap"></i>
         </div>
-        <h4 className="fw-bold text-dark">ABSENSI SMA</h4>
-        <p className="text-muted small">Sistem Manajemen Kehadiran</p>
+        <h4 className="text-xl font-bold text-dark">ABSENSI SMA</h4>
+        <p className="text-sm text-muted">Sistem Manajemen Kehadiran</p>
       </div>
 
-      <ul className="nav nav-pills nav-fill mb-3">
-        <li className="nav-item">
-          <button
-            className={`nav-link ${activeTab === 'admin' ? 'active' : ''}`}
-            onClick={() => setActiveTab('admin')}
-            type="button"
-          >
-            Admin / Guru
-          </button>
-        </li>
-        <li className="nav-item">
-          <button
-            className={`nav-link ${activeTab === 'student' ? 'active' : ''}`}
-            onClick={() => setActiveTab('student')}
-            type="button"
-          >
-            Siswa
-          </button>
-        </li>
-      </ul>
+      <div className="mb-4 flex gap-1 rounded-lg bg-light p-1">
+        <button type="button" className={tabClass(activeTab === 'admin')} onClick={() => setActiveTab('admin')}>
+          Admin / Guru
+        </button>
+        <button type="button" className={tabClass(activeTab === 'student')} onClick={() => setActiveTab('student')}>
+          Siswa
+        </button>
+      </div>
 
       {activeTab === 'admin' ? (
         <>
-          {userError ? <div className="alert alert-danger">{getErrorMessage(userError)}</div> : null}
+          {userError ? <Alert variant="danger" className="mb-4">{getErrorMessage(userError)}</Alert> : null}
           <form onSubmit={handleLogin}>
             <Input
               label="Username"
@@ -86,12 +83,12 @@ export function LoginScreen() {
               size="lg"
               required
             />
-            <button className="btn btn-primary btn-lg w-100 fw-bold" type="submit" disabled={userLoading}>
+            <button className={submitClass} type="submit" disabled={userLoading}>
               {userLoading ? 'Memproses...' : 'Masuk Sekarang'}
             </button>
           </form>
 
-          <div className="mt-4 p-3 bg-light rounded-3 text-muted small">
+          <div className="mt-6 rounded-lg bg-light p-4 text-sm text-muted">
             <strong>Credential Demo:</strong><br />
             • Admin: <code>admin</code> / <code>admin123</code><br />
             • Guru: <code>guru</code> / <code>guru123</code>
@@ -99,7 +96,7 @@ export function LoginScreen() {
         </>
       ) : (
         <>
-          {studentError ? <div className="alert alert-danger">{getErrorMessage(studentError)}</div> : null}
+          {studentError ? <Alert variant="danger" className="mb-4">{getErrorMessage(studentError)}</Alert> : null}
           <form onSubmit={handleStudentLogin}>
             <Input
               label="Nama Lengkap"
@@ -119,13 +116,13 @@ export function LoginScreen() {
               size="lg"
               required
             />
-            <button className="btn btn-primary btn-lg w-100 fw-bold" type="submit" disabled={studentLoading}>
+            <button className={submitClass} type="submit" disabled={studentLoading}>
               {studentLoading ? 'Memproses...' : 'Masuk Sekarang'}
             </button>
           </form>
 
-          <div className="mt-4 p-3 bg-light rounded-3 text-muted small">
-            <i className="fas fa-info-circle me-1"></i>
+          <div className="mt-6 rounded-lg bg-light p-4 text-sm text-muted">
+            <i className="fas fa-info-circle mr-1"></i>
             <strong>Portal Siswa:</strong> Login dengan Nama Lengkap dan NISN Anda
           </div>
         </>

@@ -3,11 +3,16 @@ import { ROUTES } from '../../constants/routes';
 
 export default function NotFound() {
   return (
-    <div className="text-center py-5">
-      <div className="display-1 fw-bold text-primary">404</div>
-      <h4 className="fw-bold mb-2">Halaman Tidak Ditemukan</h4>
-      <p className="text-muted mb-4">Halaman yang Anda cari tidak tersedia atau telah dipindahkan.</p>
-      <Link to={ROUTES.DASHBOARD} className="btn btn-primary">Kembali ke Dashboard</Link>
+    <div className="py-12 text-center">
+      <div className="text-8xl font-extrabold text-primary">404</div>
+      <h4 className="mb-2 text-xl font-bold">Halaman Tidak Ditemukan</h4>
+      <p className="mb-4 text-muted">Halaman yang Anda cari tidak tersedia atau telah dipindahkan.</p>
+      <Link
+        to={ROUTES.DASHBOARD}
+        className="inline-flex items-center justify-center gap-1 rounded-md border border-primary bg-primary px-3 py-1.5 text-base font-medium text-white no-underline transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25"
+      >
+        Kembali ke Dashboard
+      </Link>
     </div>
   );
 }

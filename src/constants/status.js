@@ -7,9 +7,13 @@ export const ATTENDANCE_STATUS = {
 
 export const ATTENDANCE_LABELS = Object.values(ATTENDANCE_STATUS);
 
-export const ATTENDANCE_BADGE_CLASSES = {
-  hadir: 'bg-success',
-  izin: 'bg-info',
-  sakit: 'bg-warning',
-  alfa: 'bg-danger',
+export const ATTENDANCE_TONES = {
+  hadir: 'success',
+  izin: 'info',
+  sakit: 'warning',
+  alfa: 'danger',
 };
+
+export function getStatusTone(status) {
+  return ATTENDANCE_TONES[String(status || '').toLowerCase()] || 'secondary';
+}

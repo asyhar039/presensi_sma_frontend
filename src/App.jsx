@@ -1,6 +1,7 @@
 import { useGetCurrentUserQuery } from './features/auth/services/authAPI';
 import { useGetStudentProfileQuery } from './features/students/services/studentsAPI';
 import { Loading } from './components/feedback/Loading/Loading';
+import { PwaReloadPrompt } from './components/pwa/PwaReloadPrompt';
 import AppRoutes from './routes/AppRoutes';
 
 function AuthBootstrap({ children }) {
@@ -21,6 +22,8 @@ export default function App() {
   return (
     <AuthBootstrap>
       <AppRoutes />
+      <PwaReloadPrompt />
     </AuthBootstrap>
   );
 }
+

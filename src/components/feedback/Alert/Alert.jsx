@@ -1,4 +1,4 @@
-import { RenderIcon } from '../../../utils/iconMap';
+import RenderIcon from '../../../utils/iconMap';
 
 const VARIANTS = {
   info: 'border-[#b6effb] bg-[#cff4fc] text-[#055160]',
@@ -7,7 +7,7 @@ const VARIANTS = {
   danger: 'border-[#f5c2c7] bg-[#f8d7da] text-[#842029]',
 };
 
-export function Alert({
+const Alert = ({
   variant = 'info',
   title,
   children,
@@ -15,7 +15,7 @@ export function Alert({
   className = '',
   onDismiss,
   ...props
-}) {
+}) => {
   if (!children && !title) return null;
 
   return (
@@ -44,4 +44,6 @@ export function Alert({
       ) : null}
     </div>
   );
-}
+};
+
+export default Alert;

@@ -1,6 +1,6 @@
 import { getInitials } from '../../../utils/format';
 
-export function Avatar({ name, size, className = '' }) {
+const Avatar = ({ name, size, className = '' }) => {
   return (
     <div
       className={`flex size-[38px] items-center justify-center rounded-full bg-brand font-bold text-white ${className}`.trim()}
@@ -9,4 +9,6 @@ export function Avatar({ name, size, className = '' }) {
       {getInitials(name)}
     </div>
   );
-}
+};
+
+export default Avatar;

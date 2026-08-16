@@ -4,7 +4,7 @@ import { selectIsAuthenticated, selectUserRole } from '../features/auth/authSele
 import { ROUTES } from '../constants/routes';
 import { ROLES } from '../constants/roles';
 
-import { LoginScreen } from '../features/auth/components/LoginScreen';
+import LoginScreen from '../features/auth/components/LoginScreen';
 import AuthLayout from '../layouts/AuthLayout';
 import AdminLayout from '../layouts/AdminLayout';
 import StudentLayout from '../layouts/StudentLayout';
@@ -13,15 +13,15 @@ import RoleRoute from './RoleRoute';
 import NotFound from '../pages/NotFound/NotFound';
 import Unauthorized from '../pages/Unauthorized/Unauthorized';
 
-import { DashboardView } from '../features/dashboard/components/DashboardView';
-import { StudentTable } from '../features/students/components/StudentTable';
-import { StudentPortal } from '../features/students/components/StudentPortal';
-import { TeacherTable } from '../features/teachers/components/TeacherTable';
-import { ClassList } from '../features/classes/components/ClassList';
-import { SubjectList } from '../features/subjects/components/SubjectList';
-import { ScheduleList } from '../features/schedules/components/ScheduleList';
-import { AttendanceView } from '../features/attendance/components/AttendanceView';
-import { ReportView } from '../features/reports/components/ReportView';
+import DashboardView from '../features/dashboard/components/DashboardView';
+import StudentTable from '../features/students/components/StudentTable';
+import StudentPortal from '../features/students/components/StudentPortal';
+import TeacherTable from '../features/teachers/components/TeacherTable';
+import ClassList from '../features/classes/components/ClassList';
+import SubjectList from '../features/subjects/components/SubjectList';
+import ScheduleList from '../features/schedules/components/ScheduleList';
+import AttendanceView from '../features/attendance/components/AttendanceView';
+import ReportView from '../features/reports/components/ReportView';
 
 const STAFF_ROUTES = [
   { path: ROUTES.DASHBOARD, element: <DashboardView />, permission: 'dashboard.view' },
@@ -34,7 +34,7 @@ const STAFF_ROUTES = [
   { path: ROUTES.REPORTS, element: <ReportView />, permission: 'laporan.view' },
 ];
 
-function IndexRoute() {
+const IndexRoute = () => {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const userRole = useAppSelector(selectUserRole);
 
@@ -46,7 +46,7 @@ function IndexRoute() {
   return <Navigate to={defaultRoute} replace />;
 }
 
-export default function AppRoutes() {
+const AppRoutes = () => {
   return (
     <Routes>
       <Route path={ROUTES.LOGIN} element={<AuthLayout><LoginScreen /></AuthLayout>} />
@@ -77,4 +77,6 @@ export default function AppRoutes() {
       <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
     </Routes>
   );
-}
+};
+
+export default AppRoutes;

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 
-export default function NotFound() {
+const NotFound = () => {
   return (
     <div className="py-12 text-center">
       <div className="text-8xl font-extrabold text-primary">404</div>
@@ -15,4 +15,6 @@ export default function NotFound() {
       </Link>
     </div>
   );
-}
+};
+
+export default NotFound;

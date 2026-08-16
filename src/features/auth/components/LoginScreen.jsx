@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GraduationCap, Info } from 'lucide-react';
 import { useLoginUserMutation, useLoginStudentMutation } from '../services/authAPI';
-import { Input } from '../../../components/ui/Input/Input';
-import { Alert } from '../../../components/feedback/Alert/Alert';
+import Input from '../../../components/ui/Input/Input';
+import Alert from '../../../components/feedback/Alert/Alert';
 import { getErrorMessage } from '../../../utils/errors';
 import { ROUTES } from '../../../constants/routes';
 
-export function LoginScreen() {
+const LoginScreen = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('admin');
   const [form, setForm] = useState({ username: '', password: '' });
@@ -130,4 +130,6 @@ export function LoginScreen() {
       )}
     </>
   );
-}
+};
+
+export default LoginScreen;

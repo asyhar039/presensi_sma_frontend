@@ -1,11 +1,11 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
-import { Alert } from '../Alert/Alert';
+import Alert from '../Alert/Alert';
 
 const ToastContext = createContext(null);
 
 let nextId = 0;
 
-function ToastContainer({ toasts = [], onDismiss }) {
+const ToastContainer = ({ toasts = [], onDismiss }) => {
   return (
     <div className="fixed top-4 right-4 z-[2000] flex w-[min(92vw,380px)] flex-col gap-2">
       {toasts.map((toast) => (
@@ -17,7 +17,7 @@ function ToastContainer({ toasts = [], onDismiss }) {
   );
 }
 
-export function ToastProvider({ children }) {
+const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
   const timersRef = useRef({});
 
@@ -48,9 +48,11 @@ export function ToastProvider({ children }) {
       <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </ToastContext.Provider>
   );
-}
+};
 
-export function useToast() {
+export default ToastProvider;
+
+export const useToast = () => {
   const context = useContext(ToastContext);
   if (!context) throw new Error('useToast harus dipakai di dalam <ToastProvider>.');
   return context;

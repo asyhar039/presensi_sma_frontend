@@ -3,9 +3,9 @@ import { GraduationCap, LogOut } from 'lucide-react';
 import { getFilteredMenuItems } from '../../../constants/menu';
 import { ROUTES } from '../../../constants/routes';
 import { useAuth } from '../../../hooks/useAuth';
-import { RenderIcon } from '../../../utils/iconMap';
+import RenderIcon from '../../../utils/iconMap';
 
-export function Sidebar() {
+const Sidebar = () => {
   const { permissions, logout } = useAuth();
   const navigate = useNavigate();
   const visibleMenu = getFilteredMenuItems(permissions);
@@ -50,4 +50,6 @@ export function Sidebar() {
       </nav>
     </div>
   );
-}
+};
+
+export default Sidebar;

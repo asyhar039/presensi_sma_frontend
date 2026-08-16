@@ -1,9 +1,9 @@
 import { Outlet } from 'react-router-dom';
-import { Sidebar } from '../components/layout/Sidebar/Sidebar';
-import { Navbar } from '../components/layout/Navbar/Navbar';
-import { Footer } from '../components/layout/Footer/Footer';
+import Sidebar from '../components/layout/Sidebar/Sidebar';
+import Navbar from '../components/layout/Navbar/Navbar';
+import Footer from '../components/layout/Footer/Footer';
 
-export default function AdminLayout() {
+const AdminLayout = () => {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
@@ -16,4 +16,6 @@ export default function AdminLayout() {
       </div>
     </div>
   );
-}
+};
+
+export default AdminLayout;

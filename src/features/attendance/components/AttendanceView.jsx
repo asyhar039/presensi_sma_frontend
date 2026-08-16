@@ -1,7 +1,7 @@
-import { Card } from '../../../components/ui/Card/Card';
-import { Alert } from '../../../components/feedback/Alert/Alert';
+import Card from '../../../components/ui/Card/Card';
+import Alert from '../../../components/feedback/Alert/Alert';
 
-export function AttendanceView() {
+const AttendanceView = () => {
   return (
     <Card title="Absensi" icon="clipboard-check">
       <Alert variant="info" icon="info-circle">
@@ -9,4 +9,6 @@ export function AttendanceView() {
       </Alert>
     </Card>
   );
-}
+};
+
+export default AttendanceView;

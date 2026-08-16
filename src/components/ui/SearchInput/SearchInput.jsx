@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { RenderIcon } from '../../../utils/iconMap';
+import RenderIcon from '../../../utils/iconMap';
 
-export function SearchInput({
+const SearchInput = ({
   value,
   onChange,
   onSearch,
   placeholder = 'Cari...',
   debounceMs = 300,
   className = '',
-}) {
+}) => {
   const [inputValue, setInputValue] = useState(value ?? '');
   const timerRef = useRef(null);
 
@@ -50,4 +50,6 @@ export function SearchInput({
       ) : null}
     </div>
   );
-}
+};
+
+export default SearchInput;

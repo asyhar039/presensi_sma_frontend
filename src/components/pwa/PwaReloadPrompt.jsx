@@ -1,8 +1,8 @@
 import { useRegisterSW } from 'virtual:pwa-register/react';
-import { Button } from '../ui/Button/Button';
-import { Alert } from '../feedback/Alert/Alert';
+import Button from '../ui/Button/Button';
+import Alert from '../feedback/Alert/Alert';
 
-export function PwaReloadPrompt() {
+const PwaReloadPrompt = () => {
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
@@ -37,4 +37,6 @@ export function PwaReloadPrompt() {
       </Alert>
     </div>
   );
-}
+};
+
+export default PwaReloadPrompt;

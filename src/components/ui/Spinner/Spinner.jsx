@@ -1,4 +1,4 @@
-export function Spinner({ size = 'md', className = '', srText }) {
+const Spinner = ({ size = 'md', className = '', srText }) => {
   return (
     <span
       className={`inline-block animate-spin rounded-full border-current border-r-transparent align-middle ${size === 'sm' ? 'size-4 border-[0.2em]' : 'size-8 border-[0.25em]'} ${className}`.trim()}
@@ -8,4 +8,6 @@ export function Spinner({ size = 'md', className = '', srText }) {
       {srText ? <span className="sr-only">{srText}</span> : null}
     </span>
   );
-}
+};
+
+export default Spinner;

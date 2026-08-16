@@ -4,7 +4,7 @@ const SIZES = {
   lg: 'rounded-lg px-4 py-2 text-lg',
 };
 
-export function Input({
+const Input = ({
   label,
   name,
   value,
@@ -18,7 +18,7 @@ export function Input({
   disabled = false,
   className = '',
   ...props
-}) {
+}) => {
   const sizeClass = SIZES[size] || '';
   const id = props.id || (name ? `form-field-${name}` : undefined);
   const baseClass = `block w-full border bg-white text-dark transition placeholder:text-muted focus:outline-none focus:ring-4 disabled:bg-input-bg ${
@@ -55,4 +55,6 @@ export function Input({
       ) : null}
     </div>
   );
-}
+};
+
+export default Input;

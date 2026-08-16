@@ -1,6 +1,6 @@
-import { RenderIcon } from '../../../utils/iconMap';
+import RenderIcon from '../../../utils/iconMap';
 
-export function EmptyState({ icon, title, message = 'Belum ada data', action, className = '' }) {
+const EmptyState = ({ icon, title, message = 'Belum ada data', action, className = '' }) => {
   return (
     <div className={`text-muted ${className}`.trim()}>
       {icon ? <RenderIcon name={icon} className="mr-1 inline h-5 w-5" /> : null}
@@ -9,4 +9,6 @@ export function EmptyState({ icon, title, message = 'Belum ada data', action, cl
       {action ? <div className="mt-2">{action}</div> : null}
     </div>
   );
-}
+};
+
+export default EmptyState;

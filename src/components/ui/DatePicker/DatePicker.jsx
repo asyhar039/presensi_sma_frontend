@@ -1,6 +1,6 @@
-import { Input } from '../Input/Input';
+import Input from '../Input/Input';
 
-export function DatePicker({
+const DatePicker = ({
   mode = 'date',
   label,
   name,
@@ -13,7 +13,7 @@ export function DatePicker({
   max,
   className = '',
   ...props
-}) {
+}) => {
   return (
     <Input
       type={mode === 'month' ? 'month' : 'date'}
@@ -30,4 +30,6 @@ export function DatePicker({
       {...props}
     />
   );
-}
+};
+
+export default DatePicker;

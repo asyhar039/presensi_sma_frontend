@@ -9,13 +9,13 @@ import { useGetSubjectsQuery } from '../../subjects/services/subjectsAPI';
 import { useGetTeachersQuery } from '../../teachers/services/teachersAPI';
 import { useResourcePermissions } from '../../../hooks/useResourcePermissions';
 import { useCrud } from '../../../hooks/useCrud';
-import { Button } from '../../../components/ui/Button/Button';
-import { DataTable } from '../../../components/data-display/DataTable/DataTable';
-import { Modal } from '../../../components/feedback/Modal/Modal';
-import { Form } from '../../../components/feedback/Form/Form';
-import { ConfirmDialog } from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
-import { Loading } from '../../../components/feedback/Loading/Loading';
-import { ErrorState } from '../../../components/feedback/ErrorState/ErrorState';
+import Button from '../../../components/ui/Button/Button';
+import DataTable from '../../../components/data-display/DataTable/DataTable';
+import Modal from '../../../components/feedback/Modal/Modal';
+import Form from '../../../components/feedback/Form/Form';
+import ConfirmDialog from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
+import Loading from '../../../components/feedback/Loading/Loading';
+import ErrorState from '../../../components/feedback/ErrorState/ErrorState';
 
 const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
 
@@ -27,7 +27,7 @@ const COLUMNS = [
   { key: 'jam', label: 'Jam', render: (row) => `${row.jam_mulai || '-'} - ${row.jam_selesai || '-'}` },
 ];
 
-function buildFields(classes, subjects, teachers) {
+const buildFields = (classes, subjects, teachers) => {
   return [
     { key: 'kelas_id', label: 'Kelas', type: 'select', required: true, options: classes.map((c) => ({ value: c.id, label: c.nama_kelas })) },
     { key: 'mata_pelajaran_id', label: 'Mata Pelajaran', type: 'select', required: true, options: subjects.map((s) => ({ value: s.id, label: s.nama_mapel })) },
@@ -36,9 +36,9 @@ function buildFields(classes, subjects, teachers) {
     { key: 'jam_mulai', label: 'Jam Mulai', type: 'time', required: true },
     { key: 'jam_selesai', label: 'Jam Selesai', type: 'time', required: true },
   ];
-}
+};
 
-export function ScheduleList() {
+const ScheduleList = () => {
   const { canCreate, canEdit, canDelete } = useResourcePermissions('jadwal');
 
   const { data: response, isLoading, error } = useGetSchedulesQuery();
@@ -103,4 +103,6 @@ export function ScheduleList() {
       <ConfirmDialog {...crud.confirmDialog} confirmLabel="Hapus" />
     </>
   );
-}
+};
+
+export default ScheduleList;

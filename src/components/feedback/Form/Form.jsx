@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Button } from '../../ui/Button/Button';
-import { Input } from '../../ui/Input/Input';
-import { Select } from '../../ui/Select/Select';
-import { DatePicker } from '../../ui/DatePicker/DatePicker';
+import Button from '../../ui/Button/Button';
+import Input from '../../ui/Input/Input';
+import Select from '../../ui/Select/Select';
+import DatePicker from '../../ui/DatePicker/DatePicker';
 
-function renderField(field, value, onChange) {
+const renderField = (field, value, onChange) => {
   const common = {
     key: field.key,
     label: field.label,
@@ -33,14 +33,14 @@ function renderField(field, value, onChange) {
   return <Input {...common} type={field.type || 'text'} placeholder={field.placeholder || ''} />;
 }
 
-export function Form({
+const Form = ({
   fields = [],
   initialValues = {},
   onSubmit,
   onCancel,
   submitLabel = 'Simpan',
   cancelLabel = 'Batal',
-}) {
+}) => {
   const [values, setValues] = useState(initialValues);
   const initialKey = JSON.stringify(initialValues ?? {});
 
@@ -68,4 +68,6 @@ export function Form({
       </div>
     </form>
   );
-}
+};
+
+export default Form;

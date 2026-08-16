@@ -1,8 +1,8 @@
-import { Button } from '../../ui/Button/Button';
-import { EmptyState } from '../../feedback/EmptyState/EmptyState';
-import { RenderIcon } from '../../../utils/iconMap';
+import Button from '../../ui/Button/Button';
+import EmptyState from '../../feedback/EmptyState/EmptyState';
+import RenderIcon from '../../../utils/iconMap';
 
-export function CardGrid({
+const CardGrid = ({
   items,
   getKey,
   renderTitle,
@@ -13,7 +13,7 @@ export function CardGrid({
   onEdit,
   onDelete,
   emptyMessage = 'Belum ada data',
-}) {
+}) => {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {items.length > 0 ? items.map((item) => (
@@ -43,4 +43,6 @@ export function CardGrid({
       )}
     </div>
   );
-}
+};
+
+export default CardGrid;

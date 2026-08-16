@@ -1,14 +1,14 @@
 import { useGetStudentProfileQuery } from '../services/studentsAPI';
 import { useAppSelector } from '../../../app/hooks';
 import { selectUser } from '../../auth/authSelectors';
-import { Loading } from '../../../components/feedback/Loading/Loading';
-import { ErrorState } from '../../../components/feedback/ErrorState/ErrorState';
-import { EmptyState } from '../../../components/feedback/EmptyState/EmptyState';
+import Loading from '../../../components/feedback/Loading/Loading';
+import ErrorState from '../../../components/feedback/ErrorState/ErrorState';
+import EmptyState from '../../../components/feedback/EmptyState/EmptyState';
 import { StatisticCardList } from '../../../components/data-display/StatisticCard/StatisticCard';
-import { StatusBadge } from '../../../components/data-display/StatusBadge/StatusBadge';
+import StatusBadge from '../../../components/data-display/StatusBadge/StatusBadge';
 import { ATTENDANCE_LABELS } from '../../../constants/status';
 
-function StudentSummaryCard({ student, profile }) {
+const StudentSummaryCard = ({ student, profile }) => {
   return (
     <div className="mb-4">
       <div className="font-bold">{student?.nama_lengkap || '-'}</div>
@@ -18,7 +18,7 @@ function StudentSummaryCard({ student, profile }) {
   );
 }
 
-export function StudentPortal() {
+const StudentPortal = () => {
   const user = useAppSelector(selectUser);
   const { data: response, isLoading, error } = useGetStudentProfileQuery();
 
@@ -57,4 +57,6 @@ export function StudentPortal() {
       </ul>
     </div>
   );
-}
+};
+
+export default StudentPortal;

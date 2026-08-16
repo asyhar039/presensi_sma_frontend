@@ -52,8 +52,10 @@ const ICON_MAP = {
   'chart-line': ChartLine,
 };
 
-export function RenderIcon({ name, className = 'h-5 w-5', ...props }) {
+const RenderIcon = ({ name, className = 'h-5 w-5', ...props }) => {
   const Component = ICON_MAP[name];
   if (!Component) return null;
   return <Component className={className} {...props} />;
-}
+};
+
+export default RenderIcon;

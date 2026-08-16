@@ -1,6 +1,6 @@
-import { RenderIcon } from '../../../utils/iconMap';
+import RenderIcon from '../../../utils/iconMap';
 
-export function Select({
+const Select = ({
   label,
   name,
   value,
@@ -12,7 +12,7 @@ export function Select({
   disabled = false,
   className = '',
   ...props
-}) {
+}) => {
   const id = props.id || (name ? `form-field-${name}` : undefined);
   const baseClass = `block w-full appearance-none border bg-white py-1.5 pr-10 pl-3 text-base text-dark transition placeholder:text-muted focus:outline-none focus:ring-4 disabled:bg-input-bg ${
     error
@@ -53,4 +53,6 @@ export function Select({
       ) : null}
     </div>
   );
-}
+};
+
+export default Select;

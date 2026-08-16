@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { RenderIcon } from '../../../utils/iconMap';
+import RenderIcon from '../../../utils/iconMap';
 
 const SIZES = {
   sm: 'max-w-[300px]',
@@ -7,7 +7,7 @@ const SIZES = {
   lg: 'max-w-[800px]',
 };
 
-export function Modal({ open, title, size = 'default', onClose, children }) {
+const Modal = ({ open, title, size = 'default', onClose, children }) => {
   useEffect(() => {
     if (!open) return undefined;
 
@@ -59,4 +59,6 @@ export function Modal({ open, title, size = 'default', onClose, children }) {
       </div>
     </div>
   );
-}
+};
+
+export default Modal;

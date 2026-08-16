@@ -1,7 +1,7 @@
-import { Modal } from '../Modal/Modal';
-import { Button } from '../../ui/Button/Button';
+import Modal from '../Modal/Modal';
+import Button from '../../ui/Button/Button';
 
-export function ConfirmDialog({
+const ConfirmDialog = ({
   open,
   title = 'Konfirmasi',
   message = 'Apakah Anda yakin ingin melanjutkan?',
@@ -10,7 +10,7 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
   variant = 'danger',
-}) {
+}) => {
   return (
     <Modal open={open} title={title} onClose={onCancel} size="sm">
       <div className="mb-6">{message}</div>
@@ -20,4 +20,6 @@ export function ConfirmDialog({
       </div>
     </Modal>
   );
-}
+};
+
+export default ConfirmDialog;

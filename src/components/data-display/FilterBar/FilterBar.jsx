@@ -1,10 +1,10 @@
-import { Button } from '../../ui/Button/Button';
-import { Input } from '../../ui/Input/Input';
-import { Select } from '../../ui/Select/Select';
-import { DatePicker } from '../../ui/DatePicker/DatePicker';
-import { SearchInput } from '../../ui/SearchInput/SearchInput';
+import Button from '../../ui/Button/Button';
+import Input from '../../ui/Input/Input';
+import Select from '../../ui/Select/Select';
+import DatePicker from '../../ui/DatePicker/DatePicker';
+import SearchInput from '../../ui/SearchInput/SearchInput';
 
-export function FilterBar({ filters = [], values = {}, onChange, onReset, resetLabel = 'Reset' }) {
+const FilterBar = ({ filters = [], values = {}, onChange, onReset, resetLabel = 'Reset' }) => {
   const handleValue = (key, value) => onChange?.(key, value);
 
   return (
@@ -67,4 +67,6 @@ export function FilterBar({ filters = [], values = {}, onChange, onReset, resetL
       ) : null}
     </div>
   );
-}
+};
+
+export default FilterBar;

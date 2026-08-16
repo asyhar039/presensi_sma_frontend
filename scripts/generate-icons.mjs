@@ -1,10 +1,10 @@
 import { deflateSync } from 'node:zlib';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, copyFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const OUT_DIR = join(__dirname, '..', 'public', 'icons');
+const OUT_DIR = join(__dirname, '..', 'public', 'pwa');
 
 const CRC_TABLE = (() => {
   const table = new Int32Array(256);
@@ -118,7 +118,10 @@ function drawIcon(size) {
 
 mkdirSync(OUT_DIR, { recursive: true });
 for (const size of [192, 512, 180]) {
-  const name = size === 180 ? 'apple-touch-icon.png' : `icon-${size}x${size}.png`;
+  const name = size === 180 ? 'apple-touch-icon.png' : `icon-${size}.png`;
   writeFileSync(join(OUT_DIR, name), drawIcon(size));
   console.log(`generated ${name} (${size}x${size})`);
 }
+// also create maskable copy
+copyFileSync(join(OUT_DIR, 'icon-512.png'), join(OUT_DIR, 'maskable-512.png'));
+console.log('generated maskable-512.png (512x512)');

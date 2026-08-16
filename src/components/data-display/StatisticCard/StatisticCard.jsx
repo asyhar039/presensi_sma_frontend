@@ -1,3 +1,5 @@
+import { RenderIcon } from '../../../utils/iconMap';
+
 const LAYOUTS = {
   default: {
     wrapper: 'rounded-lg border border-[#dee2e6] bg-white p-4',
@@ -35,7 +37,7 @@ export function StatisticCard({
     <div className={`${wrapperClass} ${className}`.trim()}>
       {c.iconBox ? (
         <div className={`${c.iconBox} bg-${tone}`}>
-          <i className={`fas fa-${icon || 'chart-line'}`}></i>
+          <RenderIcon name={icon || 'chart-line'} className="h-6 w-6" />
         </div>
       ) : null}
       <div>

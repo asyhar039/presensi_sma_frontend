@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GraduationCap, Info } from 'lucide-react';
 import { useLoginUserMutation, useLoginStudentMutation } from '../services/authAPI';
 import { Input } from '../../../components/ui/Input/Input';
 import { Alert } from '../../../components/feedback/Alert/Alert';
@@ -43,7 +44,7 @@ export function LoginScreen() {
     <>
       <div className="mb-4 text-center">
         <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-[rgba(99,102,241,0.1)] text-[32px] text-primary">
-          <i className="fas fa-graduation-cap"></i>
+          <GraduationCap className="h-8 w-8" />
         </div>
         <h4 className="text-xl font-bold text-dark">ABSENSI SMA</h4>
         <p className="text-sm text-muted">Sistem Manajemen Kehadiran</p>
@@ -122,7 +123,7 @@ export function LoginScreen() {
           </form>
 
           <div className="mt-6 rounded-lg bg-light p-4 text-sm text-muted">
-            <i className="fas fa-info-circle mr-1"></i>
+            <Info className="mr-1 inline h-4 w-4" />
             <strong>Portal Siswa:</strong> Login dengan Nama Lengkap dan NISN Anda
           </div>
         </>

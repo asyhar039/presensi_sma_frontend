@@ -1,3 +1,5 @@
+import { RenderIcon } from '../../../utils/iconMap';
+
 export function Select({
   label,
   name,
@@ -44,7 +46,7 @@ export function Select({
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
-        <i className="fas fa-chevron-down pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-secondary"></i>
+        <RenderIcon name="chevron-down" className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 h-5 w-5 text-secondary" />
       </div>
       {error ? (
         <div className="mt-1 text-sm text-danger" id={id ? `${id}-error` : undefined}>{error}</div>

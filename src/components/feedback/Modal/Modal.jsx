@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { RenderIcon } from '../../../utils/iconMap';
 
 const SIZES = {
   sm: 'max-w-[300px]',
@@ -49,7 +50,7 @@ export function Modal({ open, title, size = 'default', onClose, children }) {
                 aria-label="Tutup"
                 onClick={onClose}
               >
-                <i className="fas fa-xmark"></i>
+                <RenderIcon name="xmark" className="h-4 w-4" />
               </button>
             </div>
           ) : null}

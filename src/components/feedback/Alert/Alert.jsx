@@ -1,3 +1,5 @@
+import { RenderIcon } from '../../../utils/iconMap';
+
 const VARIANTS = {
   info: 'border-[#b6effb] bg-[#cff4fc] text-[#055160]',
   success: 'border-[#badbcc] bg-[#d1e7dd] text-[#0f5132]',
@@ -23,12 +25,12 @@ export function Alert({
       {...props}
     >
       {title ? (
-        <div className="mb-1 font-bold">
-          {icon ? <i className={`fas fa-${icon} mr-2`}></i> : null}
+        <div className="mb-1 flex items-center font-bold">
+          {icon ? <RenderIcon name={icon} className="mr-2 h-5 w-5" /> : null}
           {title}
         </div>
       ) : null}
-      {!title && icon ? <i className={`fas fa-${icon} mr-2`}></i> : null}
+      {!title && icon ? <RenderIcon name={icon} className="mr-2 inline h-5 w-5" /> : null}
       {children}
       {onDismiss ? (
         <button
@@ -37,7 +39,7 @@ export function Alert({
           aria-label="Tutup"
           onClick={onDismiss}
         >
-          <i className="fas fa-xmark"></i>
+          <RenderIcon name="xmark" className="h-4 w-4" />
         </button>
       ) : null}
     </div>

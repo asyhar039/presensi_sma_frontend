@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { RenderIcon } from '../../../utils/iconMap';
 
 export function SearchInput({
   value,
@@ -27,7 +28,7 @@ export function SearchInput({
   return (
     <div className={`flex w-full items-stretch ${className}`.trim()}>
       <span className="flex items-center rounded-s-md border border-e-0 border-[#dee2e6] bg-[#e9ecef] px-3 text-secondary">
-        <i className="fas fa-search"></i>
+        <RenderIcon name="search" className="h-5 w-5" />
       </span>
       <input
         type="search"
@@ -44,7 +45,7 @@ export function SearchInput({
           aria-label="Hapus pencarian"
           onClick={() => handleChange('')}
         >
-          <i className="fas fa-times"></i>
+          <RenderIcon name="xmark" className="h-5 w-5" />
         </button>
       ) : null}
     </div>

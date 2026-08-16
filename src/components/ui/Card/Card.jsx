@@ -1,3 +1,5 @@
+import { RenderIcon } from '../../../utils/iconMap';
+
 export function Card({
   title,
   icon,
@@ -9,7 +11,7 @@ export function Card({
       {title ? (
         <div className={actions ? 'mb-4 flex items-center justify-between' : 'mb-4'}>
           <h5 className="mb-0 text-xl font-bold">
-            {icon ? <i className={`fas fa-${icon} text-primary mr-2`}></i> : null}
+            {icon ? <RenderIcon name={icon} className="mr-2 inline text-primary" /> : null}
             {title}
           </h5>
           {actions ? <div>{actions}</div> : null}

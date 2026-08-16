@@ -1,5 +1,6 @@
 import { Button } from '../../ui/Button/Button';
 import { EmptyState } from '../../feedback/EmptyState/EmptyState';
+import { RenderIcon } from '../../../utils/iconMap';
 
 export function CardGrid({
   items,
@@ -24,12 +25,12 @@ export function CardGrid({
             <div className="mt-4 inline-flex overflow-hidden rounded-md border border-[#dee2e6]">
               {canEdit ? (
                 <Button variant="outline-warning" className="rounded-none border-0" onClick={() => onEdit(item)}>
-                  <i className="fas fa-edit"></i>
+                  <RenderIcon name="edit" className="h-4 w-4 mr-1" />
                 </Button>
               ) : null}
               {canDelete ? (
                 <Button variant="outline-danger" className="rounded-none border-0" onClick={() => onDelete(item)}>
-                  <i className="fas fa-trash"></i>
+                  <RenderIcon name="trash" className="h-4 w-4 mr-1" />
                 </Button>
               ) : null}
             </div>

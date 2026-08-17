@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 
-export default function Unauthorized() {
+const Unauthorized = () => {
   return (
     <div className="py-12 text-center">
       <div className="text-8xl font-extrabold text-danger">403</div>
@@ -15,4 +15,6 @@ export default function Unauthorized() {
       </Link>
     </div>
   );
-}
+};
+
+export default Unauthorized;

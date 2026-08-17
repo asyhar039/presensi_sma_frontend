@@ -3,10 +3,10 @@ import { useGetClassesQuery } from '../../classes/services/classesAPI';
 import { useAppSelector, useAppDispatch } from '../../../app/hooks';
 import { selectAttendanceFilters } from '../../attendance/attendanceSelectors';
 import { setFilters, resetFilters } from '../../attendance/attendanceSlice';
-import { DataTable } from '../../../components/data-display/DataTable/DataTable';
-import { FilterBar } from '../../../components/data-display/FilterBar/FilterBar';
-import { Loading } from '../../../components/feedback/Loading/Loading';
-import { ErrorState } from '../../../components/feedback/ErrorState/ErrorState';
+import DataTable from '../../../components/data-display/DataTable/DataTable';
+import FilterBar from '../../../components/data-display/FilterBar/FilterBar';
+import Loading from '../../../components/feedback/Loading/Loading';
+import ErrorState from '../../../components/feedback/ErrorState/ErrorState';
 
 const COLUMNS = [
   { key: 'nama_lengkap', label: 'Nama Siswa', render: (row) => row.nama_lengkap || '-' },
@@ -17,12 +17,12 @@ const COLUMNS = [
   { key: 'persentase_hadir', label: '% Hadir', render: (row) => `${row.persentase_hadir ?? 0}%` },
 ];
 
-function toMonthValue(filters) {
+const toMonthValue = (filters) => {
   if (!filters.bulan || !filters.tahun) return '';
   return `${filters.tahun}-${String(filters.bulan).padStart(2, '0')}`;
-}
+};
 
-export function ReportView() {
+const ReportView = () => {
   const dispatch = useAppDispatch();
   const filters = useAppSelector(selectAttendanceFilters);
   const { data: classResponse } = useGetClassesQuery();
@@ -79,4 +79,6 @@ export function ReportView() {
       />
     </>
   );
-}
+};
+
+export default ReportView;

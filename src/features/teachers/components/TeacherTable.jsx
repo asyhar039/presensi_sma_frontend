@@ -8,14 +8,14 @@ import {
 import { useResourcePermissions } from '../../../hooks/useResourcePermissions';
 import { useDebounce } from '../../../hooks/useDebounce';
 import { useCrud } from '../../../hooks/useCrud';
-import { Button } from '../../../components/ui/Button/Button';
-import { SearchInput } from '../../../components/ui/SearchInput/SearchInput';
-import { DataTable } from '../../../components/data-display/DataTable/DataTable';
-import { Modal } from '../../../components/feedback/Modal/Modal';
-import { Form } from '../../../components/feedback/Form/Form';
-import { ConfirmDialog } from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
-import { Loading } from '../../../components/feedback/Loading/Loading';
-import { ErrorState } from '../../../components/feedback/ErrorState/ErrorState';
+import Button from '../../../components/ui/Button/Button';
+import SearchInput from '../../../components/ui/SearchInput/SearchInput';
+import DataTable from '../../../components/data-display/DataTable/DataTable';
+import Modal from '../../../components/feedback/Modal/Modal';
+import Form from '../../../components/feedback/Form/Form';
+import ConfirmDialog from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
+import Loading from '../../../components/feedback/Loading/Loading';
+import ErrorState from '../../../components/feedback/ErrorState/ErrorState';
 
 const FIELDS = [
   { key: 'nip', label: 'NIP', required: true },
@@ -38,7 +38,7 @@ const COLUMNS = [
   { key: 'no_telp', label: 'No. Telp', render: (row) => row.no_telp || '-' },
 ];
 
-export function TeacherTable() {
+const TeacherTable = () => {
   const { canCreate, canEdit, canDelete } = useResourcePermissions('guru');
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 300);
@@ -113,4 +113,6 @@ export function TeacherTable() {
       <ConfirmDialog {...crud.confirmDialog} confirmLabel="Hapus" />
     </>
   );
-}
+};
+
+export default TeacherTable;

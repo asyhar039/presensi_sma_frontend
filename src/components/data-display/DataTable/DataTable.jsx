@@ -1,11 +1,12 @@
 import { usePagination } from '../../../hooks/usePagination';
-import { Pagination } from '../Pagination/Pagination';
-import { Button } from '../../ui/Button/Button';
-import { Card } from '../../ui/Card/Card';
-import { EmptyState } from '../../feedback/EmptyState/EmptyState';
-import { Loading } from '../../feedback/Loading/Loading';
+import Pagination from '../Pagination/Pagination';
+import Button from '../../ui/Button/Button';
+import Card from '../../ui/Card/Card';
+import EmptyState from '../../feedback/EmptyState/EmptyState';
+import Loading from '../../feedback/Loading/Loading';
+import RenderIcon from '../../../utils/iconMap';
 
-export function DataTable({
+const DataTable = ({
   title,
   icon,
   description,
@@ -19,7 +20,7 @@ export function DataTable({
   rowActions = [],
   paginated = false,
   pageSize = 10,
-}) {
+}) => {
   const { page, totalPages, pageItems, setPage } = usePagination(rows, pageSize);
   const displayRows = paginated ? pageItems : rows;
   const hasActions = rowActions.length > 0;
@@ -64,7 +65,7 @@ export function DataTable({
                               className="rounded-none border-0"
                               onClick={() => action.onClick(row)}
                             >
-                              <i className={`fas fa-${action.icon}`}></i>
+                              <RenderIcon name={action.icon} className="h-4 w-4" />
                             </Button>
                           )
                         ))}
@@ -90,4 +91,6 @@ export function DataTable({
       ) : null}
     </Card>
   );
-}
+};
+
+export default DataTable;

@@ -1,3 +1,11 @@
+import Button from '../../../components/ui/Button/Button';
+import SearchInput from '../../../components/ui/SearchInput/SearchInput';
+import DataTable from '../../../components/data-display/DataTable/DataTable';
+import Modal from '../../../components/feedback/Modal/Modal';
+import Form from '../../../components/feedback/Form/Form';
+import ConfirmDialog from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
+import Loading from '../../../components/feedback/Loading/Loading';
+import ErrorState from '../../../components/feedback/ErrorState/ErrorState';
 import { useMemo, useState } from 'react';
 import {
   useGetStudentsQuery,
@@ -9,14 +17,6 @@ import { useGetClassesQuery } from '../../classes/services/classesAPI';
 import { useResourcePermissions } from '../../../hooks/useResourcePermissions';
 import { useDebounce } from '../../../hooks/useDebounce';
 import { useCrud } from '../../../hooks/useCrud';
-import { Button } from '../../../components/ui/Button/Button';
-import { SearchInput } from '../../../components/ui/SearchInput/SearchInput';
-import { DataTable } from '../../../components/data-display/DataTable/DataTable';
-import { Modal } from '../../../components/feedback/Modal/Modal';
-import { Form } from '../../../components/feedback/Form/Form';
-import { ConfirmDialog } from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
-import { Loading } from '../../../components/feedback/Loading/Loading';
-import { ErrorState } from '../../../components/feedback/ErrorState/ErrorState';
 
 const FIELDS = [
   { key: 'nisn', label: 'NISN', required: true },
@@ -39,7 +39,7 @@ const COLUMNS = [
   { key: 'no_telp', label: 'No. Telp', render: (row) => row.no_telp || '-' },
 ];
 
-export function StudentTable() {
+const StudentTable = () => {
   const { canCreate, canEdit, canDelete } = useResourcePermissions('siswa');
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 300);
@@ -118,4 +118,6 @@ export function StudentTable() {
       <ConfirmDialog {...crud.confirmDialog} confirmLabel="Hapus" />
     </>
   );
-}
+};
+
+export default StudentTable;

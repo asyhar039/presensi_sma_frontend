@@ -1,4 +1,5 @@
-import { Spinner } from '../Spinner/Spinner';
+import Spinner from '../Spinner/Spinner';
+import RenderIcon from '../../../utils/iconMap';
 
 const VARIANTS = {
   primary: 'border-primary bg-primary text-white hover:border-primary-hover hover:bg-primary-hover',
@@ -21,7 +22,7 @@ const SIZES = {
   lg: 'rounded-lg px-4 py-2 text-lg',
 };
 
-export function Button({
+const Button = ({
   variant = 'primary',
   size = 'sm',
   icon,
@@ -30,7 +31,7 @@ export function Button({
   children,
   className = '',
   ...props
-}) {
+}) => {
   const { disabled } = props;
   return (
     <button
@@ -41,8 +42,10 @@ export function Button({
       {...props}
     >
       {loading ? <Spinner size="sm" className="mr-1" /> : null}
-      {icon ? <i className={`fas fa-${icon}`}></i> : null}
+      {icon ? <RenderIcon name={icon} className={size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'} /> : null}
       {children}
     </button>
   );
-}
+};
+
+export default Button;

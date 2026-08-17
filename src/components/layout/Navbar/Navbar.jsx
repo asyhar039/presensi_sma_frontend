@@ -1,15 +1,15 @@
 import { useLocation } from 'react-router-dom';
 import { menuItems } from '../../../constants/menu';
 import { useAuth } from '../../../hooks/useAuth';
-import { Avatar } from '../../ui/Avatar/Avatar';
+import Avatar from '../../ui/Avatar/Avatar';
 
-function getRouteTitle(pathname) {
+const getRouteTitle = (pathname) => {
   const key = pathname.replace('/', '');
   const menuItem = menuItems.find((item) => item.key === key);
   return menuItem?.label || 'Dashboard';
 }
 
-export function Navbar() {
+const Navbar = () => {
   const { user } = useAuth();
   const location = useLocation();
   const title = getRouteTitle(location.pathname);
@@ -26,4 +26,6 @@ export function Navbar() {
       </div>
     </div>
   );
-}
+};
+
+export default Navbar;

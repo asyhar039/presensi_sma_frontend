@@ -2,7 +2,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ROUTES } from '../constants/routes';
 
-export default function RoleRoute({ roles, children }) {
+const RoleRoute = ({ roles, children }) => {
   const { role } = useAuth();
 
   if (roles && !roles.includes(role)) {
@@ -10,4 +10,6 @@ export default function RoleRoute({ roles, children }) {
   }
 
   return children ?? <Outlet />;
-}
+};
+
+export default RoleRoute;

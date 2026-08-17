@@ -9,7 +9,7 @@ const TONES = {
   dark: 'bg-dark text-white',
 };
 
-export function Badge({ tone = 'secondary', children, className = '', ...props }) {
+const Badge = ({ tone = 'secondary', children, className = '', ...props }) => {
   return (
     <span
       className={`inline-block rounded-md px-[0.65em] py-[0.35em] text-[0.75em] leading-none text-center whitespace-nowrap align-baseline ${TONES[tone] || TONES.secondary} ${className}`.trim()}
@@ -18,4 +18,6 @@ export function Badge({ tone = 'secondary', children, className = '', ...props }
       {children}
     </span>
   );
-}
+};
+
+export default Badge;

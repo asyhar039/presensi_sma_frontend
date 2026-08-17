@@ -7,14 +7,14 @@ import {
 import { useGetTeachersQuery } from '../../teachers/services/teachersAPI';
 import { useResourcePermissions } from '../../../hooks/useResourcePermissions';
 import { useCrud } from '../../../hooks/useCrud';
-import { Button } from '../../../components/ui/Button/Button';
-import { Card } from '../../../components/ui/Card/Card';
-import { CardGrid } from '../../../components/data-display/CardGrid/CardGrid';
-import { Modal } from '../../../components/feedback/Modal/Modal';
-import { Form } from '../../../components/feedback/Form/Form';
-import { ConfirmDialog } from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
-import { Loading } from '../../../components/feedback/Loading/Loading';
-import { ErrorState } from '../../../components/feedback/ErrorState/ErrorState';
+import Button from '../../../components/ui/Button/Button';
+import Card from '../../../components/ui/Card/Card';
+import CardGrid from '../../../components/data-display/CardGrid/CardGrid';
+import Modal from '../../../components/feedback/Modal/Modal';
+import Form from '../../../components/feedback/Form/Form';
+import ConfirmDialog from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
+import Loading from '../../../components/feedback/Loading/Loading';
+import ErrorState from '../../../components/feedback/ErrorState/ErrorState';
 
 const FIELDS = [
   { key: 'nama_mapel', label: 'Nama Mata Pelajaran', required: true },
@@ -22,7 +22,7 @@ const FIELDS = [
   { key: 'guru_id', label: 'Guru Pengampu', type: 'select', required: true },
 ];
 
-export function SubjectList() {
+const SubjectList = () => {
   const { canCreate, canEdit, canDelete } = useResourcePermissions('mapel');
 
   const { data: response, isLoading, error } = useGetSubjectsQuery();
@@ -92,4 +92,6 @@ export function SubjectList() {
       <ConfirmDialog {...crud.confirmDialog} confirmLabel="Hapus" />
     </>
   );
-}
+};
+
+export default SubjectList;

@@ -1,3 +1,5 @@
+import RenderIcon from '../../../utils/iconMap';
+
 const LAYOUTS = {
   default: {
     wrapper: 'rounded-lg border border-[#dee2e6] bg-white p-4',
@@ -19,14 +21,14 @@ const LAYOUTS = {
   },
 };
 
-export function StatisticCard({
+const StatisticCard = ({
   label,
   value = 0,
   icon,
   tone = 'primary',
   layout = 'default',
   className = '',
-}) {
+}) => {
   const c = LAYOUTS[layout] || LAYOUTS.default;
   const wrapperClass = layout === 'flat' ? `${c.wrapper} bg-${tone}/10 text-${tone}` : c.wrapper;
   const valueClass = layout === 'icon' ? `${c.value} text-${tone}` : c.value;
@@ -35,7 +37,7 @@ export function StatisticCard({
     <div className={`${wrapperClass} ${className}`.trim()}>
       {c.iconBox ? (
         <div className={`${c.iconBox} bg-${tone}`}>
-          <i className={`fas fa-${icon || 'chart-line'}`}></i>
+          <RenderIcon name={icon || 'chart-line'} className="h-6 w-6" />
         </div>
       ) : null}
       <div>
@@ -44,16 +46,18 @@ export function StatisticCard({
       </div>
     </div>
   );
-}
+};
 
-export function StatisticCardList({
+export default StatisticCard;
+
+export const StatisticCardList = ({
   stats = {},
   labels = [],
   tones = [],
   layout = 'default',
   rowClassName = 'mt-4 grid grid-cols-1 gap-4 md:grid-cols-4',
   colClassName = '',
-}) {
+}) => {
   return (
     <div className={rowClassName}>
       {labels.map((label, index) => {

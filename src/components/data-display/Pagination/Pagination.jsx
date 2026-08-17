@@ -1,4 +1,4 @@
-export function Pagination({ page, totalPages, onPageChange }) {
+const Pagination = ({ page, totalPages, onPageChange }) => {
   if (totalPages <= 1) return null;
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -34,4 +34,6 @@ export function Pagination({ page, totalPages, onPageChange }) {
       </ul>
     </nav>
   );
-}
+};
+
+export default Pagination;

@@ -38,11 +38,11 @@ const DataTable = ({
             <thead>
               <tr>
                 {columns.map((column) => (
-                  <th key={column.key} className="border-b-2 border-[#dee2e6] px-2 py-2 text-left font-semibold">
+                  <th key={column.key} className="border-b-2 border-[#dee2e6] px-3 py-2 text-left font-semibold whitespace-nowrap">
                     {column.label}
                   </th>
                 ))}
-                {hasActions ? <th className="border-b-2 border-[#dee2e6] px-2 py-2 text-right font-semibold">Aksi</th> : null}
+                {hasActions ? <th className="border-b-2 border-[#dee2e6] px-3 py-2 text-right font-semibold whitespace-nowrap">Aksi</th> : null}
               </tr>
             </thead>
             <tbody>

@@ -59,7 +59,13 @@ const Form = ({
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      {fields.map((field) => renderField(field, values[field.key] ?? '', handleChange))}
+      <div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">
+        {fields.map((field) => (
+          <div key={field.key}>
+            {renderField(field, values[field.key] ?? '', handleChange)}
+          </div>
+        ))}
+      </div>
       <div className="mt-4 flex justify-end gap-2">
         {onCancel ? (
           <Button variant="secondary" onClick={onCancel}>{cancelLabel}</Button>

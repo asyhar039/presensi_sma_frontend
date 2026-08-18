@@ -102,7 +102,7 @@ const LoginForm = ({
             disabled={loading}
             aria-invalid={!!errors.username}
             aria-describedby={errors.username ? 'username-error' : undefined}
-            className={`w-full px-4 py-2.5 rounded-full border text-sm transition-all outline-none ${
+            className={`w-full px-4 py-3 rounded-full border text-sm transition-all outline-none ${
               errors.username
                 ? 'border-red-500 focus:ring-2 focus:ring-red-500/20'
                 : 'border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
@@ -133,7 +133,7 @@ const LoginForm = ({
               disabled={loading}
               aria-invalid={!!errors.password}
               aria-describedby={errors.password ? 'password-error' : undefined}
-              className={`w-full pl-4 pr-11 py-2.5 rounded-full border text-sm transition-all outline-none ${
+              className={`w-full pl-4 pr-12 py-3 rounded-full border text-sm transition-all outline-none ${
                 errors.password
                   ? 'border-red-500 focus:ring-2 focus:ring-red-500/20'
                   : 'border-blue-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
@@ -144,12 +144,12 @@ const LoginForm = ({
               onClick={() => setShowPassword(!showPassword)}
               disabled={loading}
               aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-blue-400 hover:text-blue-600 transition-colors focus:outline-none"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 text-blue-400 hover:text-blue-600 transition-colors rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50"
             >
               {showPassword ? (
-                <EyeOff className="w-4 h-4" aria-hidden="true" />
+                <EyeOff className="w-5 h-5" aria-hidden="true" />
               ) : (
-                <Eye className="w-4 h-4" aria-hidden="true" />
+                <Eye className="w-5 h-5" aria-hidden="true" />
               )}
             </button>
           </div>
@@ -165,7 +165,7 @@ const LoginForm = ({
           <button
             type="button"
             onClick={onForgotPasswordClick}
-            className="text-xs text-blue-500 hover:text-blue-700 hover:underline focus:outline-none"
+            className="px-2 py-2 -ml-2 text-xs text-blue-500 hover:text-blue-700 hover:underline rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50"
           >
             Forget password?
           </button>

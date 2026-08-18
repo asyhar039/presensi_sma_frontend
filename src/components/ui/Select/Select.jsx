@@ -14,7 +14,7 @@ const Select = ({
   ...props
 }) => {
   const id = props.id || (name ? `form-field-${name}` : undefined);
-  const baseClass = `block w-full appearance-none border bg-white py-1.5 pr-10 pl-3 text-base text-dark transition placeholder:text-muted focus:outline-none focus:ring-4 disabled:bg-input-bg ${
+  const baseClass = `block w-full appearance-none border bg-white py-2 pr-10 pl-3 text-base text-dark transition placeholder:text-muted focus:outline-none focus:ring-4 disabled:bg-input-bg ${
     error
       ? 'border-danger focus:border-danger focus:ring-danger/25'
       : 'border-[#dee2e6] focus:border-[#86b7fe] focus:ring-primary/25'

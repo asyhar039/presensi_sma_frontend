@@ -49,7 +49,7 @@ const DashboardView = () => {
 
   return (
     <div>
-      <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-4">
+      <div className="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
           <StatisticCard
             key={card.label}
@@ -63,7 +63,7 @@ const DashboardView = () => {
       </div>
 
       <Card title="Ringkasan Absensi Hari Ini" icon="clipboard-list">
-        <div className="grid grid-cols-4 gap-4 text-center">
+        <div className="grid grid-cols-2 gap-4 text-center sm:grid-cols-4">
           {ATTENDANCE_LABELS.map((label, index) => (
             <StatisticCard
               key={label}

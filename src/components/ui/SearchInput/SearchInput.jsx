@@ -32,7 +32,7 @@ const SearchInput = ({
       </span>
       <input
         type="search"
-        className={`min-w-0 flex-1 border border-[#dee2e6] bg-white px-3 py-1.5 text-base text-dark placeholder:text-muted focus:outline-none focus:ring-4 focus:ring-primary/25 ${inputValue ? 'rounded-none' : 'rounded-e-md'}`}
+        className={`min-w-0 flex-1 border border-[#dee2e6] bg-white px-3 py-2 text-base text-dark placeholder:text-muted focus:outline-none focus:ring-4 focus:ring-primary/25 ${inputValue ? 'rounded-none' : 'rounded-e-md'}`}
         placeholder={placeholder}
         value={inputValue}
         onChange={(e) => handleChange(e.target.value)}

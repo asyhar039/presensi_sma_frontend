@@ -12,15 +12,16 @@ export default defineConfig({
       registerType: 'prompt',
       injectRegister: null,
       strategies: 'generateSW',
-      manifest: {
-        name: 'Presensi SMA',
-        short_name: 'Presensi',
-        description: 'Sistem Manajemen Kehadiran Siswa SMA',
-        theme_color: '#6366f1',
-        background_color: '#f8fafc',
-        display: 'standalone',
-        scope: '/',
-        start_url: '/',
+        manifest: {
+          name: 'Presensi SMA',
+          short_name: 'Presensi',
+          description: 'Sistem Manajemen Kehadiran Siswa SMA',
+          lang: 'id',
+          theme_color: '#6366f1',
+          background_color: '#f8fafc',
+          display: 'standalone',
+          scope: '/',
+          start_url: '/',
         icons: [
           {
             src: 'pwa/icon-192.png',

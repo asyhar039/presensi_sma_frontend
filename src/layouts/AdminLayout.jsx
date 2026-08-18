@@ -5,14 +5,16 @@ import Footer from '../components/layout/Footer/Footer';
 
 const AdminLayout = () => {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-dvh overflow-x-hidden bg-slate-50">
       <Sidebar />
-      <div className="ml-[80px] w-[calc(100%-80px)] flex-1 p-4 lg:ml-[260px] lg:w-[calc(100%-260px)] lg:p-[30px]">
-        <Navbar />
-        <div className="p-4">
-          <Outlet />
+      <div className="flex-1 w-full lg:pl-[280px]">
+        <div className="p-4 lg:p-8 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)]">
+          <Navbar />
+          <div className="mt-6">
+            <Outlet />
+          </div>
+          <Footer />
         </div>
-        <Footer />
       </div>
     </div>
   );

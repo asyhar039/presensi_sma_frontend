@@ -3,12 +3,12 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
   const itemClass =
-    'rounded border border-[#dee2e6] bg-white px-2 py-1 text-sm text-primary transition-colors hover:bg-[#e9ecef] disabled:pointer-events-none disabled:opacity-65';
+    'rounded border border-[#dee2e6] bg-white px-3 py-1.5 text-sm text-primary transition-colors hover:bg-[#e9ecef] disabled:pointer-events-none disabled:opacity-65';
   const activeClass = 'border-primary bg-primary text-white hover:bg-primary';
 
   return (
     <nav aria-label="Navigasi halaman">
-      <ul className="m-0 flex list-none flex-wrap justify-end gap-1 p-0">
+      <ul className="m-0 flex list-none flex-wrap justify-center gap-1 p-0 sm:justify-end">
         <li>
           <button type="button" className={itemClass} disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
             Sebelumnya

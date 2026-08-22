@@ -6,7 +6,7 @@ export const dashboardAPI = createApi({
   baseQuery: createApiBaseQuery(),
   endpoints: (builder) => ({
     getDashboardStats: builder.query({
-      query: () => '/dashboard/stats.php',
+      query: () => '/dashboard',
       transformResponse: (response) => response,
       keepUnusedDataFor: 0,
       refetchOnMountOrArgChange: true,

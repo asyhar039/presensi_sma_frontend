@@ -7,7 +7,7 @@ export const teachersAPI = createApi({
   baseQuery: createApiBaseQuery(),
   tagTypes: ['Teachers'],
   endpoints: (builder) => ({
-    ...buildCrudEndpoints(builder, { entity: 'teacher', entities: 'teachers', basePath: '/guru/index.php', tag: 'Teachers' }),
+    ...buildCrudEndpoints(builder, { entity: 'teacher', entities: 'teachers', basePath: '/teachers', tag: 'Teachers' }),
   }),
 });
 

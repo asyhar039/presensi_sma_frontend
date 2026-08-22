@@ -10,7 +10,7 @@ export function resolveApiBase(location = typeof window !== 'undefined' ? window
   const isLocalDev = ['localhost', '127.0.0.1', '0.0.0.0'].includes(hostname) || ['3000', '3003', '3004'].includes(location.port || '');
 
   if (pathname.includes('/Presensi/')) {
-    return `${origin}/Presensi/presensi_sma_backend/api`;
+    return `${origin}/backendpresent/presensi_sma_backend/api`;
   }
 
   if (isLocalDev) {

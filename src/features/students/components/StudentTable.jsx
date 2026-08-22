@@ -17,6 +17,7 @@ import { useGetClassesQuery } from '../../classes/services/classesAPI';
 import { useResourcePermissions } from '../../../hooks/useResourcePermissions';
 import { useDebounce } from '../../../hooks/useDebounce';
 import { useCrud } from '../../../hooks/useCrud';
+import { isMaintenanceError, getErrorMessage } from '../../../utils/errors';
 
 const FIELDS = [
   { key: 'nisn', label: 'NISN', required: true },
@@ -44,7 +45,7 @@ const StudentTable = () => {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 300);
 
-  const { data: response, isLoading, error } = useGetStudentsQuery();
+  const { data: response, isLoading, error, refetch } = useGetStudentsQuery();
   const { data: classResponse } = useGetClassesQuery();
   const [createStudent] = useCreateStudentMutation();
   const [updateStudent] = useUpdateStudentMutation();
@@ -88,7 +89,16 @@ const StudentTable = () => {
   ];
 
   if (isLoading) return <Loading message="Memuat data siswa..." />;
-  if (error) return <ErrorState message="Gagal memuat data siswa. Pastikan backend tersedia." />;
+  if (error) {
+    const maintenance = isMaintenanceError(error);
+    return (
+      <ErrorState
+        maintenance={maintenance}
+        message={getErrorMessage(error, "Gagal memuat data siswa. Silakan coba beberapa saat lagi.")}
+        onRetry={refetch}
+      />
+    );
+  }
 
   return (
     <>

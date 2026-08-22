@@ -7,6 +7,8 @@ import EmptyState from '../../../components/feedback/EmptyState/EmptyState';
 import { StatisticCardList } from '../../../components/data-display/StatisticCard/StatisticCard';
 import StatusBadge from '../../../components/data-display/StatusBadge/StatusBadge';
 import { ATTENDANCE_LABELS } from '../../../constants/status';
+import { isMaintenanceError, getErrorMessage } from '../../../utils/errors';
+import Card from '../../../components/ui/Card/Card';
 
 const StudentSummaryCard = ({ student, profile }) => {
   return (
@@ -20,10 +22,19 @@ const StudentSummaryCard = ({ student, profile }) => {
 
 const StudentPortal = () => {
   const user = useAppSelector(selectUser);
-  const { data: response, isLoading, error } = useGetStudentProfileQuery();
+  const { data: response, isLoading, error, refetch } = useGetStudentProfileQuery();
 
   if (isLoading) return <Loading message="Memuat profil siswa..." />;
-  if (error) return <ErrorState message="Profil siswa tidak dapat dimuat saat ini." />;
+  if (error) {
+    const maintenance = isMaintenanceError(error);
+    return (
+      <ErrorState
+        maintenance={maintenance}
+        message={getErrorMessage(error, "Profil siswa tidak dapat dimuat saat ini. Silakan coba beberapa saat lagi.")}
+        onRetry={refetch}
+      />
+    );
+  }
 
   const profile = response?.data || null;
   const student = profile?.student || user;

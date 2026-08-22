@@ -16,6 +16,7 @@ import Form from '../../../components/feedback/Form/Form';
 import ConfirmDialog from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
 import Loading from '../../../components/feedback/Loading/Loading';
 import ErrorState from '../../../components/feedback/ErrorState/ErrorState';
+import { isMaintenanceError, getErrorMessage } from '../../../utils/errors';
 
 const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
 
@@ -41,7 +42,7 @@ const buildFields = (classes, subjects, teachers) => {
 const ScheduleList = () => {
   const { canCreate, canEdit, canDelete } = useResourcePermissions('jadwal');
 
-  const { data: response, isLoading, error } = useGetSchedulesQuery();
+  const { data: response, isLoading, error, refetch } = useGetSchedulesQuery();
   const { data: classResponse } = useGetClassesQuery();
   const { data: subjectResponse } = useGetSubjectsQuery();
   const { data: teacherResponse } = useGetTeachersQuery();
@@ -75,7 +76,16 @@ const ScheduleList = () => {
   ];
 
   if (isLoading) return <Loading message="Memuat jadwal pelajaran..." />;
-  if (error) return <ErrorState message="Gagal memuat jadwal pelajaran." />;
+  if (error) {
+    const maintenance = isMaintenanceError(error);
+    return (
+      <ErrorState
+        maintenance={maintenance}
+        message={getErrorMessage(error, "Gagal memuat jadwal pelajaran. Silakan coba beberapa saat lagi.")}
+        onRetry={refetch}
+      />
+    );
+  }
 
   return (
     <>

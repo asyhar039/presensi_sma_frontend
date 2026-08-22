@@ -15,6 +15,7 @@ import Form from '../../../components/feedback/Form/Form';
 import ConfirmDialog from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
 import Loading from '../../../components/feedback/Loading/Loading';
 import ErrorState from '../../../components/feedback/ErrorState/ErrorState';
+import { isMaintenanceError, getErrorMessage } from '../../../utils/errors';
 
 const FIELDS = [
   { key: 'nama_kelas', label: 'Nama Kelas', required: true, placeholder: 'Contoh: X-A' },
@@ -30,7 +31,7 @@ const FIELDS = [
 const ClassList = () => {
   const { canCreate, canEdit, canDelete } = useResourcePermissions('kelas');
 
-  const { data: response, isLoading, error } = useGetClassesQuery();
+  const { data: response, isLoading, error, refetch } = useGetClassesQuery();
   const { data: teacherResponse } = useGetTeachersQuery();
   const [createClass] = useCreateClassMutation();
   const [updateClass] = useUpdateClassMutation();
@@ -60,7 +61,16 @@ const ClassList = () => {
   const items = response?.data || [];
 
   if (isLoading) return <Loading message="Memuat data kelas..." />;
-  if (error) return <ErrorState message="Gagal memuat data kelas." />;
+  if (error) {
+    const maintenance = isMaintenanceError(error);
+    return (
+      <ErrorState
+        maintenance={maintenance}
+        message={getErrorMessage(error, "Gagal memuat data kelas. Silakan coba beberapa saat lagi.")}
+        onRetry={refetch}
+      />
+    );
+  }
 
   return (
     <>

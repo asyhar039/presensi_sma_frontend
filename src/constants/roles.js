@@ -1,7 +1,7 @@
 import { PERMISSIONS } from './permissions';
 
 export const ROLES = {
-  ADMIN: 'admin',
+  ADMIN: 'super_admin',
   TEACHER: 'guru',
   STUDENT: 'student',
 };

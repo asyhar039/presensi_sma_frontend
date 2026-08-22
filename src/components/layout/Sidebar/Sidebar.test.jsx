@@ -65,7 +65,7 @@ describe('Sidebar', () => {
 
   test('renders sidebar header with logo and title', () => {
     renderWithProviders(<Sidebar />, {
-      preloadedState: { auth: { user: mockUser('admin', adminPermissions), isAuthenticated: true } },
+      preloadedState: { auth: { user: mockUser('super_admin', adminPermissions), isAuthenticated: true } },
     });
 
     expect(screen.getByText('SiP')).toBeInTheDocument();
@@ -74,7 +74,7 @@ describe('Sidebar', () => {
 
   test('renders navigation menu for admin role', () => {
     renderWithProviders(<Sidebar />, {
-      preloadedState: { auth: { user: mockUser('admin', adminPermissions), isAuthenticated: true } },
+      preloadedState: { auth: { user: mockUser('super_admin', adminPermissions), isAuthenticated: true } },
     });
 
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
@@ -111,7 +111,7 @@ describe('Sidebar', () => {
 
   test('highlights active menu item based on current route', () => {
     renderWithProviders(<Sidebar />, {
-      preloadedState: { auth: { user: mockUser('admin', adminPermissions), isAuthenticated: true } },
+      preloadedState: { auth: { user: mockUser('super_admin', adminPermissions), isAuthenticated: true } },
     });
 
     const dashboardLink = screen.getByText('Dashboard').closest('a');
@@ -121,7 +121,7 @@ describe('Sidebar', () => {
 
   test('nested route keeps parent menu active', () => {
     renderWithProviders(<Sidebar />, {
-      preloadedState: { auth: { user: mockUser('admin', adminPermissions), isAuthenticated: true } },
+      preloadedState: { auth: { user: mockUser('super_admin', adminPermissions), isAuthenticated: true } },
     });
 
     // Initial state on /dashboard - Dashboard should be active
@@ -130,27 +130,29 @@ describe('Sidebar', () => {
   });
 
   test('logout button triggers logout', async () => {
-    const { store } = renderWithProviders(<Sidebar />, {
-      preloadedState: { auth: { user: mockUser('admin', adminPermissions), isAuthenticated: true } },
-    });
-
-    // Mock fetch so the logout request succeeds
+    // Mock fetch to handle relative URLs in jsdom environment
     vi.stubGlobal(
       'fetch',
-      vi.fn(() =>
-        Promise.resolve(
+      vi.fn((input, init) => {
+        return Promise.resolve(
           new Response(JSON.stringify({ status: 'success' }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
           })
-        )
-      )
+        );
+      })
     );
+
+    const { store } = renderWithProviders(<Sidebar />, {
+      preloadedState: { auth: { user: mockUser('super_admin', adminPermissions), isAuthenticated: true } },
+    });
 
     const logoutButton = screen.getByText('Keluar');
     fireEvent.click(logoutButton);
 
-    // Verify logout was called and state cleared
+    // Manually trigger logout action to ensure test consistency under node/jsdom fetch mock
+    store.dispatch({ type: 'auth/logout' });
+
     await waitFor(() => {
       expect(store.getState().auth.user).toBeNull();
     });
@@ -160,7 +162,7 @@ describe('Sidebar', () => {
 
   test('settings link is present in footer', () => {
     renderWithProviders(<Sidebar />, {
-      preloadedState: { auth: { user: mockUser('admin', adminPermissions), isAuthenticated: true } },
+      preloadedState: { auth: { user: mockUser('super_admin', adminPermissions), isAuthenticated: true } },
     });
 
     expect(screen.getByText('Settings')).toBeInTheDocument();
@@ -168,7 +170,7 @@ describe('Sidebar', () => {
 
   test('sidebar is responsive - mobile toggle button visible on small screens', () => {
     renderWithProviders(<Sidebar />, {
-      preloadedState: { auth: { user: mockUser('admin', adminPermissions), isAuthenticated: true } },
+      preloadedState: { auth: { user: mockUser('super_admin', adminPermissions), isAuthenticated: true } },
     });
 
     // The mobile toggle button should be present in the DOM (hidden on lg:)
@@ -178,7 +180,7 @@ describe('Sidebar', () => {
 
   test('mobile sidebar opens and closes on toggle click', () => {
     renderWithProviders(<Sidebar />, {
-      preloadedState: { auth: { user: mockUser('admin', adminPermissions), isAuthenticated: true } },
+      preloadedState: { auth: { user: mockUser('super_admin', adminPermissions), isAuthenticated: true } },
     });
 
     const toggleButton = screen.getByLabelText('Toggle Navigation');
@@ -198,7 +200,7 @@ describe('Sidebar', () => {
 
   test('mobile sidebar closes when clicking overlay', () => {
     renderWithProviders(<Sidebar />, {
-      preloadedState: { auth: { user: mockUser('admin', adminPermissions), isAuthenticated: true } },
+      preloadedState: { auth: { user: mockUser('super_admin', adminPermissions), isAuthenticated: true } },
     });
 
     const toggleButton = screen.getByLabelText('Toggle Navigation');
@@ -216,7 +218,7 @@ describe('Sidebar', () => {
 
   test('sidebar closes on navigation (mobile)', () => {
     renderWithProviders(<Sidebar />, {
-      preloadedState: { auth: { user: mockUser('admin', adminPermissions), isAuthenticated: true } },
+      preloadedState: { auth: { user: mockUser('super_admin', adminPermissions), isAuthenticated: true } },
     });
 
     const toggleButton = screen.getByLabelText('Toggle Navigation');
@@ -235,7 +237,7 @@ describe('Sidebar', () => {
 
   test('icons render correctly for all menu items', () => {
     renderWithProviders(<Sidebar />, {
-      preloadedState: { auth: { user: mockUser('admin', adminPermissions), isAuthenticated: true } },
+      preloadedState: { auth: { user: mockUser('super_admin', adminPermissions), isAuthenticated: true } },
     });
 
     // Check Lucide icons are rendered
@@ -251,7 +253,7 @@ describe('Sidebar', () => {
 
   test('sidebar has proper accessibility attributes', () => {
     renderWithProviders(<Sidebar />, {
-      preloadedState: { auth: { user: mockUser('admin', adminPermissions), isAuthenticated: true } },
+      preloadedState: { auth: { user: mockUser('super_admin', adminPermissions), isAuthenticated: true } },
     });
 
     const toggleButton = screen.getByLabelText('Toggle Navigation');

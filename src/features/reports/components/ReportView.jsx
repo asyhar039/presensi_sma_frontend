@@ -7,6 +7,7 @@ import DataTable from '../../../components/data-display/DataTable/DataTable';
 import FilterBar from '../../../components/data-display/FilterBar/FilterBar';
 import Loading from '../../../components/feedback/Loading/Loading';
 import ErrorState from '../../../components/feedback/ErrorState/ErrorState';
+import { isMaintenanceError, getErrorMessage } from '../../../utils/errors';
 
 const COLUMNS = [
   { key: 'nama_lengkap', label: 'Nama Siswa', render: (row) => row.nama_lengkap || '-' },
@@ -26,7 +27,7 @@ const ReportView = () => {
   const dispatch = useAppDispatch();
   const filters = useAppSelector(selectAttendanceFilters);
   const { data: classResponse } = useGetClassesQuery();
-  const { data: response, isLoading, error } = useGetAttendanceReportQuery(filters);
+  const { data: response, isLoading, error, refetch } = useGetAttendanceReportQuery(filters);
 
   const classes = classResponse?.data || [];
   const filterConfig = [
@@ -57,7 +58,16 @@ const ReportView = () => {
   const handleReset = () => dispatch(resetFilters());
 
   if (isLoading) return <Loading message="Memuat laporan absensi..." />;
-  if (error) return <ErrorState message="Fitur laporan sedang dikembangkan. Laporan absensi akan segera tersedia." />;
+  if (error) {
+    const maintenance = isMaintenanceError(error);
+    return (
+      <ErrorState
+        maintenance={maintenance}
+        message={getErrorMessage(error, "Fitur laporan sedang dikembangkan atau layanan tidak tersedia.")}
+        onRetry={refetch}
+      />
+    );
+  }
 
   const report = response?.data || null;
 

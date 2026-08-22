@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import logo from '../../../assets/images/logo/logo_sma_11.png';
+import Spinner from '../../../components/ui/Spinner/Spinner';
 
 const LoginForm = ({
   onSubmit,
@@ -31,7 +32,7 @@ const LoginForm = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
-      onSubmit?.({ username, password });
+      onSubmit?.({ email: username, password });
     }
   };
 
@@ -176,9 +177,16 @@ const LoginForm = ({
           type="submit"
           disabled={loading}
           aria-busy={loading || undefined}
-          className="w-full py-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-medium shadow-md shadow-blue-500/20 border-0 transition-all text-sm disabled:pointer-events-none disabled:bg-blue-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50"
+          className="inline-flex w-full items-center justify-center gap-2 py-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-medium shadow-md shadow-blue-500/20 border-0 transition-all text-sm disabled:pointer-events-none disabled:bg-blue-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50"
         >
-          {loading ? 'Memproses...' : 'Login'}
+          {loading ? (
+            <>
+              <Spinner size="sm" srText="Memproses..." />
+              Memproses...
+            </>
+          ) : (
+            'Login'
+          )}
         </button>
       </form>
     </div>

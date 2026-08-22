@@ -1,80 +1,49 @@
-import { useGetDashboardStatsQuery } from "../services/dashboardAPI";
-import Loading from "../../../components/feedback/Loading/Loading";
-import ErrorState from "../../../components/feedback/ErrorState/ErrorState";
-import Card from "../../../components/ui/Card/Card";
-import StatisticCard from "../../../components/data-display/StatisticCard/StatisticCard";
-import { ATTENDANCE_LABELS } from "../../../constants/status";
+import { useGetDashboardStatsQuery } from '../services/dashboardAPI';
+import { useAppSelector } from '../../../app/hooks';
+import { selectUser } from '../../auth/authSelectors';
+import Alert from '../../../components/feedback/Alert/Alert';
+import { isMaintenanceError } from '../../../utils/errors';
+import DashboardHeader from './DashboardHeader';
+import StatCardsRow from './StatCardsRow';
+import LivePresenceTable from './LivePresenceTable';
+import PresenceComposition from './PresenceComposition';
 
 const DashboardView = () => {
-  const { data: response, isLoading, error } = useGetDashboardStatsQuery();
+  const { error } = useGetDashboardStatsQuery();
+  const user = useAppSelector(selectUser);
 
-  if (isLoading) return <Loading message="Memuat statistik dashboard..." />;
-
-  if (error) {
-    return (
-      <ErrorState message="Fitur dashboard sedang dikembangkan. Statistik akan segera tersedia." />
-    );
-  }
-
-  const stats = response?.data || {};
-  const cards = [
-    {
-      label: "Total Siswa",
-      value: stats?.totals?.total_siswa ?? 0,
-      icon: "users",
-      tone: "primary",
-    },
-    {
-      label: "Total Guru",
-      value: stats?.totals?.total_guru ?? 0,
-      icon: "chalkboard-teacher",
-      tone: "success",
-    },
-    {
-      label: "Total Kelas",
-      value: stats?.totals?.total_kelas ?? 0,
-      icon: "school",
-      tone: "warning",
-    },
-    {
-      label: "Mata Pelajaran",
-      value: stats?.totals?.total_mapel ?? 0,
-      icon: "book",
-      tone: "info",
-    },
-  ];
-
-  const todayAttendance = stats?.today_attendance || {};
-  const tones = ["success", "info", "warning", "danger"];
+  const offline = Boolean(error);
 
   return (
-    <div>
-      <div className="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.map((card) => (
-          <StatisticCard
-            key={card.label}
-            label={card.label}
-            value={card.value}
-            icon={card.icon}
-            tone={card.tone}
-            layout="icon"
-          />
-        ))}
-      </div>
+    <div className="flex flex-col gap-6">
+      <DashboardHeader userName={user?.nama_lengkap || 'Administrator'} />
 
-      <Card title="Ringkasan Absensi Hari Ini" icon="clipboard-list">
-        <div className="grid grid-cols-2 gap-4 text-center sm:grid-cols-4">
-          {ATTENDANCE_LABELS.map((label, index) => (
-            <StatisticCard
-              key={label}
-              label={label}
-              value={todayAttendance[label] ?? 0}
-              tone={tones[index] || "secondary"}
-              layout="flat"
-            />
-          ))}
-        </div>
-      </Card>
+      {offline ? (
+        <Alert
+          variant="warning"
+          icon="exclamation-triangle"
+          title={isMaintenanceError(error) ? 'Mode Pratinjau' : 'Data Belum Sinkron'}
+        >
+          <div className="text-sm">
+            {isMaintenanceError(error)
+              ? 'Service sedang dalam pemeliharaan. Data di bawah adalah simulasi pratinjau atau data yang tersimpan sebelumnya.'
+              : 'Gagal memuat data terbaru. Menampilkan data yang tersedia.'}
+          </div>
+        </Alert>
+      ) : null}
+
+      <section aria-label="Ringkasan Statistik">
+        <StatCardsRow />
+      </section>
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <section className="xl:col-span-2" aria-label="Live Presensi Siswa">
+          <LivePresenceTable />
+        </section>
+        <section aria-label="Komposisi Presensi">
+          <PresenceComposition />
+        </section>
+      </div>
     </div>
   );
 };

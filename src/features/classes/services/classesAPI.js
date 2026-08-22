@@ -7,7 +7,7 @@ export const classesAPI = createApi({
   baseQuery: createApiBaseQuery(),
   tagTypes: ['Classes'],
   endpoints: (builder) => ({
-    ...buildCrudEndpoints(builder, { entity: 'class', entities: 'classes', basePath: '/kelas/index.php', tag: 'Classes' }),
+    ...buildCrudEndpoints(builder, { entity: 'class', entities: 'classes', basePath: '/classes', tag: 'Classes' }),
   }),
 });
 

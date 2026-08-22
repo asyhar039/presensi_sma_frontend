@@ -11,7 +11,7 @@ const LoginScreen = () => {
   const handleLogin = async (credentials) => {
     try {
       const res = await loginUser(credentials).unwrap();
-      if (res?.status === 'success') {
+      if (res?.token || res?.status === 'success') {
         navigate(ROUTES.DASHBOARD, { replace: true });
       }
     } catch {

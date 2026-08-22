@@ -16,6 +16,7 @@ import Form from '../../../components/feedback/Form/Form';
 import ConfirmDialog from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
 import Loading from '../../../components/feedback/Loading/Loading';
 import ErrorState from '../../../components/feedback/ErrorState/ErrorState';
+import { isMaintenanceError, getErrorMessage } from '../../../utils/errors';
 
 const FIELDS = [
   { key: 'nip', label: 'NIP', required: true },
@@ -43,7 +44,7 @@ const TeacherTable = () => {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 300);
 
-  const { data: response, isLoading, error } = useGetTeachersQuery();
+  const { data: response, isLoading, error, refetch } = useGetTeachersQuery();
   const [createTeacher] = useCreateTeacherMutation();
   const [updateTeacher] = useUpdateTeacherMutation();
   const [deleteTeacher] = useDeleteTeacherMutation();
@@ -83,7 +84,16 @@ const TeacherTable = () => {
   ];
 
   if (isLoading) return <Loading message="Memuat data guru..." />;
-  if (error) return <ErrorState message="Gagal memuat data guru." />;
+  if (error) {
+    const maintenance = isMaintenanceError(error);
+    return (
+      <ErrorState
+        maintenance={maintenance}
+        message={getErrorMessage(error, "Gagal memuat data guru. Silakan coba beberapa saat lagi.")}
+        onRetry={refetch}
+      />
+    );
+  }
 
   return (
     <>

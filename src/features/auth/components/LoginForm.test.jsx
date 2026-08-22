@@ -70,7 +70,7 @@ describe('LoginForm Component', () => {
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
-        username: 'isestar@gmail.com',
+        email: 'isestar@gmail.com',
         password: 'password123',
       });
     });

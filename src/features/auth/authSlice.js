@@ -4,9 +4,9 @@ import { studentsAPI } from '../students/services/studentsAPI';
 import { ROLES, ROLE_PERMISSIONS } from '../../constants/roles';
 
 const initialState = {
-  user: null,
+  user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
   loading: false,
-  authType: null,
+  authType: localStorage.getItem('user') ? (JSON.parse(localStorage.getItem('user'))?.role === 'student' ? 'student' : 'user') : null,
   error: null,
 };
 
@@ -65,6 +65,7 @@ const authSlice = createSlice({
     builder
       .addMatcher(authAPI.endpoints.logout.matchFulfilled, (state) => {
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         state.user = null;
         state.authType = null;
         state.error = null;
@@ -74,29 +75,36 @@ const authSlice = createSlice({
           localStorage.setItem('token', payload.token);
         }
         if (payload?.user || payload?.data?.user) {
-          const userObj = payload.user || payload.data.user;
-          state.user = normalizeUser(userObj);
+          const userObj = normalizeUser(payload.user || payload.data.user);
+          localStorage.setItem('user', JSON.stringify(userObj));
+          state.user = userObj;
           state.authType = 'user';
           state.error = null;
         }
       })
       .addMatcher(authAPI.endpoints.loginStudent.matchFulfilled, (state, { payload }) => {
         if (payload?.status === 'success' && payload?.data?.student) {
-          state.user = normalizeStudent(payload.data.student);
+          const userObj = normalizeStudent(payload.data.student);
+          localStorage.setItem('user', JSON.stringify(userObj));
+          state.user = userObj;
           state.authType = 'student';
           state.error = null;
         }
       })
       .addMatcher(authAPI.endpoints.getCurrentUser.matchFulfilled, (state, { payload }) => {
         if (payload?.status === 'success' && payload?.data?.user) {
-          state.user = normalizeUser(payload.data.user);
+          const userObj = normalizeUser(payload.data.user);
+          localStorage.setItem('user', JSON.stringify(userObj));
+          state.user = userObj;
           state.authType = 'user';
           state.error = null;
         }
       })
       .addMatcher(studentsAPI.endpoints.getStudentProfile.matchFulfilled, (state, { payload }) => {
         if (payload?.status === 'success' && payload?.data?.student) {
-          state.user = normalizeStudent(payload.data.student);
+          const userObj = normalizeStudent(payload.data.student);
+          localStorage.setItem('user', JSON.stringify(userObj));
+          state.user = userObj;
           state.authType = 'student';
           state.error = null;
         }

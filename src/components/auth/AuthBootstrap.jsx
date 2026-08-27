@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
 import { useGetCurrentUserQuery } from '../../features/auth/services/authAPI';
 import { useGetStudentProfileQuery } from '../../features/students/services/studentsAPI';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '../../features/auth/authSlice';
 import { useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 import Loading from '../feedback/Loading/Loading';
@@ -20,21 +23,26 @@ import Loading from '../feedback/Loading/Loading';
  */
 const AuthBootstrap = ({ children }) => {
   const location = useLocation();
+  const dispatch = useDispatch();
   const isLoginPage = location.pathname === ROUTES.LOGIN;
 
-  const { data: userResponse, isLoading: loadingUser, error: userError } = useGetCurrentUserQuery(undefined, {
-    skip: isLoginPage,
+  const { data: userResponse, isLoading: loadingUser, error: userError, isFetching: fetchingUser } = useGetCurrentUserQuery(undefined, {
+    skip: isLoginPage || !localStorage.getItem('token'),
   });
 
   const isConfirmedNonStudent =
     userResponse?.status === 'success' && userResponse?.data?.user;
   const backendUnreachable = Boolean(userError);
 
-  const { isLoading: loadingStudent } = useGetStudentProfileQuery(undefined, {
-    skip: isLoginPage || isConfirmedNonStudent || backendUnreachable,
+  const { isLoading: loadingStudent, isFetching: fetchingStudent } = useGetStudentProfileQuery(undefined, {
+    skip: isLoginPage || isConfirmedNonStudent || backendUnreachable || !localStorage.getItem('token'),
   });
 
-  if (!isLoginPage && (loadingUser || loadingStudent)) {
+  useEffect(() => {
+    dispatch(setLoading(fetchingUser || fetchingStudent));
+  }, [fetchingUser, fetchingStudent, dispatch]);
+
+  if (!isLoginPage && (loadingUser || loadingStudent || fetchingUser || fetchingStudent)) {
     return (
       <div className="flex min-h-dvh min-h-screen w-full items-center justify-center p-4">
         <Loading message="Memuat aplikasi React..." />

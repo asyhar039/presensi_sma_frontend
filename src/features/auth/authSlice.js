@@ -3,10 +3,13 @@ import { authAPI } from './services/authAPI';
 import { studentsAPI } from '../students/services/studentsAPI';
 import { ROLES, ROLE_PERMISSIONS } from '../../constants/roles';
 
+const hasToken = Boolean(localStorage.getItem('token'));
+const storedUser = localStorage.getItem('user');
+
 const initialState = {
-  user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
+  user: hasToken && storedUser ? JSON.parse(storedUser) : null,
   loading: false,
-  authType: localStorage.getItem('user') ? (JSON.parse(localStorage.getItem('user'))?.role === 'student' ? 'student' : 'user') : null,
+  authType: hasToken && storedUser ? (JSON.parse(storedUser)?.role === 'student' ? 'student' : 'user') : null,
   error: null,
 };
 

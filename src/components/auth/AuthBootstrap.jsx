@@ -42,6 +42,14 @@ const AuthBootstrap = ({ children }) => {
     dispatch(setLoading(fetchingUser || fetchingStudent));
   }, [fetchingUser, fetchingStudent, dispatch]);
 
+  useEffect(() => {
+    if (userError?.status === 401 || userError?.status === 403) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      dispatch(setLoading(false));
+    }
+  }, [userError, dispatch]);
+
   if (!isLoginPage && (loadingUser || loadingStudent || fetchingUser || fetchingStudent)) {
     return (
       <div className="flex min-h-dvh min-h-screen w-full items-center justify-center p-4">

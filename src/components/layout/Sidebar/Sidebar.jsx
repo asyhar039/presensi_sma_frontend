@@ -74,7 +74,7 @@ const Sidebar = () => {
 
         <SidebarHeader />
         
-        <hr className="mx-4 border-slate-200/80" />
+        <hr className="mx-4 border-slate-200/80 border-dashed" />
         
         <div className="flex-1 overflow-y-auto py-2">
           <SidebarMenu items={visibleMenu} onNavItemClick={closeSidebar} />

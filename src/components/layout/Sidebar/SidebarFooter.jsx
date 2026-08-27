@@ -8,10 +8,10 @@ const SidebarFooter = ({ onLogout, onNavItemClick }) => {
         to="/settings"
         onClick={onNavItemClick}
         className={({ isActive }) =>
-          `group flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-all duration-200 no-underline ${
+          `group flex items-center gap-3 rounded-2xl px-4 py-3.5 text-sm font-medium transition-all duration-200 no-underline ${
             isActive
-              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-lg shadow-indigo-200'
+              : 'text-slate-500 hover:bg-slate-100/80 hover:text-slate-900'
           }`
         }
       >
@@ -19,7 +19,7 @@ const SidebarFooter = ({ onLogout, onNavItemClick }) => {
           <>
             <Settings
               className={`h-5 w-5 shrink-0 transition-colors ${
-                isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-800'
+                isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-700'
               }`}
             />
             <span className="truncate">Settings</span>
@@ -30,7 +30,7 @@ const SidebarFooter = ({ onLogout, onNavItemClick }) => {
       <button
         type="button"
         onClick={onLogout}
-        className="group flex w-full cursor-pointer items-center gap-3 rounded-xl px-3.5 py-3 text-left text-sm font-medium text-red-600 transition-all duration-200 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+        className="group flex w-full cursor-pointer items-center gap-3 rounded-2xl px-4 py-3.5 text-left text-sm font-medium text-red-600 transition-all duration-200 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
       >
         <LogOut className="h-5 w-5 shrink-0 text-red-500 transition-colors group-hover:text-red-600" />
         <span className="truncate">Keluar</span>

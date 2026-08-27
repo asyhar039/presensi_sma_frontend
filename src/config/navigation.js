@@ -39,35 +39,11 @@ export const navigationItems = [
     roles: [ROLES.ADMIN],
   },
   {
-    key: 'kelas',
-    label: 'Data Kelas',
-    path: ROUTES.CLASSES,
-    icon: School,
-    permission: PERMISSIONS.KELAS_VIEW,
-    roles: [ROLES.ADMIN, ROLES.TEACHER],
-  },
-  {
-    key: 'mapel',
-    label: 'Mata Pelajaran',
-    path: ROUTES.SUBJECTS,
-    icon: BookOpen,
-    permission: PERMISSIONS.MAPEL_VIEW,
-    roles: [ROLES.ADMIN, ROLES.TEACHER],
-  },
-  {
     key: 'jadwal',
     label: 'Jadwal',
     path: ROUTES.SCHEDULES,
     icon: CalendarDays,
     permission: PERMISSIONS.JADWAL_VIEW,
-    roles: [ROLES.ADMIN, ROLES.TEACHER],
-  },
-  {
-    key: 'absensi',
-    label: 'Absensi',
-    path: ROUTES.ATTENDANCE,
-    icon: ClipboardCheck,
-    permission: PERMISSIONS.ABSENSI_VIEW,
     roles: [ROLES.ADMIN, ROLES.TEACHER],
   },
   {
@@ -77,14 +53,6 @@ export const navigationItems = [
     icon: ChartNoAxesColumn,
     permission: PERMISSIONS.LAPORAN_VIEW,
     roles: [ROLES.ADMIN, ROLES.TEACHER],
-  },
-  {
-    key: 'profil',
-    label: 'Profil Siswa',
-    path: ROUTES.PROFILE,
-    icon: User,
-    permission: PERMISSIONS.PROFIL_VIEW,
-    roles: [ROLES.STUDENT],
   },
 ];
 

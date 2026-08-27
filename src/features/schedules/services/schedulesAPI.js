@@ -7,9 +7,9 @@ export const schedulesAPI = createApi({
   baseQuery: createApiBaseQuery(),
   tagTypes: ['Schedules'],
   endpoints: (builder) => ({
-    ...buildCrudEndpoints(builder, { entity: 'schedule', entities: 'schedules', basePath: '/jadwal/index.php', tag: 'Schedules' }),
+    ...buildCrudEndpoints(builder, { entity: 'schedule', entities: 'schedules', basePath: '/api/schedules', tag: 'Schedules' }),
     getSchedulesByClass: builder.query({
-      query: (kelasId) => `/jadwal/index.php?kelas_id=${kelasId}`,
+      query: (kelasId) => `/api/schedules?kelas_id=${kelasId}`,
       transformResponse: (response) => response,
       providesTags: (result, error, kelasId) => [{ type: 'Schedules', id: kelasId }],
     }),

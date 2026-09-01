@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, TrendingUp, AlertTriangle, AlertCircle, Phone, Mail } from 'lucide-react';
 import { useResourcePermissions } from '../../../hooks/useResourcePermissions';
 import { useDebounce } from '../../../hooks/useDebounce';
@@ -59,6 +60,8 @@ const StudentTable = () => {
     },
   });
 
+  const navigate = useNavigate();
+
   const classes = classResponse?.data || [];
   const fields = FIELDS.map((field) =>
     field.key === 'kelas_id'
@@ -80,20 +83,17 @@ const StudentTable = () => {
   const COLUMNS = [
     {
       key: 'nisn',
-      label: 'Kode & NISN',
+      label: 'NIS',
       render: (row) => (
-        <div className="flex flex-col gap-1">
-          <span className="inline-flex items-center rounded-lg bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 w-fit">
-            SIS-{row.id}
-          </span>
-          <span className="text-xs text-slate-500">NISN {row.nisn}</span>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-sm font-semibold text-slate-900">{row.nisn || row.id}</span>
         </div>
       ),
     },
     {
       key: 'nama_lengkap',
       label: 'Nama Siswa',
-      render: (row) => <span className="font-bold text-slate-900">{row.nama_lengkap}</span>,
+      render: (row) => <span className="text-sm font-semibold text-slate-900">{row.nama_lengkap}</span>,
     },
     {
       key: 'nama_kelas',
@@ -107,7 +107,7 @@ const StudentTable = () => {
     {
       key: 'alamat',
       label: 'Alamat',
-      render: (row) => <span className="text-slate-600 max-w-[200px] block truncate">{row.alamat || '-'}</span>,
+      render: (row) => <span className="text-sm text-slate-600 max-w-[200px] block truncate">{row.alamat || '-'}</span>,
     },
     {
       key: 'kontak',
@@ -124,20 +124,20 @@ const StudentTable = () => {
       label: (
         <div className="flex flex-col gap-1">
           <span>Akumulasi Presensi</span>
-          <div className="flex items-center gap-2 normal-case font-medium text-[10px]">
-             <div className="flex items-center gap-1"><div className="size-2 rounded-full bg-emerald-500" /> H</div>
-             <div className="flex items-center gap-1"><div className="size-2 rounded-full bg-indigo-500" /> I</div>
-             <div className="flex items-center gap-1"><div className="size-2 rounded-full bg-amber-500" /> S</div>
-             <div className="flex items-center gap-1"><div className="size-2 rounded-full bg-rose-500" /> A</div>
+          <div className="flex items-center gap-2 text-[10px] font-medium uppercase">
+            <div className="flex items-center gap-1"><div className="size-2 rounded-full bg-emerald-500" /> H</div>
+            <div className="flex items-center gap-1"><div className="size-2 rounded-full bg-indigo-500" /> I</div>
+            <div className="flex items-center gap-1"><div className="size-2 rounded-full bg-amber-500" /> S</div>
+            <div className="flex items-center gap-1"><div className="size-2 rounded-full bg-rose-500" /> A</div>
           </div>
         </div>
       ),
       render: () => (
-        <div className="flex items-center gap-1.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-xs font-bold text-emerald-600 border border-emerald-100">12</div>
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-xs font-bold text-indigo-600 border border-indigo-100">0</div>
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-xs font-bold text-amber-600 border border-amber-100">2</div>
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-50 text-xs font-bold text-rose-600 border border-rose-100">0</div>
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-50 text-xs font-bold text-emerald-600">12</div>
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-50 text-xs font-bold text-indigo-600">0</div>
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-50 text-xs font-bold text-amber-600">2</div>
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-50 text-xs font-bold text-rose-600">0</div>
         </div>
       ),
     },
@@ -145,6 +145,7 @@ const StudentTable = () => {
 
   const rowActions = [
     ...(canEdit ? [{ key: 'edit', icon: 'edit', variant: 'outline-warning', label: 'Edit', onClick: crud.openEdit }] : []),
+    ...(canEdit ? [{ key: 'reset', icon: 'rotate-ccw-key', variant: 'outline-info', label: 'Reset Password', onClick: (row) => alert(`Reset password untuk siswa ${row.nama_lengkap}`) }] : []),
     ...(canDelete ? [{ key: 'delete', icon: 'trash', variant: 'outline-danger', label: 'Hapus', onClick: crud.requestRemove }] : []),
   ];
 
@@ -162,33 +163,13 @@ const StudentTable = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header Section */}
-      <header className="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm border border-slate-100">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            Data Siswa
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Kelola data induk siswa, kontak orang tua, dan histori akumulasi kehadiran
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="size-10 flex items-center justify-center rounded-full bg-indigo-50">
-             <User className="h-5 w-5 text-indigo-600" />
-          </div>
-        </div>
-      </header>
-
       {/* Action Buttons */}
       <div className="flex flex-wrap items-center justify-end gap-3">
-        <Button variant="outline-secondary" className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50" icon="file-spreadsheet">
-           Import Excel
-        </Button>
-        <Button variant="outline-secondary" className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50" icon="download">
+        <Button variant="outline-secondary" className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50" icon="download" onClick={() => alert('Export Data')}>
            Export Data
         </Button>
         {canCreate ? (
-          <Button variant="primary" className="bg-indigo-600 hover:bg-indigo-700 border-none px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-100" icon="plus" onClick={crud.openCreate}>
+          <Button variant="primary" className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 border-none shadow-md shadow-indigo-100" icon="plus" onClick={() => navigate('/siswa/create')}>
              Tambah Siswa
           </Button>
         ) : null}
@@ -196,10 +177,10 @@ const StudentTable = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-none shadow-sm p-5 flex flex-col justify-between h-full bg-white rounded-3xl">
+        <Card className="border-none p-5 bg-white rounded-2xl shadow-sm flex flex-col justify-between h-full">
           <div className="flex items-start justify-between">
             <div className="text-xs font-bold text-slate-400 tracking-wider uppercase">Total Siswa Aktif</div>
-            <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+            <div className="p-2.5 bg-indigo-50 rounded-xl text-indigo-600">
               <User className="h-5 w-5" />
             </div>
           </div>
@@ -209,10 +190,10 @@ const StudentTable = () => {
           </div>
         </Card>
 
-        <Card className="border-none shadow-sm p-5 flex flex-col justify-between h-full bg-white rounded-3xl">
+        <Card className="border-none p-5 bg-white rounded-2xl shadow-sm flex flex-col justify-between h-full">
           <div className="flex items-start justify-between">
             <div className="text-xs font-bold text-slate-400 tracking-wider uppercase">Tingkat Kehadiran</div>
-            <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+            <div className="p-2.5 bg-emerald-50 rounded-xl text-emerald-600">
               <TrendingUp className="h-5 w-5" />
             </div>
           </div>
@@ -222,10 +203,10 @@ const StudentTable = () => {
           </div>
         </Card>
 
-        <Card className="border-none shadow-sm p-5 flex flex-col justify-between h-full bg-white rounded-3xl">
+        <Card className="border-none p-5 bg-white rounded-2xl shadow-sm flex flex-col justify-between h-full">
           <div className="flex items-start justify-between">
             <div className="text-xs font-bold text-slate-400 tracking-wider uppercase">Izin / Sakit Hari Ini</div>
-            <div className="p-2 bg-amber-50 rounded-lg text-amber-600">
+            <div className="p-2.5 bg-amber-50 rounded-xl text-amber-600">
               <AlertTriangle className="h-5 w-5" />
             </div>
           </div>
@@ -235,10 +216,10 @@ const StudentTable = () => {
           </div>
         </Card>
 
-        <Card className="border-none shadow-sm p-5 flex flex-col justify-between h-full bg-white rounded-3xl">
+        <Card className="border-none p-5 bg-white rounded-2xl shadow-sm flex flex-col justify-between h-full">
           <div className="flex items-start justify-between">
-            <div className="text-xs font-bold text-slate-400 tracking-wider uppercase leading-tight">At-Risk / Alpa {'>'} 3 Kali</div>
-            <div className="p-2 bg-rose-50 rounded-lg text-rose-600">
+            <div className="text-xs font-bold text-slate-400 tracking-wider uppercase leading-tight">At-Risk / Alpa &gt; 3 Kali</div>
+            <div className="p-2.5 bg-rose-50 rounded-xl text-rose-600">
               <AlertCircle className="h-5 w-5" />
             </div>
           </div>
@@ -249,17 +230,48 @@ const StudentTable = () => {
         </Card>
       </div>
 
-      {/* Main Table Section using DataTable and SearchInput */}
-      <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-100">
+      {/* Search and Filter Bar */}
+      <Card className="rounded-2xl bg-white p-4 shadow-sm border border-slate-100 flex flex-wrap items-center gap-3">
+        <div className="flex-1 min-w-[240px]">
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Cari nama atau NIS siswa..."
+          />
+        </div>
+        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2">
+          <svg className="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          <span className="text-sm font-medium text-slate-700">Agustus 2024</span>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white px-3.5 py-2">
+          <select className="bg-white border-0 text-sm font-medium text-slate-700 focus:outline-none">
+            <option>Semester Ganjil 2023/2024</option>
+            <option>Semester Genap 2023/2024</option>
+          </select>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white px-3.5 py-2">
+          <select className="bg-white border-0 text-sm font-medium text-slate-700 focus:outline-none">
+            <option>Semua Status</option>
+            <option>Aktif</option>
+            <option>Non-Aktif</option>
+          </select>
+        </div>
+      </Card>
+
+      {/* Main Table Section */}
+      <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-100">
         <DataTable
-          title="Direktori Siswa"
           columns={COLUMNS}
           rows={rows}
           emptyMessage="Belum ada data siswa"
-          toolbar={<SearchInput value={search} onChange={setSearch} placeholder="Cari nama, NISN, atau kelas..." />}
           rowActions={rowActions}
           paginated
-          pageSize={10}
+          pageSize={7}
         />
       </div>
 

@@ -16,8 +16,6 @@ const DashboardView = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <DashboardHeader userName={user?.nama_lengkap || 'Administrator'} />
-
       {offline ? (
         <Alert
           variant="warning"

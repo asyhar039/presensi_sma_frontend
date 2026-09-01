@@ -9,8 +9,8 @@ export const selectUser = createSelector(
 );
 
 export const selectIsAuthenticated = createSelector(
-  [selectUser],
-  (user) => user !== null
+  [selectUser, () => Boolean(localStorage.getItem('token'))],
+  (user, hasToken) => user !== null && hasToken
 );
 
 export const selectUserRole = createSelector(

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   selectAuth,
   selectUser,
@@ -13,6 +13,20 @@ import {
 } from './authSelectors';
 
 describe('authSelectors', () => {
+  beforeEach(() => {
+    vi.stubGlobal('localStorage', {
+      getItem: vi.fn((key) => {
+        if (key === 'token') return 'mock-token';
+        return null;
+      }),
+      setItem: vi.fn(),
+      removeItem: vi.fn(),
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
   const adminState = {
     auth: {
       user: {
@@ -52,12 +66,22 @@ describe('authSelectors', () => {
   });
 
   describe('selectIsAuthenticated', () => {
-    it('mengembalikan true jika user ada', () => {
+    it('mengembalikan true jika user ada dan token ada', () => {
       expect(selectIsAuthenticated(adminState)).toBe(true);
     });
 
     it('mengembalikan false jika user null', () => {
       expect(selectIsAuthenticated(emptyState)).toBe(false);
+    });
+
+    it('mengembalikan false jika user ada tetapi token tidak ada', () => {
+      vi.stubGlobal('localStorage', {
+        getItem: vi.fn(() => null),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+      });
+      // Pass a new object reference to bypass memoization
+      expect(selectIsAuthenticated({ ...adminState })).toBe(false);
     });
   });
 

@@ -34,35 +34,36 @@ const DataTable = ({
         <Loading />
       ) : (
         <div className="w-full overflow-x-auto">
-          <table className="w-full border-collapse text-base text-dark">
+          <table className="w-full border-collapse text-sm text-slate-700">
             <thead>
-              <tr>
+              <tr className="bg-slate-50">
                 {columns.map((column) => (
-                  <th key={column.key} className="border-b-2 border-[#dee2e6] px-3 py-2 text-left font-semibold whitespace-nowrap">
+                  <th key={column.key} className="border-b border-slate-200 px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
                     {column.label}
                   </th>
                 ))}
-                {hasActions ? <th className="border-b-2 border-[#dee2e6] px-3 py-2 text-right font-semibold whitespace-nowrap">Aksi</th> : null}
+                {hasActions ? <th className="border-b border-slate-200 px-4 py-3 text-center text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Aksi</th> : null}
               </tr>
             </thead>
             <tbody>
               {displayRows.length > 0 ? displayRows.map((row, index) => (
-                <tr key={row?.[keyField] ?? index} className="transition-colors hover:bg-black/[0.075]">
+                <tr key={row?.[keyField] ?? index} className="transition-colors hover:bg-slate-50/50 border-b border-slate-100">
                   {columns.map((column) => (
-                    <td key={column.key} className="border-b border-[#dee2e6] px-2 py-2">
+                    <td key={column.key} className="px-4 py-3 align-middle">
                       {column.render ? column.render(row) : row?.[column.key]}
                     </td>
                   ))}
                   {hasActions ? (
-                    <td className="border-b border-[#dee2e6] px-2 py-2 text-right">
-                      <div className="inline-flex overflow-hidden rounded-md border border-[#dee2e6]">
+                    <td className="px-4 py-3 text-center align-middle">
+                      <div className="inline-flex items-center gap-1">
                         {rowActions.map((action) => (
                           action.hidden?.(row) ? null : (
                             <Button
                               key={action.key}
                               variant={action.variant}
                               title={action.label}
-                              className="rounded-none border-0"
+                              size="sm"
+                              className="rounded-lg px-2 py-1.5"
                               onClick={() => action.onClick(row)}
                             >
                               <RenderIcon name={action.icon} className="h-4 w-4" />
@@ -75,7 +76,7 @@ const DataTable = ({
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={colSpan} className="border-b border-[#dee2e6] px-2 py-2">
+                  <td colSpan={colSpan} className="px-4 py-8">
                     <EmptyState message={emptyMessage} />
                   </td>
                 </tr>
@@ -85,7 +86,7 @@ const DataTable = ({
         </div>
       )}
       {paginated ? (
-        <div className="mt-4">
+        <div className="mt-4 pt-4 border-t border-slate-100">
           <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
         </div>
       ) : null}

@@ -90,31 +90,6 @@ const ScheduleList = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header Section */}
-      <header className="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm border border-slate-100">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            Jadwal
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Atur dan pantau alokasi jadwal pelajaran, ruang khusus, serta validasi bentrok
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline-secondary" className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50" icon="print">
-             Cetak Jadwal (PDF)
-          </Button>
-          <Button variant="outline-secondary" className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50" icon="download">
-             Export Excel
-          </Button>
-          {canCreate ? (
-            <Button variant="primary" className="bg-indigo-600 hover:bg-indigo-700 border-none px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-100" icon="plus" onClick={crud.openCreate}>
-               Tambah Slot Jadwal
-            </Button>
-          ) : null}
-        </div>
-      </header>
-
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="border-none shadow-sm p-5 flex flex-col justify-between h-full bg-white rounded-3xl">

@@ -3,7 +3,7 @@ import { useGetCurrentUserQuery } from '../../features/auth/services/authAPI';
 import { useGetStudentProfileQuery } from '../../features/students/services/studentsAPI';
 import { useDispatch } from 'react-redux';
 import { setLoading } from '../../features/auth/authSlice';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Navigate } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 import Loading from '../feedback/Loading/Loading';
 
@@ -26,8 +26,12 @@ const AuthBootstrap = ({ children }) => {
   const dispatch = useDispatch();
   const isLoginPage = location.pathname === ROUTES.LOGIN;
 
+  const hasToken = Boolean(localStorage.getItem('token'));
+  const storedUser = localStorage.getItem('user');
+  const isValidSession = hasToken && storedUser;
+
   const { data: userResponse, isLoading: loadingUser, error: userError, isFetching: fetchingUser } = useGetCurrentUserQuery(undefined, {
-    skip: isLoginPage || !localStorage.getItem('token'),
+    skip: isLoginPage || !hasToken,
   });
 
   const isConfirmedNonStudent =
@@ -35,7 +39,7 @@ const AuthBootstrap = ({ children }) => {
   const backendUnreachable = Boolean(userError);
 
   const { isLoading: loadingStudent, isFetching: fetchingStudent } = useGetStudentProfileQuery(undefined, {
-    skip: isLoginPage || isConfirmedNonStudent || backendUnreachable || !localStorage.getItem('token'),
+    skip: isLoginPage || isConfirmedNonStudent || (!hasToken && !storedUser) || backendUnreachable,
   });
 
   useEffect(() => {
@@ -56,6 +60,10 @@ const AuthBootstrap = ({ children }) => {
         <Loading message="Memuat aplikasi React..." />
       </div>
     );
+  }
+
+  if (!isValidSession) {
+    return <Navigate to={ROUTES.LOGIN} replace />;
   }
 
   return children;

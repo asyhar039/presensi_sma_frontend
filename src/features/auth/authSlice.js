@@ -6,10 +6,13 @@ import { ROLES, ROLE_PERMISSIONS } from '../../constants/roles';
 const hasToken = Boolean(localStorage.getItem('token'));
 const storedUser = localStorage.getItem('user');
 
+// Fail-closed initialization: require both token and user
+const isValidPersistedSession = hasToken && storedUser;
+
 const initialState = {
-  user: hasToken && storedUser ? JSON.parse(storedUser) : null,
+  user: isValidPersistedSession ? JSON.parse(storedUser) : null,
   loading: false,
-  authType: hasToken && storedUser ? (JSON.parse(storedUser)?.role === 'student' ? 'student' : 'user') : null,
+  authType: isValidPersistedSession ? (JSON.parse(storedUser)?.role === 'student' ? 'student' : 'user') : null,
   error: null,
 };
 
@@ -20,13 +23,17 @@ function normalizeUser(raw) {
   if (primaryRole === 'Siswa') primaryRole = ROLES.STUDENT;
 
   const homeroom = raw.homeroom ?? null;
+  let permissions = raw.permissions || ROLE_PERMISSIONS[primaryRole] || ROLE_PERMISSIONS[ROLES.ADMIN] || [];
+  if (!permissions.includes('profil.view')) {
+    permissions = [...permissions, 'profil.view'];
+  }
 
   return {
     id: raw.id,
     username: raw.email || raw.username,
     nama_lengkap: raw.name || raw.nama_lengkap,
     role: primaryRole,
-    permissions: raw.permissions || ROLE_PERMISSIONS[primaryRole] || ROLE_PERMISSIONS[ROLES.ADMIN] || [],
+    permissions,
     homeroom,
   };
 }

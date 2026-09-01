@@ -25,6 +25,8 @@ import {
   Wrench,
   RotateCcw,
   UserCheck,
+  Eye,
+  RotateCcwKey,
 } from 'lucide-react';
 
 const ICON_MAP = {
@@ -56,6 +58,8 @@ const ICON_MAP = {
   'chart-line': ChartLine,
   'wrench': Wrench,
   'rotate': RotateCcw,
+  'rotate-ccw-key': RotateCcwKey,
+  'eye': Eye,
 };
 
 const RenderIcon = ({ name, className = 'h-5 w-5', ...props }) => {

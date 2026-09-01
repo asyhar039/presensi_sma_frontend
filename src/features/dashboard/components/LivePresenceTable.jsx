@@ -14,17 +14,16 @@ const LivePresenceRow = ({ student }) => {
   return (
     <tr className="border-b border-slate-100 last:border-0">
       <td className="px-4 py-3">
-        <div className="flex items-center gap-3">
-          <div className="flex size-9 flex-shrink-0 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-brand" aria-hidden="true">
-            {student.initials}
-          </div>
-          <div className="min-w-0">
-            <div className="truncate font-semibold text-dark">{student.name}</div>
-            <div className="truncate text-xs text-muted">{student.studentId}</div>
-          </div>
+        <div className="min-w-0">
+          <div className="truncate font-semibold text-dark">{student.name}</div>
+          <div className="truncate text-xs text-muted">{student.studentId}</div>
         </div>
       </td>
-      <td className="px-4 py-3 text-sm text-muted">{student.classSubject}</td>
+      <td className="px-4 py-3 text-sm text-muted">
+        {student.classSubject.split('\n').map((line, idx) => (
+          <div key={idx}>{line}</div>
+        ))}
+      </td>
       <td className="px-4 py-3 text-sm whitespace-nowrap text-muted">{student.scanTime}</td>
       <td className="px-4 py-3 text-right">
         <Badge tone={meta.tone}>{meta.label}</Badge>

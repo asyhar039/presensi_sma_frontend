@@ -136,23 +136,6 @@ const TeacherTable = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header Section */}
-      <header className="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm border border-slate-100">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            Data Guru
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Kelola data induk guru, penugasan wali kelas, dan informasi kontak
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="size-10 flex items-center justify-center rounded-full bg-indigo-50">
-             <GraduationCap className="h-5 w-5 text-indigo-600" />
-          </div>
-        </div>
-      </header>
-
       {/* Action Buttons */}
       <div className="flex flex-wrap items-center justify-end gap-3">
         <Button variant="outline-secondary" className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50" icon="file-spreadsheet">

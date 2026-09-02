@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, GraduationCap, BookOpen, Award, Search, ChevronDown, Phone, Mail } from 'lucide-react';
 import { useResourcePermissions } from '../../../hooks/useResourcePermissions';
 import { useDebounce } from '../../../hooks/useDebounce';
@@ -35,6 +36,7 @@ const FIELDS = [
 ];
 
 const TeacherTable = () => {
+  const navigate = useNavigate();
   const { canCreate, canEdit, canDelete } = useResourcePermissions('guru');
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 300);
@@ -145,7 +147,7 @@ const TeacherTable = () => {
            Export Data
         </Button>
         {canCreate ? (
-          <Button variant="primary" className="bg-indigo-600 hover:bg-indigo-700 border-none px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-100" icon="plus" onClick={crud.openCreate}>
+          <Button variant="primary" className="bg-indigo-600 hover:bg-indigo-700 border-none px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-100" icon="plus" onClick={() => navigate('/guru/create')}>
              Tambah Guru
           </Button>
         ) : null}

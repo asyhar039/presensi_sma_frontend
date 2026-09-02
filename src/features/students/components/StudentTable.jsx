@@ -15,12 +15,14 @@ import { isMaintenanceError, getErrorMessage } from '../../../utils/errors';
 import Button from '../../../components/ui/Button/Button';
 import SearchInput from '../../../components/ui/SearchInput/SearchInput';
 import DataTable from '../../../components/data-display/DataTable/DataTable';
+import SummaryCard from '../../../components/data-display/SummaryCard/SummaryCard';
 import Card from '../../../components/ui/Card/Card';
 import Modal from '../../../components/feedback/Modal/Modal';
 import Form from '../../../components/feedback/Form/Form';
 import ConfirmDialog from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
 import Loading from '../../../components/feedback/Loading/Loading';
 import ErrorState from '../../../components/feedback/ErrorState/ErrorState';
+import ResetPasswordModal from './ResetPasswordModal';
 
 const FIELDS = [
   { key: 'nisn', label: 'NISN', required: true },
@@ -38,6 +40,18 @@ const FIELDS = [
 const StudentTable = () => {
   const { canCreate, canEdit, canDelete } = useResourcePermissions('siswa');
   const [search, setSearch] = useState('');
+  const [resetModalOpen, setResetModalOpen] = useState(false);
+  const [selectedStudentForReset, setSelectedStudentForReset] = useState(null);
+
+  const handleOpenResetModal = (row) => {
+    setSelectedStudentForReset(row);
+    setResetModalOpen(true);
+  };
+
+  const handleCloseResetModal = () => {
+    setResetModalOpen(false);
+    setSelectedStudentForReset(null);
+  };
   const debouncedSearch = useDebounce(search, 300);
 
   const { data: response, isLoading, error, refetch } = useGetStudentsQuery();
@@ -145,7 +159,7 @@ const StudentTable = () => {
 
   const rowActions = [
     ...(canEdit ? [{ key: 'edit', icon: 'edit', variant: 'outline-warning', label: 'Edit', onClick: crud.openEdit }] : []),
-    ...(canEdit ? [{ key: 'reset', icon: 'rotate-ccw-key', variant: 'outline-info', label: 'Reset Password', onClick: (row) => alert(`Reset password untuk siswa ${row.nama_lengkap}`) }] : []),
+    ...(canEdit ? [{ key: 'reset', icon: 'rotate-ccw-key', variant: 'outline-info', label: 'Reset Password', onClick: handleOpenResetModal }] : []),
     ...(canDelete ? [{ key: 'delete', icon: 'trash', variant: 'outline-danger', label: 'Hapus', onClick: crud.requestRemove }] : []),
   ];
 
@@ -177,57 +191,42 @@ const StudentTable = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-none p-5 bg-white rounded-2xl shadow-sm flex flex-col justify-between h-full">
-          <div className="flex items-start justify-between">
-            <div className="text-xs font-bold text-slate-400 tracking-wider uppercase">Total Siswa Aktif</div>
-            <div className="p-2.5 bg-indigo-50 rounded-xl text-indigo-600">
-              <User className="h-5 w-5" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-2xl font-extrabold text-slate-900">{rows.length}</span>
-            <span className="text-sm font-medium text-slate-500">Siswa</span>
-          </div>
-        </Card>
-
-        <Card className="border-none p-5 bg-white rounded-2xl shadow-sm flex flex-col justify-between h-full">
-          <div className="flex items-start justify-between">
-            <div className="text-xs font-bold text-slate-400 tracking-wider uppercase">Tingkat Kehadiran</div>
-            <div className="p-2.5 bg-emerald-50 rounded-xl text-emerald-600">
-              <TrendingUp className="h-5 w-5" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-2xl font-extrabold text-slate-900">95.4%</span>
-            <span className="text-sm font-medium text-emerald-600">Rata-rata</span>
-          </div>
-        </Card>
-
-        <Card className="border-none p-5 bg-white rounded-2xl shadow-sm flex flex-col justify-between h-full">
-          <div className="flex items-start justify-between">
-            <div className="text-xs font-bold text-slate-400 tracking-wider uppercase">Izin / Sakit Hari Ini</div>
-            <div className="p-2.5 bg-amber-50 rounded-xl text-amber-600">
-              <AlertTriangle className="h-5 w-5" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-2xl font-extrabold text-slate-900">28</span>
-            <span className="text-sm font-medium text-slate-500">Siswa</span>
-          </div>
-        </Card>
-
-        <Card className="border-none p-5 bg-white rounded-2xl shadow-sm flex flex-col justify-between h-full">
-          <div className="flex items-start justify-between">
-            <div className="text-xs font-bold text-slate-400 tracking-wider uppercase leading-tight">At-Risk / Alpa &gt; 3 Kali</div>
-            <div className="p-2.5 bg-rose-50 rounded-xl text-rose-600">
-              <AlertCircle className="h-5 w-5" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-2xl font-extrabold text-rose-600">4</span>
-            <span className="text-sm font-medium text-rose-600">Siswa</span>
-          </div>
-        </Card>
+        <SummaryCard
+          title="Total Siswa Aktif"
+          value={rows.length}
+          subtitle="Siswa"
+          icon="user"
+          iconBg="bg-indigo-50"
+          iconColor="text-indigo-600"
+          valueColor="text-slate-900"
+        />
+        <SummaryCard
+          title="Tingkat Kehadiran"
+          value="95.4%"
+          subtitle="Rata-rata"
+          icon="chart-line"
+          iconBg="bg-emerald-50"
+          iconColor="text-emerald-600"
+          valueColor="text-slate-900"
+        />
+        <SummaryCard
+          title="Izin / Sakit Hari Ini"
+          value="28"
+          subtitle="Siswa"
+          icon="exclamation-triangle"
+          iconBg="bg-amber-50"
+          iconColor="text-amber-600"
+          valueColor="text-slate-900"
+        />
+        <SummaryCard
+          title="At-Risk / Alpa &gt; 3 Kali"
+          value="4"
+          subtitle="Siswa"
+          icon="info-circle"
+          iconBg="bg-rose-50"
+          iconColor="text-rose-600"
+          valueColor="text-rose-600"
+        />
       </div>
 
       {/* Search and Filter Bar */}
@@ -288,6 +287,12 @@ const StudentTable = () => {
         />
       </Modal>
       <ConfirmDialog {...crud.confirmDialog} confirmLabel="Hapus" />
+
+      <ResetPasswordModal
+        open={resetModalOpen}
+        student={selectedStudentForReset}
+        onClose={handleCloseResetModal}
+      />
     </div>
   );
 };

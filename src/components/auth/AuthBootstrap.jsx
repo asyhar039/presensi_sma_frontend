@@ -62,7 +62,7 @@ const AuthBootstrap = ({ children }) => {
     );
   }
 
-  if (!isValidSession) {
+  if (!isValidSession && !isLoginPage) {
     return <Navigate to={ROUTES.LOGIN} replace />;
   }
 

@@ -15,6 +15,7 @@ const ROUTE_TITLES = {
   [ROUTES.ATTENDANCE]: 'Presensi',
   [ROUTES.REPORTS]: 'Laporan',
   [ROUTES.PROFILE]: 'Profil',
+  [ROUTES.SETTINGS]: 'Pengaturan Sistem',
 };
 
 const ROUTE_DESCRIPTIONS = {
@@ -29,6 +30,7 @@ const ROUTE_DESCRIPTIONS = {
   [ROUTES.ATTENDANCE]: 'Pantau data absensi harian dan rekapitulasi kehadiran siswa',
   [ROUTES.REPORTS]: 'Kelola dan ekspor data kehadiran siswa secara periodik',
   [ROUTES.PROFILE]: 'Kelola informasi biodata dan akun pribadi Anda',
+  [ROUTES.SETTINGS]: 'Kelola konfigurasi umum, batas toleransi presensi, dan preferensi notifikasi',
 };
 
 const formatDate = (date) =>

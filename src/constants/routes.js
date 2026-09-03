@@ -9,6 +9,7 @@ export const ROUTES = {
   ATTENDANCE: '/absensi',
   REPORTS: '/laporan',
   PROFILE: '/profil',
+  SETTINGS: '/settings',
   UNAUTHORIZED: '/unauthorized',
   NOT_FOUND: '*',
 };

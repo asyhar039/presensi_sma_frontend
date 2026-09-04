@@ -1,4 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
+import { ROLES } from '../../constants/roles';
 
 export const selectAuth = (state) => state.auth;
 
@@ -8,8 +9,8 @@ export const selectUser = createSelector(
 );
 
 export const selectIsAuthenticated = createSelector(
-  [selectUser],
-  (user) => user !== null
+  [selectUser, () => Boolean(localStorage.getItem('token'))],
+  (user, hasToken) => user !== null && hasToken
 );
 
 export const selectUserRole = createSelector(
@@ -29,15 +30,25 @@ export const selectAuthType = createSelector(
 
 export const selectIsAdmin = createSelector(
   [selectUserRole],
-  (role) => role === 'admin'
+  (role) => role === ROLES.ADMIN
 );
 
 export const selectIsTeacher = createSelector(
   [selectUserRole],
-  (role) => role === 'guru'
+  (role) => role === ROLES.TEACHER
 );
 
 export const selectIsStudent = createSelector(
   [selectUserRole],
-  (role) => role === 'student'
+  (role) => role === ROLES.STUDENT
+);
+
+export const selectUserHomeroom = createSelector(
+  [selectUser],
+  (user) => user?.homeroom ?? null
+);
+
+export const selectIsHomeroomTeacher = createSelector(
+  [selectUserHomeroom],
+  (homeroom) => homeroom?.is_homeroom_teacher === true
 );

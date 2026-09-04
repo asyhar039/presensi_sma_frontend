@@ -7,6 +7,8 @@ import EmptyState from '../../../components/feedback/EmptyState/EmptyState';
 import { StatisticCardList } from '../../../components/data-display/StatisticCard/StatisticCard';
 import StatusBadge from '../../../components/data-display/StatusBadge/StatusBadge';
 import { ATTENDANCE_LABELS } from '../../../constants/status';
+import { isMaintenanceError, getErrorMessage } from '../../../utils/errors';
+import Card from '../../../components/ui/Card/Card';
 
 const StudentSummaryCard = ({ student, profile }) => {
   return (
@@ -20,10 +22,19 @@ const StudentSummaryCard = ({ student, profile }) => {
 
 const StudentPortal = () => {
   const user = useAppSelector(selectUser);
-  const { data: response, isLoading, error } = useGetStudentProfileQuery();
+  const { data: response, isLoading, error, refetch } = useGetStudentProfileQuery();
 
   if (isLoading) return <Loading message="Memuat profil siswa..." />;
-  if (error) return <ErrorState message="Profil siswa tidak dapat dimuat saat ini." />;
+  if (error) {
+    const maintenance = isMaintenanceError(error);
+    return (
+      <ErrorState
+        maintenance={maintenance}
+        message={getErrorMessage(error, "Profil siswa tidak dapat dimuat saat ini. Silakan coba beberapa saat lagi.")}
+        onRetry={refetch}
+      />
+    );
+  }
 
   const profile = response?.data || null;
   const student = profile?.student || user;
@@ -33,7 +44,7 @@ const StudentPortal = () => {
   return (
     <div className="rounded-lg border border-[#dee2e6] bg-white p-4">
       <div className="mb-6">
-        <h2 className="mb-1 text-3xl font-bold">Portal Siswa</h2>
+        <h2 className="mb-1 text-2xl font-bold sm:text-3xl">Portal Siswa</h2>
         <p className="mb-0 text-sm text-muted">Pantau profil dan riwayat absensi Anda</p>
       </div>
 
@@ -42,10 +53,10 @@ const StudentPortal = () => {
       <h5 className="mt-6 text-xl font-bold">Riwayat Kehadiran</h5>
       <ul className="mt-4 flex flex-col divide-y divide-[#dee2e6] rounded-md border border-[#dee2e6] bg-white">
         {history.length > 0 ? history.map((item, index) => (
-          <li className="flex items-center justify-between px-4 py-2" key={index}>
-            <div>
+          <li className="flex flex-wrap items-center justify-between gap-2 px-4 py-2" key={index}>
+            <div className="min-w-0 flex-1">
               <div className="font-semibold">{item.tanggal_indo}</div>
-              <div className="text-sm text-muted">{item.nama_mapel} • {item.nama_guru}</div>
+              <div className="truncate text-sm text-muted">{item.nama_mapel} • {item.nama_guru}</div>
             </div>
             <StatusBadge status={item.status} />
           </li>

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   selectAuth,
   selectUser,
@@ -9,15 +9,30 @@ import {
   selectIsAdmin,
   selectIsTeacher,
   selectIsStudent,
+  selectUserHomeroom,
 } from './authSelectors';
 
 describe('authSelectors', () => {
+  beforeEach(() => {
+    vi.stubGlobal('localStorage', {
+      getItem: vi.fn((key) => {
+        if (key === 'token') return 'mock-token';
+        return null;
+      }),
+      setItem: vi.fn(),
+      removeItem: vi.fn(),
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
   const adminState = {
     auth: {
       user: {
         id: 1,
         nama_lengkap: 'Admin',
-        role: 'admin',
+        role: 'super_admin',
         permissions: ['dashboard.view', 'siswa.view'],
       },
       authType: 'user',
@@ -51,18 +66,28 @@ describe('authSelectors', () => {
   });
 
   describe('selectIsAuthenticated', () => {
-    it('mengembalikan true jika user ada', () => {
+    it('mengembalikan true jika user ada dan token ada', () => {
       expect(selectIsAuthenticated(adminState)).toBe(true);
     });
 
     it('mengembalikan false jika user null', () => {
       expect(selectIsAuthenticated(emptyState)).toBe(false);
     });
+
+    it('mengembalikan false jika user ada tetapi token tidak ada', () => {
+      vi.stubGlobal('localStorage', {
+        getItem: vi.fn(() => null),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+      });
+      // Pass a new object reference to bypass memoization
+      expect(selectIsAuthenticated({ ...adminState })).toBe(false);
+    });
   });
 
   describe('selectUserRole', () => {
     it('mengembalikan role admin', () => {
-      expect(selectUserRole(adminState)).toBe('admin');
+      expect(selectUserRole(adminState)).toBe('super_admin');
     });
 
     it('mengembalikan null jika user null', () => {
@@ -103,6 +128,29 @@ describe('authSelectors', () => {
     it('selectIsStudent', () => {
       expect(selectIsStudent(studentState)).toBe(true);
       expect(selectIsStudent(adminState)).toBe(false);
+    });
+  });
+
+  describe('selectUserHomeroom', () => {
+    it('returns null when homeroom is not set', () => {
+      expect(selectUserHomeroom(adminState)).toBeNull();
+    });
+
+    it('returns homeroom object when set', () => {
+      const stateWithHomeroom = {
+        auth: {
+          user: {
+            id: 15,
+            role: 'guru',
+            homeroom: { is_homeroom_teacher: true, class_id: 10, class_name: 'X IPA 1' },
+          },
+        },
+      };
+      expect(selectUserHomeroom(stateWithHomeroom)).toEqual({
+        is_homeroom_teacher: true,
+        class_id: 10,
+        class_name: 'X IPA 1',
+      });
     });
   });
 });

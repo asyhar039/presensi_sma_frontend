@@ -7,6 +7,10 @@ export const createApiBaseQuery = () =>
     credentials: 'include',
     prepareHeaders: (headers) => {
       headers.set('Accept', 'application/json');
+      const token = localStorage.getItem('token');
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
       return headers;
     },
   });

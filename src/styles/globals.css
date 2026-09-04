@@ -5,8 +5,10 @@ body {
   background-color: var(--color-bg-main);
   color: var(--color-text-main);
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
 }

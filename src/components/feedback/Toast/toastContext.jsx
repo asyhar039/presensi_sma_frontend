@@ -7,7 +7,7 @@ let nextId = 0;
 
 const ToastContainer = ({ toasts = [], onDismiss }) => {
   return (
-    <div className="fixed top-4 right-4 z-[2000] flex w-[min(92vw,380px)] flex-col gap-2">
+    <div className="fixed top-[calc(env(safe-area-inset-top,0px)+1rem)] right-[calc(env(safe-area-inset-right,0px)+1rem)] z-[2000] flex w-[min(92vw,380px)] flex-col gap-2">
       {toasts.map((toast) => (
         <Alert key={toast.id} variant={toast.variant} onDismiss={() => onDismiss(toast.id)}>
           {toast.message}

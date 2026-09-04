@@ -1,18 +1,22 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/layout/Sidebar/Sidebar';
-import Navbar from '../components/layout/Navbar/Navbar';
+import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer/Footer';
+import OfflineBanner from '../components/ui/OfflineBanner/OfflineBanner';
 
 const AdminLayout = () => {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-dvh overflow-x-hidden bg-slate-50">
+      <OfflineBanner />
       <Sidebar />
-      <div className="ml-[80px] w-[calc(100%-80px)] flex-1 p-4 lg:ml-[260px] lg:w-[calc(100%-260px)] lg:p-[30px]">
-        <Navbar />
-        <div className="p-4">
-          <Outlet />
+      <div className="flex-1 w-full lg:pl-[280px]">
+        <div className="p-4 lg:p-8 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)]">
+          <Header />
+          <div className="mt-6">
+            <Outlet />
+          </div>
+          <Footer />
         </div>
-        <Footer />
       </div>
     </div>
   );

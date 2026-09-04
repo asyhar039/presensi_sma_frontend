@@ -8,7 +8,7 @@ const FilterBar = ({ filters = [], values = {}, onChange, onReset, resetLabel = 
   const handleValue = (key, value) => onChange?.(key, value);
 
   return (
-    <div className="mb-4 flex flex-wrap items-end gap-2">
+    <div className="mb-4 grid grid-cols-1 items-end gap-2 sm:grid-cols-2 lg:flex lg:flex-wrap">
       {filters.map((filter) => {
         if (filter.type === 'select') {
           return (

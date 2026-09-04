@@ -1,5 +1,48 @@
 import RenderIcon from '../../../utils/iconMap';
 
+const TONES = {
+  primary: {
+    iconBox: 'bg-primary',
+    value: 'text-primary',
+    flat: 'bg-primary/10 text-primary',
+  },
+  secondary: {
+    iconBox: 'bg-secondary',
+    value: 'text-secondary',
+    flat: 'bg-secondary/10 text-secondary',
+  },
+  success: {
+    iconBox: 'bg-success',
+    value: 'text-success',
+    flat: 'bg-success/10 text-success',
+  },
+  info: {
+    iconBox: 'bg-info',
+    value: 'text-info',
+    flat: 'bg-info/10 text-info',
+  },
+  warning: {
+    iconBox: 'bg-warning',
+    value: 'text-warning',
+    flat: 'bg-warning/10 text-warning',
+  },
+  danger: {
+    iconBox: 'bg-danger',
+    value: 'text-danger',
+    flat: 'bg-danger/10 text-danger',
+  },
+  light: {
+    iconBox: 'bg-light',
+    value: 'text-dark',
+    flat: 'bg-light text-dark',
+  },
+  dark: {
+    iconBox: 'bg-dark',
+    value: 'text-dark',
+    flat: 'bg-dark/10 text-dark',
+  },
+};
+
 const LAYOUTS = {
   default: {
     wrapper: 'rounded-lg border border-[#dee2e6] bg-white p-4',
@@ -30,13 +73,14 @@ const StatisticCard = ({
   className = '',
 }) => {
   const c = LAYOUTS[layout] || LAYOUTS.default;
-  const wrapperClass = layout === 'flat' ? `${c.wrapper} bg-${tone}/10 text-${tone}` : c.wrapper;
-  const valueClass = layout === 'icon' ? `${c.value} text-${tone}` : c.value;
+  const toneMap = TONES[tone] || TONES.primary;
+  const wrapperClass = layout === 'flat' ? `${c.wrapper} ${toneMap.flat}` : c.wrapper;
+  const valueClass = layout === 'icon' ? `${c.value} ${toneMap.value}` : c.value;
 
   return (
     <div className={`${wrapperClass} ${className}`.trim()}>
       {c.iconBox ? (
-        <div className={`${c.iconBox} bg-${tone}`}>
+        <div className={`${c.iconBox} ${toneMap.iconBox}`}>
           <RenderIcon name={icon || 'chart-line'} className="h-6 w-6" />
         </div>
       ) : null}

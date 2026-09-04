@@ -6,12 +6,12 @@ export const authAPI = createApi({
   baseQuery: createApiBaseQuery(),
   endpoints: (builder) => ({
     getCurrentUser: builder.query({
-      query: () => '/auth/me.php',
+      query: () => '/me',
       transformResponse: (response) => response,
     }),
     loginUser: builder.mutation({
       query: (credentials) => ({
-        url: '/auth/login.php',
+        url: '/login',
         method: 'POST',
         body: credentials,
         headers: { 'Content-Type': 'application/json' },
@@ -20,7 +20,7 @@ export const authAPI = createApi({
     }),
     loginStudent: builder.mutation({
       query: (credentials) => ({
-        url: '/auth/student_login.php',
+        url: '/student',
         method: 'POST',
         body: credentials,
         headers: { 'Content-Type': 'application/json' },
@@ -29,8 +29,8 @@ export const authAPI = createApi({
     }),
     logout: builder.mutation({
       query: () => ({
-        url: '/auth/logout.php',
-        method: 'GET',
+        url: '/logout',
+        method: 'POST',
       }),
       transformResponse: (response) => response,
     }),

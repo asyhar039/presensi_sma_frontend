@@ -7,14 +7,14 @@ export const studentsAPI = createApi({
   baseQuery: createApiBaseQuery(),
   tagTypes: ['Students', 'StudentProfile'],
   endpoints: (builder) => ({
-    ...buildCrudEndpoints(builder, { entity: 'student', entities: 'students', basePath: '/siswa/index.php', tag: 'Students' }),
+    ...buildCrudEndpoints(builder, { entity: 'student', entities: 'students', basePath: '/students', tag: 'Students' }),
     getStudentById: builder.query({
-      query: (id) => `/siswa/index.php?id=${id}`,
+      query: (id) => `/students?id=${id}`,
       transformResponse: (response) => response,
       providesTags: (result, error, id) => [{ type: 'Students', id }],
     }),
     getStudentProfile: builder.query({
-      query: () => '/student/profile.php',
+      query: () => '/students',
       transformResponse: (response) => response,
       providesTags: ['StudentProfile'],
       keepUnusedDataFor: 60,

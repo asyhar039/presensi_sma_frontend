@@ -22,16 +22,24 @@ import SubjectList from '../features/subjects/components/SubjectList';
 import ScheduleList from '../features/schedules/components/ScheduleList';
 import AttendanceView from '../features/attendance/components/AttendanceView';
 import ReportView from '../features/reports/components/ReportView';
+import ProfileView from '../features/auth/components/ProfileView';
+import SettingsView from '../features/settings/components/SettingsView';
+import AddStudent from '../features/students/components/AddStudent';
+import AddTeacher from '../features/teachers/components/AddTeacher';
 
 const STAFF_ROUTES = [
   { path: ROUTES.DASHBOARD, element: <DashboardView />, permission: 'dashboard.view' },
   { path: ROUTES.STUDENTS, element: <StudentTable />, permission: 'siswa.view' },
+  { path: `${ROUTES.STUDENTS}/create`, element: <AddStudent />, permission: 'siswa.create' },
   { path: ROUTES.TEACHERS, element: <TeacherTable />, permission: 'guru.view' },
+  { path: `${ROUTES.TEACHERS}/create`, element: <AddTeacher />, permission: 'guru.create' },
   { path: ROUTES.CLASSES, element: <ClassList />, permission: 'kelas.view' },
   { path: ROUTES.SUBJECTS, element: <SubjectList />, permission: 'mapel.view' },
   { path: ROUTES.SCHEDULES, element: <ScheduleList />, permission: 'jadwal.view' },
   { path: ROUTES.ATTENDANCE, element: <AttendanceView />, permission: 'absensi.view' },
   { path: ROUTES.REPORTS, element: <ReportView />, permission: 'laporan.view' },
+  { path: ROUTES.PROFILE, element: <ProfileView />, permission: 'profil.view' },
+  { path: ROUTES.SETTINGS, element: <SettingsView />, permission: 'profil.view' },
 ];
 
 const IndexRoute = () => {

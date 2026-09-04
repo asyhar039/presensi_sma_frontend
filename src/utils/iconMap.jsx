@@ -22,6 +22,11 @@ import {
   ChevronDown,
   LogOut,
   ChartLine,
+  Wrench,
+  RotateCcw,
+  UserCheck,
+  Eye,
+  RotateCcwKey,
 } from 'lucide-react';
 
 const ICON_MAP = {
@@ -35,6 +40,7 @@ const ICON_MAP = {
   'clipboard-check': ClipboardCheck,
   'file-invoice': FileText,
   'users': Users,
+  'user-check': UserCheck,
   'book': Book,
   'plus': Plus,
   'edit': Pencil,
@@ -50,6 +56,10 @@ const ICON_MAP = {
   'graduation-cap': GraduationCap,
   'sign-out-alt': LogOut,
   'chart-line': ChartLine,
+  'wrench': Wrench,
+  'rotate': RotateCcw,
+  'rotate-ccw-key': RotateCcwKey,
+  'eye': Eye,
 };
 
 const RenderIcon = ({ name, className = 'h-5 w-5', ...props }) => {

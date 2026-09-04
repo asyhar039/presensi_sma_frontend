@@ -1,14 +1,27 @@
-import { NavLink, useNavigate } from 'react-router-dom';
-import { GraduationCap, LogOut } from 'lucide-react';
-import { getFilteredMenuItems } from '../../../constants/menu';
-import { ROUTES } from '../../../constants/routes';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { X, Menu } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
-import RenderIcon from '../../../utils/iconMap';
+import { getFilteredNavigation } from '../../../config/navigation';
+import { ROUTES } from '../../../constants/routes';
+import SidebarHeader from './SidebarHeader';
+import SidebarMenu from './SidebarMenu';
+import SidebarFooter from './SidebarFooter';
 
 const Sidebar = () => {
-  const { permissions, logout } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const { permissions, role, logout } = useAuth();
   const navigate = useNavigate();
-  const visibleMenu = getFilteredMenuItems(permissions);
+  const location = useLocation();
+  const visibleMenu = getFilteredNavigation(permissions, role);
+
+  const toggleSidebar = () => setIsOpen(!isOpen);
+  const closeSidebar = () => setIsOpen(false);
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    closeSidebar();
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     try {
@@ -19,36 +32,57 @@ const Sidebar = () => {
     navigate(ROUTES.LOGIN, { replace: true });
   };
 
-  const linkClass = ({ isActive }) =>
-    `flex items-center justify-center gap-3 rounded-[10px] px-2 py-3 text-sm font-semibold text-white/80 transition-all hover:translate-x-1 hover:bg-white/20 hover:text-white lg:justify-start lg:px-4 no-underline ${
-      isActive ? 'translate-x-1 bg-white/20 text-white' : ''
-    }`;
-
   return (
-    <div className="fixed z-[100] flex h-screen w-[80px] flex-col overflow-y-auto bg-[linear-gradient(135deg,#005eff_0%,#7EB4FA_100%)] p-4 text-white shadow-[4px_0_20px_rgba(0,0,0,0.15)] lg:w-[260px]">
-      <div className="mb-5 flex items-center justify-center gap-3 border-b border-white/15 pb-5 lg:justify-start">
-        <div className="flex size-[42px] items-center justify-center rounded-xl bg-white/20 text-xl">
-          <GraduationCap className="h-6 w-6" />
-        </div>
-        <div className="hidden text-lg font-extrabold tracking-wide lg:block">ABSENSI SMA</div>
-      </div>
-      <nav className="flex flex-col">
-        {visibleMenu.map((item) => (
-          <NavLink key={item.key} to={`/${item.key}`} className={linkClass}>
-            <RenderIcon name={item.icon} className="h-5 w-5 shrink-0" />
-            <span className="hidden lg:inline">{item.label}</span>
-          </NavLink>
-        ))}
-        <hr className="my-3 border-white/20" />
+    <>
+      {/* Mobile Toggle Button */}
+      <button
+        type="button"
+        className="fixed top-[calc(env(safe-area-inset-top,0px)+1rem)] left-[calc(env(safe-area-inset-left,0px)+1rem)] z-[60] flex size-10 items-center justify-center rounded-lg bg-white shadow-md border border-slate-200 text-slate-600 lg:hidden"
+        onClick={toggleSidebar}
+        aria-label="Toggle Navigation"
+        aria-expanded={isOpen}
+        aria-controls="app-sidebar"
+      >
+        <Menu className="h-6 w-6" />
+      </button>
+
+      {/* Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-[110] bg-slate-900/40 backdrop-blur-sm lg:hidden"
+          onClick={closeSidebar}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar Container */}
+      <aside
+        id="app-sidebar"
+        aria-label="Navigasi utama"
+        className={`fixed inset-y-0 left-0 z-[120] flex w-[280px] flex-col bg-white border-r border-slate-200/80 transition-transform duration-300 ease-in-out pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)] lg:z-40 lg:translate-x-0 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        {/* Mobile Close Button */}
         <button
           type="button"
-          className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-[10px] border-0 bg-transparent px-2 py-3 text-left text-sm font-semibold text-warning hover:bg-white/10 hover:text-warning lg:justify-start lg:px-4"
-          onClick={handleLogout}
+          className="absolute top-[calc(env(safe-area-inset-top,0px)+1rem)] right-4 flex size-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 lg:hidden"
+          onClick={closeSidebar}
         >
-          <LogOut className="h-5 w-5 shrink-0" /><span className="hidden lg:inline">Keluar</span>
+          <X className="h-5 w-5" />
         </button>
-      </nav>
-    </div>
+
+        <SidebarHeader />
+        
+        <hr className="mx-4 border-slate-200/80 border-dashed" />
+        
+        <div className="flex-1 overflow-y-auto py-2">
+          <SidebarMenu items={visibleMenu} onNavItemClick={closeSidebar} />
+        </div>
+
+        <SidebarFooter onLogout={handleLogout} onNavItemClick={closeSidebar} />
+      </aside>
+    </>
   );
 };
 

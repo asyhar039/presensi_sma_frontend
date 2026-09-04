@@ -27,12 +27,12 @@ const SearchInput = ({
 
   return (
     <div className={`flex w-full items-stretch ${className}`.trim()}>
-      <span className="flex items-center rounded-s-md border border-e-0 border-[#dee2e6] bg-[#e9ecef] px-3 text-secondary">
-        <RenderIcon name="search" className="h-5 w-5" />
+      <span className="flex items-center rounded-s-lg border border-e-0 border-slate-200 bg-slate-50 px-3 text-slate-400">
+        <RenderIcon name="search" className="h-4 w-4" />
       </span>
       <input
         type="search"
-        className={`min-w-0 flex-1 border border-[#dee2e6] bg-white px-3 py-1.5 text-base text-dark placeholder:text-muted focus:outline-none focus:ring-4 focus:ring-primary/25 ${inputValue ? 'rounded-none' : 'rounded-e-md'}`}
+        className={`min-w-0 flex-1 border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 ${inputValue ? 'rounded-none' : 'rounded-e-lg'}`}
         placeholder={placeholder}
         value={inputValue}
         onChange={(e) => handleChange(e.target.value)}
@@ -41,11 +41,11 @@ const SearchInput = ({
       {inputValue ? (
         <button
           type="button"
-          className="rounded-e-md border border-s-0 border-[#dee2e6] bg-white px-3 text-secondary hover:bg-light"
+          className="rounded-e-lg border border-s-0 border-slate-200 bg-white px-3 text-slate-400 hover:bg-slate-50 hover:text-slate-600"
           aria-label="Hapus pencarian"
           onClick={() => handleChange('')}
         >
-          <RenderIcon name="xmark" className="h-5 w-5" />
+          <RenderIcon name="xmark" className="h-4 w-4" />
         </button>
       ) : null}
     </div>

@@ -1,59 +1,59 @@
-import { PERMISSIONS } from './permissions';
+import { getFilteredNavigation } from '../config/navigation';
 
 export const menuItems = [
   { 
     key: 'profil', 
     label: 'Profil Siswa', 
     icon: 'user',
-    permission: PERMISSIONS.PROFIL_VIEW
+    permission: 'profil.view'
   },
   { 
     key: 'dashboard', 
     label: 'Dashboard', 
     icon: 'chart-pie',
-    permission: PERMISSIONS.DASHBOARD_VIEW
+    permission: 'dashboard.view'
   },
   { 
     key: 'siswa', 
     label: 'Data Siswa', 
     icon: 'user-graduate',
-    permission: PERMISSIONS.SISWA_VIEW
+    permission: 'siswa.view'
   },
   { 
     key: 'guru', 
     label: 'Data Guru', 
     icon: 'chalkboard-teacher',
-    permission: PERMISSIONS.GURU_VIEW
+    permission: 'guru.view'
   },
   { 
     key: 'kelas', 
     label: 'Data Kelas', 
     icon: 'school',
-    permission: PERMISSIONS.KELAS_VIEW
+    permission: 'kelas.view'
   },
   { 
     key: 'mapel', 
     label: 'Mata Pelajaran', 
     icon: 'book-open',
-    permission: PERMISSIONS.MAPEL_VIEW
+    permission: 'mapel.view'
   },
   { 
     key: 'jadwal', 
     label: 'Jadwal', 
     icon: 'calendar-alt',
-    permission: PERMISSIONS.JADWAL_VIEW
+    permission: 'jadwal.view'
   },
   { 
     key: 'absensi', 
     label: 'Absensi', 
     icon: 'clipboard-check',
-    permission: PERMISSIONS.ABSENSI_VIEW
+    permission: 'absensi.view'
   },
   { 
     key: 'laporan', 
     label: 'Laporan', 
     icon: 'file-invoice',
-    permission: PERMISSIONS.LAPORAN_VIEW
+    permission: 'laporan.view'
   }
 ];
 
@@ -62,4 +62,8 @@ export function getFilteredMenuItems(permissions) {
   return menuItems.filter(item => 
     permissions.includes(item.permission)
   );
+}
+
+export function getFilteredMenuItemsByRole(permissions, role) {
+  return getFilteredNavigation(permissions, role);
 }

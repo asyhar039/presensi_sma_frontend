@@ -2,6 +2,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { ROUTES } from '../../constants/routes';
 import { useAuth } from '../../hooks/useAuth';
+import { ROLES } from '../../constants/roles';
 
 const ROUTE_TITLES = {
   [ROUTES.DASHBOARD]: 'Dashboard',
@@ -42,10 +43,16 @@ const formatDate = (date) =>
   });
 
 const Header = () => {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const location = useLocation();
-  const title = ROUTE_TITLES[location.pathname] || 'Dashboard';
-  const description = ROUTE_DESCRIPTIONS[location.pathname] || 'Selamat datang di sistem presensi sekolah.';
+  const isAttendance = location.pathname === ROUTES.ATTENDANCE;
+  const title = isAttendance ? 'Sesi Presensi: Matematika - X IPA 1' : (ROUTE_TITLES[location.pathname] || 'Dashboard');
+  const defaultDescription = role === ROLES.STUDENT
+    ? 'Pantau kehadiran dan jadwal pelajaranmu hari ini.'
+    : role === ROLES.TEACHER
+      ? 'Pantau jadwal mengajar dan presensi kelas dari satu tempat.'
+      : 'Selamat datang di sistem presensi sekolah.';
+  const description = isAttendance ? 'Ruang R-01 • 07:00 - 08:30' : (ROUTE_DESCRIPTIONS[location.pathname] || defaultDescription);
   const isDashboard = location.pathname === ROUTES.DASHBOARD;
 
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -66,7 +73,7 @@ const Header = () => {
           {isDashboard ? `Selamat Datang, ${displayName} 👋` : title}
         </h1>
         <p className="mt-1 text-sm text-muted mb-0">
-          {isDashboard ? `${formatDate(currentDate)} • Jam Operasional: 06:30 - 15:30 WIB` : description}
+          {isDashboard ? (role === ROLES.STUDENT || role === ROLES.TEACHER ? description : `${formatDate(currentDate)} • Jam Operasional: 06:30 - 15:30 WIB`) : description}
         </p>
       </div>
 

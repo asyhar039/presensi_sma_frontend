@@ -6,20 +6,22 @@ import { ROLES } from '../constants/roles';
 
 import LoginScreen from '../features/auth/components/LoginScreen';
 import AuthLayout from '../layouts/AuthLayout';
-import AdminLayout from '../layouts/AdminLayout';
-import StudentLayout from '../layouts/StudentLayout';
+import RoleLayout from '../layouts/RoleLayout';
 import ProtectedRoute from './ProtectedRoute';
 import RoleRoute from './RoleRoute';
 import NotFound from '../pages/NotFound/NotFound';
 import Unauthorized from '../pages/Unauthorized/Unauthorized';
 
 import DashboardView from '../features/dashboard/components/DashboardView';
+import TeacherDashboard from '../features/dashboard/components/TeacherDashboard';
+import StudentDashboard from '../features/dashboard/components/StudentDashboard';
 import StudentTable from '../features/students/components/StudentTable';
 import StudentPortal from '../features/students/components/StudentPortal';
 import TeacherTable from '../features/teachers/components/TeacherTable';
 import ClassList from '../features/classes/components/ClassList';
 import SubjectList from '../features/subjects/components/SubjectList';
 import ScheduleList from '../features/schedules/components/ScheduleList';
+import AddSchedule from '../features/schedules/components/AddSchedule';
 import AttendanceView from '../features/attendance/components/AttendanceView';
 import ReportView from '../features/reports/components/ReportView';
 import ProfileView from '../features/auth/components/ProfileView';
@@ -28,19 +30,30 @@ import AddStudent from '../features/students/components/AddStudent';
 import AddTeacher from '../features/teachers/components/AddTeacher';
 
 const STAFF_ROUTES = [
-  { path: ROUTES.DASHBOARD, element: <DashboardView />, permission: 'dashboard.view' },
-  { path: ROUTES.STUDENTS, element: <StudentTable />, permission: 'siswa.view' },
-  { path: `${ROUTES.STUDENTS}/create`, element: <AddStudent />, permission: 'siswa.create' },
-  { path: ROUTES.TEACHERS, element: <TeacherTable />, permission: 'guru.view' },
-  { path: `${ROUTES.TEACHERS}/create`, element: <AddTeacher />, permission: 'guru.create' },
-  { path: ROUTES.CLASSES, element: <ClassList />, permission: 'kelas.view' },
-  { path: ROUTES.SUBJECTS, element: <SubjectList />, permission: 'mapel.view' },
-  { path: ROUTES.SCHEDULES, element: <ScheduleList />, permission: 'jadwal.view' },
-  { path: ROUTES.ATTENDANCE, element: <AttendanceView />, permission: 'absensi.view' },
-  { path: ROUTES.REPORTS, element: <ReportView />, permission: 'laporan.view' },
-  { path: ROUTES.PROFILE, element: <ProfileView />, permission: 'profil.view' },
-  { path: ROUTES.SETTINGS, element: <SettingsView />, permission: 'profil.view' },
+  { path: ROUTES.STUDENTS, element: <StudentTable />, permission: 'siswa.view', roles: [ROLES.ADMIN, ROLES.TEACHER] },
+  { path: `${ROUTES.STUDENTS}/create`, element: <AddStudent />, permission: 'siswa.create', roles: [ROLES.ADMIN] },
+  { path: ROUTES.TEACHERS, element: <TeacherTable />, permission: 'guru.view', roles: [ROLES.ADMIN] },
+  { path: `${ROUTES.TEACHERS}/create`, element: <AddTeacher />, permission: 'guru.create', roles: [ROLES.ADMIN] },
+  { path: ROUTES.CLASSES, element: <ClassList />, permission: 'kelas.view', roles: [ROLES.ADMIN, ROLES.TEACHER] },
+  { path: ROUTES.SUBJECTS, element: <SubjectList />, permission: 'mapel.view', roles: [ROLES.ADMIN, ROLES.TEACHER] },
+  { path: ROUTES.SCHEDULES, element: <ScheduleList />, permission: 'jadwal.view', roles: [ROLES.ADMIN, ROLES.TEACHER] },
+  { path: `${ROUTES.SCHEDULES}/tambah`, element: <AddSchedule />, permission: 'jadwal.create', roles: [ROLES.ADMIN, ROLES.TEACHER] },
+  { path: ROUTES.ATTENDANCE, element: <AttendanceView />, permission: 'absensi.view', roles: [ROLES.ADMIN, ROLES.TEACHER] },
+  { path: ROUTES.REPORTS, element: <ReportView />, permission: 'laporan.view', roles: [ROLES.ADMIN, ROLES.TEACHER] },
+  { path: ROUTES.SETTINGS, element: <SettingsView />, permission: 'profil.view', roles: [ROLES.ADMIN] },
 ];
+
+const RoleDashboard = () => {
+  const role = useAppSelector(selectUserRole);
+  if (role === ROLES.TEACHER) return <TeacherDashboard />;
+  if (role === ROLES.STUDENT) return <StudentDashboard />;
+  return <DashboardView />;
+};
+
+const RoleProfile = () => {
+  const role = useAppSelector(selectUserRole);
+  return role === ROLES.STUDENT ? <StudentPortal /> : <ProfileView />;
+};
 
 const IndexRoute = () => {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
@@ -61,24 +74,28 @@ const AppRoutes = () => {
       <Route path={ROUTES.UNAUTHORIZED} element={<Unauthorized />} />
 
       <Route element={<ProtectedRoute />}>
-        <Route element={<AdminLayout />}>
+        <Route element={<RoleLayout />}>
           <Route index element={<IndexRoute />} />
-          {STAFF_ROUTES.map(({ path, element, permission }) => (
+          <Route path={ROUTES.DASHBOARD} element={<ProtectedRoute><RoleDashboard /></ProtectedRoute>} />
+          {STAFF_ROUTES.map(({ path, element, permission, roles }) => (
             <Route
               key={path}
               path={path}
-              element={<ProtectedRoute permission={permission}>{element}</ProtectedRoute>}
+              element={(
+                <RoleRoute roles={roles}>
+                  <ProtectedRoute permission={permission}>{element}</ProtectedRoute>
+                </RoleRoute>
+              )}
             />
           ))}
-        </Route>
-
-        <Route element={<StudentLayout />}>
-          <Route element={<RoleRoute roles={[ROLES.STUDENT]} />}>
-            <Route
-              path={ROUTES.PROFILE}
-              element={<ProtectedRoute permission="profil.view"><StudentPortal /></ProtectedRoute>}
-            />
-          </Route>
+          <Route
+            path={ROUTES.PROFILE}
+            element={(
+              <RoleRoute roles={[ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT]}>
+                <ProtectedRoute permission="profil.view"><RoleProfile /></ProtectedRoute>
+              </RoleRoute>
+            )}
+          />
         </Route>
       </Route>
 

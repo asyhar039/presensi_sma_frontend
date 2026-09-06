@@ -2,18 +2,21 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { X, Menu } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
+import { useDispatch } from 'react-redux';
+import { logout as clearLocalSession } from '../../../features/auth/authSlice';
 import { getFilteredNavigation } from '../../../config/navigation';
 import { ROUTES } from '../../../constants/routes';
 import SidebarHeader from './SidebarHeader';
 import SidebarMenu from './SidebarMenu';
 import SidebarFooter from './SidebarFooter';
 
-const Sidebar = () => {
+const Sidebar = ({ navigationItems, portalLabel = 'Admin Portal', showSettings = true }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { permissions, role, logout } = useAuth();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const visibleMenu = getFilteredNavigation(permissions, role);
+  const visibleMenu = getFilteredNavigation(permissions, role, navigationItems);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
   const closeSidebar = () => setIsOpen(false);
@@ -28,8 +31,10 @@ const Sidebar = () => {
       await logout().unwrap();
     } catch (error) {
       console.error('Logout error:', error);
+    } finally {
+      dispatch(clearLocalSession());
+      navigate(ROUTES.LOGIN, { replace: true });
     }
-    navigate(ROUTES.LOGIN, { replace: true });
   };
 
   return (
@@ -72,7 +77,7 @@ const Sidebar = () => {
           <X className="h-5 w-5" />
         </button>
 
-        <SidebarHeader />
+        <SidebarHeader portalLabel={portalLabel} />
         
         <hr className="mx-4 border-slate-200/80 border-dashed" />
         
@@ -80,7 +85,7 @@ const Sidebar = () => {
           <SidebarMenu items={visibleMenu} onNavItemClick={closeSidebar} />
         </div>
 
-        <SidebarFooter onLogout={handleLogout} onNavItemClick={closeSidebar} />
+        <SidebarFooter onLogout={handleLogout} onNavItemClick={closeSidebar} showSettings={showSettings} />
       </aside>
     </>
   );

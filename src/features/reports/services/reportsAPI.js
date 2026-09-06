@@ -13,7 +13,7 @@ export const reportsAPI = createApi({
         if (params?.bulan) searchParams.set('bulan', params.bulan);
         if (params?.tahun) searchParams.set('tahun', params.tahun);
         const query = searchParams.toString();
-        return `/absensi/laporan.php${query ? `?${query}` : ''}`;
+        return `/absensi/${query ? `?${query}` : ''}`;
       },
       transformResponse: (response) => response,
       providesTags: ['AttendanceReport'],

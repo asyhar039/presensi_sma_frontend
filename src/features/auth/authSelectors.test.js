@@ -36,6 +36,7 @@ describe('authSelectors', () => {
         permissions: ['dashboard.view', 'siswa.view'],
       },
       authType: 'user',
+      sessionStatus: 'verified',
     },
   };
 
@@ -48,6 +49,7 @@ describe('authSelectors', () => {
         permissions: ['profil.view'],
       },
       authType: 'student',
+      sessionStatus: 'verified',
     },
   };
 

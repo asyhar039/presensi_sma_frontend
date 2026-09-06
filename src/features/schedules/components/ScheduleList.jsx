@@ -227,14 +227,18 @@ const ScheduleList = () => {
                               <span>Ruang 101</span>
                             </div>
                           </div>
-                        ) : (
+                        ) : canCreate ? (
                           <button
-                            onClick={crud.openCreate}
+                            onClick={() => window.location.href = '/jadwal/tambah'}
                             className="flex w-full flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed border-slate-200 p-4 text-slate-400 hover:border-indigo-600 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all min-h-[100px]"
                           >
                             <Plus className="h-5 w-5" />
                             <span className="text-xs font-semibold">Tambah Slot</span>
                           </button>
+                        ) : (
+                          <div className="flex w-full flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed border-slate-200 p-4 text-slate-300 min-h-[100px]">
+                            <span className="text-xs">Kosong</span>
+                          </div>
                         )}
                       </td>
                     );

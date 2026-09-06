@@ -20,6 +20,7 @@ import Form from '../../../components/feedback/Form/Form';
 import ConfirmDialog from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
 import Loading from '../../../components/feedback/Loading/Loading';
 import ErrorState from '../../../components/feedback/ErrorState/ErrorState';
+import ResetPasswordModal from '../../../components/feedback/ResetPasswordModal';
 
 const FIELDS = [
   { key: 'nip', label: 'NIP', required: true },
@@ -39,6 +40,18 @@ const TeacherTable = () => {
   const navigate = useNavigate();
   const { canCreate, canEdit, canDelete } = useResourcePermissions('guru');
   const [search, setSearch] = useState('');
+  const [resetModalOpen, setResetModalOpen] = useState(false);
+  const [selectedTeacherForReset, setSelectedTeacherForReset] = useState(null);
+
+  const handleOpenResetModal = (teacher) => {
+    setSelectedTeacherForReset(teacher);
+    setResetModalOpen(true);
+  };
+
+  const handleCloseResetModal = () => {
+    setResetModalOpen(false);
+    setSelectedTeacherForReset(null);
+  };
   const debouncedSearch = useDebounce(search, 300);
 
   const { data: response, isLoading, error, refetch } = useGetTeachersQuery();
@@ -121,6 +134,7 @@ const TeacherTable = () => {
 
   const rowActions = [
     ...(canEdit ? [{ key: 'edit', icon: 'edit', variant: 'outline-warning', label: 'Edit', onClick: crud.openEdit }] : []),
+    ...(canEdit ? [{ key: 'reset', icon: 'rotate-ccw-key', variant: 'outline-info', label: 'Reset Password', onClick: handleOpenResetModal }] : []),
     ...(canDelete ? [{ key: 'delete', icon: 'trash', variant: 'outline-danger', label: 'Hapus', onClick: crud.requestRemove }] : []),
   ];
 
@@ -235,6 +249,12 @@ const TeacherTable = () => {
         />
       </Modal>
       <ConfirmDialog {...crud.confirmDialog} confirmLabel="Hapus" />
+      <ResetPasswordModal
+        open={resetModalOpen}
+        user={selectedTeacherForReset}
+        entityName="Guru"
+        onClose={handleCloseResetModal}
+      />
     </div>
   );
 };

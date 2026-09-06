@@ -6,13 +6,28 @@ import { ROLES, ROLE_PERMISSIONS } from '../../constants/roles';
 const hasToken = Boolean(localStorage.getItem('token'));
 const storedUser = localStorage.getItem('user');
 
+function readStoredUser(value) {
+  if (!value) return null;
+
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    return null;
+  }
+}
+
 // Fail-closed initialization: require both token and user
-const isValidPersistedSession = hasToken && storedUser;
+const persistedUser = readStoredUser(storedUser);
+const isValidPersistedSession = hasToken && persistedUser;
 
 const initialState = {
-  user: isValidPersistedSession ? JSON.parse(storedUser) : null,
+  user: isValidPersistedSession ? persistedUser : null,
   loading: false,
-  authType: isValidPersistedSession ? (JSON.parse(storedUser)?.role === 'student' ? 'student' : 'user') : null,
+  authType: isValidPersistedSession ? (persistedUser.role === 'student' ? 'student' : 'user') : null,
+  sessionStatus: isValidPersistedSession ? 'checking' : 'anonymous',
   error: null,
 };
 
@@ -41,13 +56,26 @@ function normalizeUser(raw) {
 function normalizeStudent(raw) {
   return {
     id: raw.id,
-    nama_lengkap: raw.nama_lengkap,
+    username: raw.email || raw.username,
+    nama_lengkap: raw.name || raw.nama_lengkap,
     nisn: raw.nisn,
     kelas_id: raw.kelas_id,
     role: ROLES.STUDENT,
     permissions: ROLE_PERMISSIONS[ROLES.STUDENT] || [],
     homeroom: null,
   };
+}
+
+function normalizeAuthUser(raw) {
+  const roles = Array.isArray(raw?.roles) ? raw.roles : raw?.role ? [raw.role] : [];
+  return roles.includes(ROLES.STUDENT) || roles.includes('Siswa')
+    ? normalizeStudent(raw)
+    : normalizeUser(raw);
+}
+
+function getCurrentUserFromResponse(payload) {
+  const user = payload?.data?.user || payload?.data;
+  return user?.id && (Array.isArray(user.roles) || user.role) ? user : null;
 }
 
 const authSlice = createSlice({
@@ -57,7 +85,17 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
       state.authType = action.payload?.role === 'student' ? 'student' : 'user';
+      state.sessionStatus = action.payload ? 'verified' : 'anonymous';
       state.error = null;
+    },
+    sessionVerified: (state) => {
+      state.sessionStatus = state.user ? 'verified' : 'anonymous';
+    },
+    sessionUnavailable: (state) => {
+      state.user = null;
+      state.authType = null;
+      state.sessionStatus = 'unverified';
+      state.error = 'Sesi belum dapat diverifikasi karena layanan tidak tersedia.';
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
@@ -66,29 +104,33 @@ const authSlice = createSlice({
       state.error = action.payload;
     },
     logout: (state) => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
       state.user = null;
       state.authType = null;
+      state.sessionStatus = 'anonymous';
       state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
       .addMatcher(authAPI.endpoints.logout.matchFulfilled, (state) => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
         state.user = null;
         state.authType = null;
+        state.sessionStatus = 'anonymous';
         state.error = null;
       })
       .addMatcher(authAPI.endpoints.loginUser.matchFulfilled, (state, { payload }) => {
         if (payload?.token) {
           localStorage.setItem('token', payload.token);
         }
-        if (payload?.user || payload?.data?.user) {
-          const userObj = normalizeUser(payload.user || payload.data.user);
+        const rawUser = payload?.user || payload?.data?.user || payload?.data?.student;
+        if (rawUser) {
+          const userObj = normalizeAuthUser(rawUser);
           localStorage.setItem('user', JSON.stringify(userObj));
           state.user = userObj;
-          state.authType = 'user';
+          state.authType = userObj.role === ROLES.STUDENT ? 'student' : 'user';
+          state.sessionStatus = 'verified';
           state.error = null;
         }
       })
@@ -98,15 +140,18 @@ const authSlice = createSlice({
           localStorage.setItem('user', JSON.stringify(userObj));
           state.user = userObj;
           state.authType = 'student';
+          state.sessionStatus = 'verified';
           state.error = null;
         }
       })
       .addMatcher(authAPI.endpoints.getCurrentUser.matchFulfilled, (state, { payload }) => {
-        if (payload?.status === 'success' && payload?.data?.user) {
-          const userObj = normalizeUser(payload.data.user);
+        const rawUser = getCurrentUserFromResponse(payload);
+        if (rawUser) {
+          const userObj = normalizeAuthUser(rawUser);
           localStorage.setItem('user', JSON.stringify(userObj));
           state.user = userObj;
-          state.authType = 'user';
+          state.authType = userObj.role === ROLES.STUDENT ? 'student' : 'user';
+          state.sessionStatus = 'verified';
           state.error = null;
         }
       })
@@ -116,11 +161,19 @@ const authSlice = createSlice({
           localStorage.setItem('user', JSON.stringify(userObj));
           state.user = userObj;
           state.authType = 'student';
+          state.sessionStatus = 'verified';
           state.error = null;
         }
       });
   },
 });
 
-export const { setUser, setLoading, setError, logout } = authSlice.actions;
+export const {
+  setUser,
+  setLoading,
+  setError,
+  sessionVerified,
+  sessionUnavailable,
+  logout,
+} = authSlice.actions;
 export default authSlice.reducer;

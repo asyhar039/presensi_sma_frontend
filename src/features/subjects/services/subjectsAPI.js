@@ -7,7 +7,7 @@ export const subjectsAPI = createApi({
   baseQuery: createApiBaseQuery(),
   tagTypes: ['Subjects'],
   endpoints: (builder) => ({
-    ...buildCrudEndpoints(builder, { entity: 'subject', entities: 'subjects', basePath: '/mapel/index.php', tag: 'Subjects' }),
+    ...buildCrudEndpoints(builder, { entity: 'subject', entities: 'subjects', basePath: '/mapels', tag: 'Subjects' }),
   }),
 });
 

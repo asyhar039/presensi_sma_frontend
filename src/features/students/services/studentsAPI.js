@@ -14,8 +14,14 @@ export const studentsAPI = createApi({
       providesTags: (result, error, id) => [{ type: 'Students', id }],
     }),
     getStudentProfile: builder.query({
-      query: () => '/students',
-      transformResponse: (response) => response,
+      query: () => '/me',
+      transformResponse: (response) => ({
+        ...response,
+        data: {
+          ...(response?.data || {}),
+          student: response?.data?.student || response?.data?.user,
+        },
+      }),
       providesTags: ['StudentProfile'],
       keepUnusedDataFor: 60,
       refetchOnMountOrArgChange: true,

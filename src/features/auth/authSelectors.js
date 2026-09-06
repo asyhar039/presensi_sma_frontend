@@ -9,8 +9,8 @@ export const selectUser = createSelector(
 );
 
 export const selectIsAuthenticated = createSelector(
-  [selectUser, () => Boolean(localStorage.getItem('token'))],
-  (user, hasToken) => user !== null && hasToken
+  [selectUser, selectAuth, () => Boolean(localStorage.getItem('token'))],
+  (user, auth, hasToken) => user !== null && hasToken && auth.sessionStatus === 'verified'
 );
 
 export const selectUserRole = createSelector(

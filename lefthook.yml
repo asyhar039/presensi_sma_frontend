@@ -1,0 +1,19 @@
+pre-commit:
+  parallel: true
+  commands:
+    biome-lint:
+      glob: "*.{js,ts,cjs,mjs,jsx,tsx,json,jsonc}"
+      run: bunx --bun biome lint {staged_files}
+    biome-format:
+      glob: "*.{js,ts,cjs,mjs,jsx,tsx,json,jsonc}"
+      run: bunx --bun biome format {staged_files} --write
+      stage_fixed: true
+    biome-check:
+      glob: "*.{js,ts,cjs,mjs,jsx,tsx,json,jsonc}"
+      run: bunx --bun biome check {staged_files} --write --unsafe
+      stage_fixed: true
+
+pre-push:
+  commands:
+    type-check:
+      run: bunx --bun tsc -b

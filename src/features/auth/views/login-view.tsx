@@ -1,4 +1,4 @@
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useRouterState } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
 import { Route } from '@/routes/_auth/login'
@@ -13,11 +13,20 @@ export function LoginView() {
   const navigate = useNavigate()
   const search = Route.useSearch()
 
+  const redirectTo = useRouterState({
+    select: (state) => state.location.state.redirectTo,
+  })
+
   useOnce(() => {
     const errorCode = search.error_code
     if (errorCode) {
       toast.error(getAuthErrorMessage(errorCode))
-      void navigate({ replace: true })
+      void navigate({
+        replace: true,
+        state: {
+          redirectTo,
+        },
+      })
     }
   })
 

@@ -10,6 +10,7 @@ export type IAuthUser = {
 
 export type IAuthContext = {
   user: IAuthUser | null
+  login: (user: IAuthUser) => void
   refetch: () => Promise<void>
   logout: () => Promise<void>
 }

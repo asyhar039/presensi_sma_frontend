@@ -1,4 +1,4 @@
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useRouterState } from '@tanstack/react-router'
 
 import { FieldGroup } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -7,11 +7,15 @@ import { useLogin } from '@/features/auth/hooks/use-login'
 import { loginSchema } from '@/features/auth/schemas/login-schema'
 import { useAppForm } from '@/hooks/use-form'
 import { formErrorHandler } from '@/utils/error'
+import { delay } from '@/utils/time'
 
 export function LoginForm() {
-  const { refetch } = useAuth()
+  const { login } = useAuth()
   const submit = useLogin()
   const navigate = useNavigate()
+  const redirectTo = useRouterState({
+    select: (state) => state.location.state.redirectTo,
+  })
 
   const form = useAppForm({
     defaultValues: {
@@ -23,10 +27,10 @@ export function LoginForm() {
     },
     onSubmit: async ({ value }) => {
       try {
-        await submit.mutateAsync(value)
-        await refetch()
-        await new Promise((resolve) => setTimeout(resolve, 50))
-        await navigate({ to: '/dashboard', replace: true })
+        const data = await submit.mutateAsync(value)
+        login(data.user)
+        await delay(100)
+        navigate({ to: redirectTo || '/dashboard', replace: true })
       } catch (error) {
         formErrorHandler(error, form, 'Failed to login. Please try again.')
       }

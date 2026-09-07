@@ -1,7 +1,7 @@
 import type { IAuthContext } from '@/types/auth.types'
 
 import { useQueryClient } from '@tanstack/react-query'
-import { createContext, use, useMemo } from 'react'
+import { createContext, use, useMemo, useState } from 'react'
 
 import { LoadingScreen } from '@/components/composite/loading-screen'
 import { useAuthMe } from '@/features/auth/hooks/use-auth-me'
@@ -16,7 +16,8 @@ const AuthContext = createContext<IAuthContext | null>(null)
 
 export function AuthProvider({ children }: React.PropsWithChildren) {
   const queryClient = useQueryClient()
-  const hasToken = hasAccessToken()
+  const [hasToken, setHasToken] = useState(() => hasAccessToken())
+
   const meQuery = useAuthMe(hasToken)
   const logout = useLogout()
 
@@ -29,12 +30,17 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
       refetch: async () => {
         await queryRefetch()
       },
+      login: async (data) => {
+        queryClient.setQueryData(authKeys.me, data)
+        setHasToken(true)
+      },
       logout: async () => {
         try {
           await logout.mutateAsync()
         } finally {
-          await queryClient.setQueryData(authKeys.me, null)
+          queryClient.setQueryData(authKeys.me, null)
           clearAccessToken()
+          setHasToken(false)
         }
       },
     }
@@ -46,7 +52,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     )
   }
 
-  return <AuthContext value={value}>{children}</AuthContext>
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export function useAuth(): IAuthContext {

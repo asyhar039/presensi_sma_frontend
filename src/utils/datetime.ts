@@ -14,7 +14,7 @@ dayjs.extend(timezone)
 
 export function formatDate(
   date?: ConfigType,
-  format = DATE_FORMAT.DATE_TIME,
+  format: string = DATE_FORMAT.DATE_TIME,
   errorValue = '-',
 ): string {
   const parsedDate = dayjs.utc(date)

@@ -4,8 +4,9 @@ import type {
   SortingState,
   Updater,
 } from '@tanstack/react-table'
+import type { ReactNode } from 'react'
+import type { DataTableProviderProps } from './data-table-context'
 
-import { IconDatabaseOff, IconReload } from '@tabler/icons-react'
 import {
   flexRender,
   functionalUpdate,
@@ -14,16 +15,6 @@ import {
   useTable,
 } from '@tanstack/react-table'
 
-import { Button } from '@/components/ui/button'
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from '@/components/ui/empty'
-import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -32,54 +23,85 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { getErrorMessage } from '@/utils/error'
+import {
+  DataTableEmptyState,
+  DataTableErrorState,
+  DataTableSkeletonRows,
+  DataTableStateRow,
+  resolveSkeletonRowCount,
+} from './data-table-body'
+import { DataTableProvider, useDataTable } from './data-table-context'
+import { DataTablePagination } from './data-table-pagination'
+import { DataTableToolbar } from './data-table-toolbar'
 
 export const dataTableFeatures = tableFeatures({ rowSortingFeature })
 
 export type DataTableFeatures = typeof dataTableFeatures
 
-export interface DataTableProps<TData extends RowData> {
+export type DataTableProps<TData extends RowData> = Omit<
+  DataTableProviderProps<TData>,
+  'children'
+> & {
   columns: ColumnDef<DataTableFeatures, TData, unknown>[]
-  data: TData[]
-  keys?: readonly unknown[]
-  sorting?: SortingState
-  onSortingChange?: (sorting: SortingState) => void
-  isLoading?: boolean
-  isError?: boolean
-  errorMessage?: string
-  onRetry?: () => void
-  toolbar?: React.ReactNode
-  footer?: React.ReactNode
+  toolbar?: ReactNode
+  footer?: ReactNode
   emptyTitle?: string
   emptyDescription?: string
-  skeletonRowCount?: number
+  errorMessage?: string
 }
 
-export function DataTable<TData extends RowData>({
+function resolveToolbar(toolbar?: ReactNode) {
+  if (toolbar === null) return null
+  if (toolbar !== undefined) return toolbar
+  return <DataTableToolbar />
+}
+
+function resolveFooter(footer?: ReactNode) {
+  if (footer === null) return null
+  if (footer !== undefined) return footer
+  return <DataTablePagination />
+}
+
+interface DataTableShellProps<TData extends RowData> {
+  columns: ColumnDef<DataTableFeatures, TData, unknown>[]
+  toolbar?: ReactNode
+  footer?: ReactNode
+  emptyTitle: string
+  emptyDescription: string
+  errorMessage: string
+}
+
+function DataTableShell<TData extends RowData>({
   columns,
-  data,
-  keys,
-  sorting = [],
-  onSortingChange,
-  isLoading = false,
-  isError = false,
-  errorMessage = 'Failed to load data. Please try again.',
-  onRetry,
   toolbar,
   footer,
-  emptyTitle = 'No results found',
-  emptyDescription = 'Try adjusting your search or filters.',
-  skeletonRowCount = 8,
-}: DataTableProps<TData>) {
+  emptyTitle,
+  emptyDescription,
+  errorMessage,
+}: DataTableShellProps<TData>) {
+  const {
+    apiParams,
+    sorting,
+    setSortingState,
+    items,
+    perPage,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useDataTable<TData>()
+
   const table = useTable<DataTableFeatures, TData>({
     features: dataTableFeatures,
     columns,
-    data,
+    data: items,
     state: { sorting },
     onSortingChange: (updater: Updater<SortingState>) => {
-      onSortingChange?.(functionalUpdate(updater, sorting))
+      setSortingState(functionalUpdate(updater, sorting))
     },
     manualSorting: true,
-    key: keys ? JSON.stringify(keys) : undefined,
+    key: JSON.stringify(apiParams),
   })
 
   const columnCount = table.getAllColumns().length
@@ -87,7 +109,7 @@ export function DataTable<TData extends RowData>({
 
   return (
     <div className="flex flex-col gap-4">
-      {toolbar}
+      {resolveToolbar(toolbar)}
       <div className="overflow-hidden rounded-lg border border-border bg-card">
         <Table>
           <TableHeader>
@@ -109,73 +131,143 @@ export function DataTable<TData extends RowData>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              Array.from({ length: skeletonRowCount }).map((_, rowIndex) => (
-                <TableRow key={rowIndex}>
-                  {Array.from({ length: Math.max(columnCount, 1) }).map(
-                    (__, cellIndex) => (
-                      <TableCell key={cellIndex}>
-                        <Skeleton className="h-5 w-full" />
-                      </TableCell>
-                    ),
-                  )}
-                </TableRow>
-              ))
-            ) : isError ? (
-              <TableRow>
-                <TableCell colSpan={columnCount} className="py-0">
-                  <Empty className="border-0">
-                    <EmptyHeader>
-                      <EmptyMedia variant="icon">
-                        <IconDatabaseOff />
-                      </EmptyMedia>
-                      <EmptyTitle>Something went wrong</EmptyTitle>
-                      <EmptyDescription>{errorMessage}</EmptyDescription>
-                    </EmptyHeader>
-                    {onRetry && (
-                      <EmptyContent>
-                        <Button variant="outline" size="sm" onClick={onRetry}>
-                          <IconReload />
-                          <span>Try again</span>
-                        </Button>
-                      </EmptyContent>
-                    )}
-                  </Empty>
-                </TableCell>
+          <TableBodyContent
+            columnCount={columnCount}
+            rowCount={rows.length}
+            perPage={perPage}
+            isLoading={isLoading}
+            isError={isError}
+            errorMessage={getErrorMessage(error, errorMessage)}
+            onRetry={refetch}
+            emptyTitle={emptyTitle}
+            emptyDescription={emptyDescription}
+          >
+            {rows.map((row) => (
+              <TableRow key={row.id}>
+                {row.getAllCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
               </TableRow>
-            ) : rows.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={columnCount} className="py-0">
-                  <Empty className="border-0">
-                    <EmptyHeader>
-                      <EmptyMedia variant="icon">
-                        <IconDatabaseOff />
-                      </EmptyMedia>
-                      <EmptyTitle>{emptyTitle}</EmptyTitle>
-                      <EmptyDescription>{emptyDescription}</EmptyDescription>
-                    </EmptyHeader>
-                  </Empty>
-                </TableCell>
-              </TableRow>
-            ) : (
-              rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getAllCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            )}
-          </TableBody>
+            ))}
+          </TableBodyContent>
         </Table>
       </div>
-      {footer}
+      {resolveFooter(footer)}
     </div>
+  )
+}
+
+interface DataTableBodyContentProps {
+  children: ReactNode
+  columnCount: number
+  rowCount: number
+  perPage: number
+  isLoading: boolean
+  isError: boolean
+  errorMessage: string
+  onRetry: () => void
+  emptyTitle: string
+  emptyDescription: string
+}
+
+function TableBodyContent({
+  children,
+  columnCount,
+  rowCount,
+  perPage,
+  isLoading,
+  isError,
+  errorMessage,
+  onRetry,
+  emptyTitle,
+  emptyDescription,
+}: DataTableBodyContentProps) {
+  if (isLoading) {
+    return (
+      <TableBody>
+        <DataTableSkeletonRows
+          rowCount={resolveSkeletonRowCount(perPage)}
+          columnCount={columnCount}
+        />
+      </TableBody>
+    )
+  }
+
+  if (isError) {
+    return (
+      <TableBody>
+        <DataTableStateRow columnCount={columnCount}>
+          <DataTableErrorState message={errorMessage} onRetry={onRetry} />
+        </DataTableStateRow>
+      </TableBody>
+    )
+  }
+
+  if (rowCount === 0) {
+    return (
+      <TableBody>
+        <DataTableStateRow columnCount={columnCount}>
+          <DataTableEmptyState
+            title={emptyTitle}
+            description={emptyDescription}
+          />
+        </DataTableStateRow>
+      </TableBody>
+    )
+  }
+
+  return <TableBody>{children}</TableBody>
+}
+
+export function DataTable<TData extends RowData>({
+  columns,
+  queryKey,
+  queryFn,
+  allowedSortBy,
+  defaultSortBy,
+  defaultOrder,
+  defaultPage,
+  defaultPerPage,
+  perPageOptions,
+  filterDefs,
+  enableSearch,
+  searchPlaceholder,
+  searchDebounceMs,
+  syncWithQueryParams,
+  staleTime,
+  toolbar,
+  footer,
+  emptyTitle = 'No results found',
+  emptyDescription = 'Try adjusting your search or filters.',
+  errorMessage = 'Failed to load data. Please try again.',
+}: DataTableProps<TData>) {
+  return (
+    <DataTableProvider
+      queryKey={queryKey}
+      queryFn={queryFn}
+      allowedSortBy={allowedSortBy}
+      defaultSortBy={defaultSortBy}
+      defaultOrder={defaultOrder}
+      defaultPage={defaultPage}
+      defaultPerPage={defaultPerPage}
+      perPageOptions={perPageOptions}
+      filterDefs={filterDefs}
+      enableSearch={enableSearch}
+      searchPlaceholder={searchPlaceholder}
+      searchDebounceMs={searchDebounceMs}
+      syncWithQueryParams={syncWithQueryParams}
+      staleTime={staleTime}
+    >
+      <DataTableShell
+        columns={columns}
+        toolbar={toolbar}
+        footer={footer}
+        emptyTitle={emptyTitle}
+        emptyDescription={emptyDescription}
+        errorMessage={errorMessage}
+      />
+    </DataTableProvider>
   )
 }

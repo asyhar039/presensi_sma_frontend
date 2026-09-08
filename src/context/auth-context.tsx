@@ -11,6 +11,7 @@ import {
   clearAccessToken,
   hasAccessToken,
 } from '@/features/auth/services/auth-storage'
+import { parseRole } from '@/utils/role'
 
 const AuthContext = createContext<IAuthContext | null>(null)
 
@@ -27,6 +28,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
   const value = useMemo<IAuthContext>((): IAuthContext => {
     return {
       user: userData || null,
+      role: parseRole(userData?.roles),
       refetch: async () => {
         await queryRefetch()
       },

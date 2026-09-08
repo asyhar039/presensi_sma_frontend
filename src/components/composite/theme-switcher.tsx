@@ -1,14 +1,22 @@
 import { IconMoon, IconSun } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/class-name'
 import { useThemeStore } from '@/stores/theme-store'
 
-export function ThemeSwitcher() {
+interface ThemeSwitcherProps {
+  className?: string
+}
+
+export function ThemeSwitcher({ className }: ThemeSwitcherProps) {
   const onToggle = useThemeStore((val) => val.toggle)
 
   return (
     <Button
-      className="bg-background dark:bg-foreground dark:text-background dark:hover:bg-foreground dark:hover:text-primary size-9 cursor-pointer rounded-full dark:border-transparent"
+      className={cn(
+        'bg-background dark:bg-foreground dark:text-background dark:hover:bg-foreground dark:hover:text-primary size-9 cursor-pointer rounded-full dark:border-transparent',
+        className,
+      )}
       variant="outline"
       size="icon"
       onClick={onToggle}

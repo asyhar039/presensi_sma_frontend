@@ -1,6 +1,15 @@
 import { Outlet, createLazyFileRoute } from '@tanstack/react-router'
 
+import { DashboardLayout } from '@/components/layout/dashboard-layout'
+
 export const Route = createLazyFileRoute('/dashboard')({
-  // TODO: add layout based on user role
-  component: () => <Outlet />,
+  component: DashboardRouteLayout,
 })
+
+function DashboardRouteLayout() {
+  return (
+    <DashboardLayout>
+      <Outlet />
+    </DashboardLayout>
+  )
+}

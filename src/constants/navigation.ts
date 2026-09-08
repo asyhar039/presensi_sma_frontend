@@ -3,8 +3,11 @@ import type { TablerIcon } from '@tabler/icons-react'
 import {
   IconBook,
   IconCalendar,
+  IconCalendarTime,
+  IconChalkboardTeacher,
   IconClipboardCheck,
   IconClipboardData,
+  IconDoor,
   IconFileCheck,
   IconHistory,
   IconLayoutDashboard,
@@ -32,20 +35,51 @@ export const DASHBOARD_NAVIGATION: Record<UserRole, DashboardNavGroup[]> = {
     {
       title: 'Main Menu',
       items: [
-        { title: 'Dashboard', href: '/dashboard', icon: IconLayoutDashboard },
+        {
+          title: 'Dashboard',
+          href: '/dashboard',
+          icon: IconLayoutDashboard,
+        },
       ],
     },
     {
       title: 'Management',
       items: [
-        { title: 'Student', href: '/dashboard/students', icon: IconUsers },
+        {
+          title: 'Student',
+          href: '/dashboard/students',
+          icon: IconUsers,
+        },
         {
           title: 'Teacher',
           href: '/dashboard/teachers',
           icon: IconClipboardData,
         },
-        { title: 'Subject', href: '/dashboard/subjects', icon: IconBook },
-        { title: 'Schedule', href: '/dashboard/schedules', icon: IconCalendar },
+        {
+          title: 'Subject',
+          href: '/dashboard/subjects',
+          icon: IconBook,
+        },
+        {
+          title: 'Academic Year',
+          href: '/dashboard/academic-years',
+          icon: IconCalendarTime,
+        },
+        {
+          title: 'Schedule',
+          href: '/dashboard/schedules',
+          icon: IconCalendar,
+        },
+        {
+          title: 'Room',
+          href: '/dashboard/rooms',
+          icon: IconDoor,
+        },
+        {
+          title: 'ClassRoom',
+          href: '/dashboard/classrooms',
+          icon: IconChalkboardTeacher,
+        },
       ],
     },
     {
@@ -56,7 +90,11 @@ export const DASHBOARD_NAVIGATION: Record<UserRole, DashboardNavGroup[]> = {
           href: '/dashboard/reports',
           icon: IconReportAnalytics,
         },
-        { title: 'Settings', href: '/dashboard/settings', icon: IconSettings },
+        {
+          title: 'Settings',
+          href: '/dashboard/settings',
+          icon: IconSettings,
+        },
       ],
     },
   ],

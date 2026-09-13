@@ -28,7 +28,7 @@ const Input = ({
   }`;
 
   return (
-    <div className="mb-4">
+    <div className={label ? "mb-4" : ""}>
       {label ? (
         <label className="mb-2 block font-semibold" htmlFor={id}>
           {label}

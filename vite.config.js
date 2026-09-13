@@ -62,19 +62,6 @@ export default defineConfig({
           {
             urlPattern: ({ url, request }) =>
               (url.pathname.includes('/api/') || url.pathname.includes('/presensi_sma_backend/')) &&
-              request.method === 'GET' &&
-              !url.pathname.includes('/auth/'),
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'presensi-api-get',
-              networkTimeoutSeconds: 10,
-              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 7 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-          {
-            urlPattern: ({ url, request }) =>
-              (url.pathname.includes('/api/') || url.pathname.includes('/presensi_sma_backend/')) &&
               (url.pathname.includes('/auth/') || request.method !== 'GET'),
             handler: 'NetworkOnly',
             options: { cacheableResponse: { statuses: [0, 200] } },

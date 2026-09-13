@@ -56,8 +56,8 @@ export const navigationItems = [
   },
 ];
 
-export function getFilteredNavigation(permissions = [], role = null) {
-  return navigationItems.filter((item) => {
+export function getFilteredNavigation(permissions = [], role = null, items = navigationItems) {
+  return items.filter((item) => {
     if (role && item.roles && !item.roles.includes(role)) {
       return false;
     }

@@ -22,7 +22,8 @@ import Form from '../../../components/feedback/Form/Form';
 import ConfirmDialog from '../../../components/feedback/ConfirmDialog/ConfirmDialog';
 import Loading from '../../../components/feedback/Loading/Loading';
 import ErrorState from '../../../components/feedback/ErrorState/ErrorState';
-import ResetPasswordModal from './ResetPasswordModal';
+import ResetPasswordModal from '../../../components/feedback/ResetPasswordModal';
+import DatePicker from '../../../components/ui/DatePicker/DatePicker';
 
 const FIELDS = [
   { key: 'nisn', label: 'NISN', required: true },
@@ -83,16 +84,39 @@ const StudentTable = () => {
       : field
   );
 
+  const [dateFilter, setDateFilter] = useState('');
+  const [semesterFilter, setSemesterFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+
   const rows = useMemo(() => {
-    const data = response?.data || [];
+    let data = response?.data || [];
     const query = debouncedSearch.trim().toLowerCase();
-    if (!query) return data;
-    return data.filter((row) =>
-      [row.nama_lengkap, row.nisn, row.nama_kelas].some((value) =>
-        value && value.toLowerCase().includes(query)
-      )
-    );
-  }, [response, debouncedSearch]);
+    
+    if (query) {
+      data = data.filter((row) =>
+        [row.nama_lengkap, row.nisn, row.nama_kelas].some((value) =>
+          value && value.toLowerCase().includes(query)
+        )
+      );
+    }
+
+    if (dateFilter) {
+      data = data.filter((row) => {
+        if (!row.created_at && !row.tanggal_lahir) return true;
+        const targetDate = row.created_at || row.tanggal_lahir;
+        return targetDate.includes(dateFilter);
+      });
+    }
+
+    if (statusFilter && statusFilter !== 'Semua Status') {
+      data = data.filter((row) => {
+        const status = row.status || 'aktif';
+        return status.toLowerCase() === statusFilter.toLowerCase();
+      });
+    }
+
+    return data;
+  }, [response, debouncedSearch, dateFilter, semesterFilter, statusFilter]);
 
   const COLUMNS = [
     {
@@ -245,19 +269,44 @@ const StudentTable = () => {
             <line x1="8" y1="2" x2="8" y2="6" />
             <line x1="3" y1="10" x2="21" y2="10" />
           </svg>
-          <span className="text-sm font-medium text-slate-700">Agustus 2024</span>
+          <div className="relative min-w-[120px]">
+            <DatePicker
+              value={dateFilter}
+              onChange={(_, val) => setDateFilter(val)}
+              className="!border-0 !py-2 !px-0 !ring-0 text-sm font-medium text-slate-700 bg-transparent w-full cursor-pointer"
+            />
+          </div>
+          {dateFilter && (
+            <button
+              type="button"
+              onClick={() => setDateFilter('')}
+              className="text-xs text-slate-400 hover:text-slate-600 ml-1 font-bold"
+              title="Reset Filter Tanggal"
+            >
+              ×
+            </button>
+          )}
         </div>
         <div className="rounded-xl border border-slate-200 bg-white px-3.5 py-2">
-          <select className="bg-white border-0 text-sm font-medium text-slate-700 focus:outline-none">
-            <option>Semester Ganjil 2023/2024</option>
-            <option>Semester Genap 2023/2024</option>
+          <select
+            value={semesterFilter}
+            onChange={(e) => setSemesterFilter(e.target.value)}
+            className="bg-white border-0 text-sm font-medium text-slate-700 focus:outline-none cursor-pointer"
+          >
+            <option value="">Semua Semester</option>
+            <option value="ganjil">Semester Ganjil 2023/2024</option>
+            <option value="genap">Semester Genap 2023/2024</option>
           </select>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white px-3.5 py-2">
-          <select className="bg-white border-0 text-sm font-medium text-slate-700 focus:outline-none">
-            <option>Semua Status</option>
-            <option>Aktif</option>
-            <option>Non-Aktif</option>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="bg-white border-0 text-sm font-medium text-slate-700 focus:outline-none cursor-pointer"
+          >
+            <option value="">Semua Status</option>
+            <option value="aktif">Aktif</option>
+            <option value="non-aktif">Non-Aktif</option>
           </select>
         </div>
       </Card>
@@ -290,7 +339,8 @@ const StudentTable = () => {
 
       <ResetPasswordModal
         open={resetModalOpen}
-        student={selectedStudentForReset}
+        user={selectedStudentForReset}
+        entityName="Siswa"
         onClose={handleCloseResetModal}
       />
     </div>

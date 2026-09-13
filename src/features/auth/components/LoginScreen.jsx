@@ -3,6 +3,7 @@ import LoginForm from './LoginForm';
 import { useLoginUserMutation } from '../services/authAPI';
 import { getErrorMessage } from '../../../utils/errors';
 import { ROUTES } from '../../../constants/routes';
+import { ROLES } from '../../../constants/roles';
 
 const LoginScreen = () => {
   const navigate = useNavigate();
@@ -12,7 +13,14 @@ const LoginScreen = () => {
     try {
       const res = await loginUser(credentials).unwrap();
       if (res?.token || res?.status === 'success') {
-        navigate(ROUTES.DASHBOARD, { replace: true });
+        const loggedInUser = res?.user || res?.data?.user || res?.data?.student;
+        const roles = Array.isArray(loggedInUser?.roles)
+          ? loggedInUser.roles
+          : loggedInUser?.role
+            ? [loggedInUser.role]
+            : [];
+        const isStudent = roles.includes('Siswa') || roles.includes(ROLES.STUDENT);
+        navigate(isStudent ? ROUTES.PROFILE : ROUTES.DASHBOARD, { replace: true });
       }
     } catch {
       // Error handling is managed by the error state from RTK Query

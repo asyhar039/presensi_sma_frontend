@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 import { useGetCurrentUserQuery } from '../../features/auth/services/authAPI';
-import { useGetStudentProfileQuery } from '../../features/students/services/studentsAPI';
 import { useDispatch } from 'react-redux';
-import { setLoading } from '../../features/auth/authSlice';
+import { logout, sessionUnavailable, sessionVerified, setLoading } from '../../features/auth/authSlice';
 import { useLocation, Navigate } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 import Loading from '../feedback/Loading/Loading';
@@ -34,27 +33,30 @@ const AuthBootstrap = ({ children }) => {
     skip: isLoginPage || !hasToken,
   });
 
-  const isConfirmedNonStudent =
-    userResponse?.status === 'success' && userResponse?.data?.user;
-  const backendUnreachable = Boolean(userError);
-
-  const { isLoading: loadingStudent, isFetching: fetchingStudent } = useGetStudentProfileQuery(undefined, {
-    skip: isLoginPage || isConfirmedNonStudent || (!hasToken && !storedUser) || backendUnreachable,
-  });
+  const currentUser = userResponse?.data?.user || userResponse?.data;
+  const sessionConfirmed = Boolean(
+    currentUser?.id && (Array.isArray(currentUser.roles) || currentUser.role)
+  );
 
   useEffect(() => {
-    dispatch(setLoading(fetchingUser || fetchingStudent));
-  }, [fetchingUser, fetchingStudent, dispatch]);
+    dispatch(setLoading(fetchingUser));
+  }, [fetchingUser, dispatch]);
 
   useEffect(() => {
-    if (userError?.status === 401 || userError?.status === 403) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      dispatch(setLoading(false));
-    }
-  }, [userError, dispatch]);
+    if (sessionConfirmed) dispatch(sessionVerified());
+    if (userError?.status === 401 || userError?.status === 403) dispatch(logout());
+    else if (userError) dispatch(sessionUnavailable());
+  }, [sessionConfirmed, userError, dispatch]);
 
-  if (!isLoginPage && (loadingUser || loadingStudent || fetchingUser || fetchingStudent)) {
+  if (!isLoginPage && userError && userError.status !== 401 && userError.status !== 403) {
+    return (
+      <div className="flex min-h-dvh min-h-screen w-full items-center justify-center p-4">
+        <Loading message="Sesi belum dapat diverifikasi. Silakan coba lagi." />
+      </div>
+    );
+  }
+
+  if (!isLoginPage && (loadingUser || fetchingUser)) {
     return (
       <div className="flex min-h-dvh min-h-screen w-full items-center justify-center p-4">
         <Loading message="Memuat aplikasi React..." />

@@ -3,6 +3,15 @@ import { NavLink } from 'react-router-dom';
 const SidebarMenuItem = ({ item, onClick }) => {
   const IconComponent = item.icon;
 
+  if (item.disabled) {
+    return (
+      <div className="flex cursor-not-allowed items-center gap-3 rounded-2xl px-4 py-3.5 text-sm font-medium text-slate-300" title="Menunggu integrasi backend">
+        <IconComponent className="h-5 w-5 shrink-0 text-slate-300" />
+        <span className="truncate">{item.label}</span>
+      </div>
+    );
+  }
+
   return (
     <NavLink
       to={item.path}

@@ -1,6 +1,6 @@
 import { Shield } from 'lucide-react';
 
-const SidebarHeader = () => {
+const SidebarHeader = ({ portalLabel = 'Admin Portal' }) => {
   return (
     <div className="flex flex-col px-5 py-5">
       <div className="flex items-center gap-3">
@@ -9,7 +9,7 @@ const SidebarHeader = () => {
         </div>
         <span className="text-xl font-bold tracking-tight text-indigo-900 leading-none">SiP</span>
       </div>
-      <span className="text-xs font-medium text-slate-400 mt-1.5 ml-1">Admin Portal</span>
+      <span className="text-xs font-medium text-slate-400 mt-1.5 ml-1">{portalLabel}</span>
     </div>
   );
 };

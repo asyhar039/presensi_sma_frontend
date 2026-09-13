@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import type { DataTableFeatures } from '@/components/data-table/data-table'
-import type { IStudent } from '@/features/students/types/student.types'
+import type { ITeacher } from '@/features/teachers/types/teacher.types'
 
 import {
   IconDotsVertical,
@@ -26,24 +26,24 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { DATE_FORMAT } from '@/constants/app'
-import { useStudentStore } from '@/features/students/components/student-store'
-import { useDeleteStudent } from '@/features/students/hooks/use-delete-student'
+import { useTeacherStore } from '@/features/teachers/components/teacher-store'
+import { useDeleteTeacher } from '@/features/teachers/hooks/use-delete-teacher'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { formatDate } from '@/utils/datetime'
 import { getErrorMessage } from '@/utils/error'
 
-function StudentActions({ item }: { item: IStudent }) {
-  const openView = useStudentStore((state) => state.openView)
-  const openEdit = useStudentStore((state) => state.openEdit)
-  const openPassword = useStudentStore((state) => state.openPassword)
+function TeacherActions({ item }: { item: ITeacher }) {
+  const openView = useTeacherStore((state) => state.openView)
+  const openEdit = useTeacherStore((state) => state.openEdit)
+  const openPassword = useTeacherStore((state) => state.openPassword)
   const showConfirmation = useConfirmationStore((state) => state.show)
-  const deleteMutation = useDeleteStudent()
+  const deleteMutation = useDeleteTeacher()
 
   const handleDelete = () => {
     showConfirmation({
       icon: IconTrash,
-      title: 'Delete student?',
-      description: `This will permanently delete the student "${item.user.name}". This action cannot be undone.`,
+      title: 'Delete teacher?',
+      description: `This will permanently delete the teacher "${item.user.name}". This action cannot be undone.`,
       actionLabel: 'Delete',
       actionVariant: 'destructive',
       onAction: async ({ close, loading }) => {
@@ -52,7 +52,7 @@ function StudentActions({ item }: { item: IStudent }) {
           await deleteMutation.mutateAsync(item.id)
           close()
         } catch (error) {
-          toast.error(getErrorMessage(error, 'Failed to delete student.'))
+          toast.error(getErrorMessage(error, 'Failed to delete teacher.'))
         } finally {
           loading(false)
         }
@@ -92,24 +92,29 @@ function StudentActions({ item }: { item: IStudent }) {
   )
 }
 
-function GenderBadge({ gender }: { gender: IStudent['gender'] }) {
+function GenderBadge({ gender }: { gender: ITeacher['gender'] }) {
   return <Badge variant="secondary">{gender.label || gender.key}</Badge>
 }
 
-function StatusBadge({ status }: { status: IStudent['status'] }) {
-  const key = status.key.toLowerCase()
-  if (key === 'active') return <Badge variant="default">{status.label}</Badge>
-  if (key === 'graduated')
-    return <Badge variant="default">{status.label}</Badge>
-  return <Badge variant="outline">{status.label}</Badge>
+function EmploymentStatusBadge({
+  employment_status,
+}: {
+  employment_status: ITeacher['employment_status']
+}) {
+  const key = employment_status.key.toLowerCase()
+  if (key === 'pns')
+    return <Badge variant="default">{employment_status.label}</Badge>
+  if (key === 'pppk')
+    return <Badge variant="secondary">{employment_status.label}</Badge>
+  return <Badge variant="outline">{employment_status.label}</Badge>
 }
 
-export function useStudentColumns(): ColumnDef<
+export function useTeacherColumns(): ColumnDef<
   DataTableFeatures,
-  IStudent,
+  ITeacher,
   unknown
 >[] {
-  return useMemo<ColumnDef<DataTableFeatures, IStudent, unknown>[]>(
+  return useMemo<ColumnDef<DataTableFeatures, ITeacher, unknown>[]>(
     () => [
       {
         id: 'name',
@@ -143,10 +148,14 @@ export function useStudentColumns(): ColumnDef<
         cell: ({ row }) => <GenderBadge gender={row.original.gender} />,
       },
       {
-        id: 'status',
-        header: dataTableHeader('Status'),
+        id: 'employment_status',
+        header: dataTableHeader('Employment Status'),
         enableSorting: false,
-        cell: ({ row }) => <StatusBadge status={row.original.status} />,
+        cell: ({ row }) => (
+          <EmploymentStatusBadge
+            employment_status={row.original.employment_status}
+          />
+        ),
       },
       {
         accessorKey: 'created_at',
@@ -163,7 +172,7 @@ export function useStudentColumns(): ColumnDef<
         enableSorting: false,
         cell: ({ row }) => (
           <div className="flex justify-end">
-            <StudentActions item={row.original} />
+            <TeacherActions item={row.original} />
           </div>
         ),
       },

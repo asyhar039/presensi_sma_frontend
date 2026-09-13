@@ -24,6 +24,7 @@ import { useAcademicYearStore } from '@/features/academic-years/components/acade
 import { useAcademicYearDetail } from '@/features/academic-years/hooks/use-academic-year-detail'
 import { useCreateAcademicYear } from '@/features/academic-years/hooks/use-create-academic-year'
 import { useUpdateAcademicYear } from '@/features/academic-years/hooks/use-update-academic-year'
+import { ACADEMIC_YEAR_SEMESTER_FORM_OPTIONS } from '@/features/academic-years/lib/academic-year-table'
 import {
   type IAcademicYearSchema,
   academicYearSchema,
@@ -128,6 +129,7 @@ function AcademicYearForm({ initial }: { initial: IAcademicYear | null }) {
                 label="Semester"
                 children={({ value, onChange }) => (
                   <Select
+                    items={ACADEMIC_YEAR_SEMESTER_FORM_OPTIONS}
                     value={value}
                     onValueChange={(next) =>
                       onChange(next as IAcademicYearSchema['semester'])
@@ -137,8 +139,11 @@ function AcademicYearForm({ initial }: { initial: IAcademicYear | null }) {
                       <SelectValue placeholder="Select semester" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="odd">Odd</SelectItem>
-                      <SelectItem value="even">Even</SelectItem>
+                      {ACADEMIC_YEAR_SEMESTER_FORM_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 )}

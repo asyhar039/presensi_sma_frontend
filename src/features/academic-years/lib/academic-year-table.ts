@@ -39,3 +39,8 @@ export const ACADEMIC_YEAR_SEMESTER_OPTIONS = [
   { label: 'Odd', value: 'odd' },
   { label: 'Even', value: 'even' },
 ]
+
+export const ACADEMIC_YEAR_SEMESTER_FORM_OPTIONS = [
+  { label: 'Odd', value: 'odd' },
+  { label: 'Even', value: 'even' },
+]

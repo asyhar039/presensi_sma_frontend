@@ -41,7 +41,7 @@ function FormField<T>({
       orientation={horizontal ? 'horizontal' : undefined}
       className={className}
     >
-      <FieldContent>
+      <FieldContent className="flex-none">
         <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
         {description && <FieldDescription>{description}</FieldDescription>}
       </FieldContent>

@@ -37,7 +37,7 @@ function ButtonSubmit({
       loadingLabel={loadingLabel || 'Loading...'}
       loading={isSubmitting}
       type={type || 'submit'}
-      size={size || 'lg'}
+      size={size || 'default'}
       variant={variant}
       className={className || 'w-full'}
       disabled={isDisabled || !canSubmit || !isDirty}

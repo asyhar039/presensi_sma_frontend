@@ -1,23 +1,25 @@
 export type { DataTableProps } from './data-table'
 export type {
+  DataTableContextValue,
   DataTableFilterBinding,
   DataTableProviderProps,
+  UseDataTableFilterOptions,
 } from './data-table-context'
 export type {
   DataTableHeaderProps,
   DataTableSortableColumn,
 } from './data-table-header'
 export type { DataTablePaginationProps } from './data-table-pagination'
+export type { DataTableSearchInputProps } from './data-table-search-input'
 export type {
+  DataTableFilterSelectOption,
   DataTableFilterSelectProps,
-  DataTableSearchInputProps,
   DataTableToolbarProps,
 } from './data-table-toolbar'
 export type {
   DataTableApiParams,
-  DataTableFilterDef,
-  DataTableFilterOption,
-  DataTableFilterValues,
+  DataTableFilterSchema,
+  DataTableFilters,
   DataTableListResult,
   DataTablePaginationMeta,
   DataTableQueryFn,
@@ -44,16 +46,19 @@ export {
   DATA_TABLE_DEFAULT_PER_PAGE_OPTIONS,
   createDataTableSearchSchema,
   fromSortingState,
+  getDataTableFilterKeys,
   getDataTableManagedKeys,
   mergeDataTableSearch,
   resolveDataTableDefaults,
   resolveDataTableState,
+  sanitizeDataTableFilters,
+  sanitizeDataTableSearch,
   serializeDataTableState,
   toSortingState,
 } from './data-table-query'
+export { DataTableSearchInput } from './data-table-search-input'
 export {
   DataTableFilterSelect,
   DataTableResetButton,
-  DataTableSearchInput,
   DataTableToolbar,
 } from './data-table-toolbar'

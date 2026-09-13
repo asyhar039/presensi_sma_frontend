@@ -6,6 +6,7 @@ import type {
 } from '@tanstack/react-table'
 import type { ReactNode } from 'react'
 import type { DataTableProviderProps } from './data-table-context'
+import type { DataTableFilters } from './data-table-types'
 
 import {
   flexRender,
@@ -39,10 +40,10 @@ export const dataTableFeatures = tableFeatures({ rowSortingFeature })
 
 export type DataTableFeatures = typeof dataTableFeatures
 
-export type DataTableProps<TData extends RowData> = Omit<
-  DataTableProviderProps<TData>,
-  'children'
-> & {
+export type DataTableProps<
+  TData extends RowData,
+  TFilters extends DataTableFilters = DataTableFilters,
+> = Omit<DataTableProviderProps<TData, TFilters>, 'children'> & {
   columns: ColumnDef<DataTableFeatures, TData, unknown>[]
   toolbar?: ReactNode
   footer?: ReactNode
@@ -221,7 +222,10 @@ function TableBodyContent({
   return <TableBody>{children}</TableBody>
 }
 
-export function DataTable<TData extends RowData>({
+export function DataTable<
+  TData extends RowData,
+  TFilters extends DataTableFilters = DataTableFilters,
+>({
   columns,
   queryKey,
   queryFn,
@@ -231,7 +235,8 @@ export function DataTable<TData extends RowData>({
   defaultPage,
   defaultPerPage,
   perPageOptions,
-  filterDefs,
+  defaultFilters,
+  filterSchema,
   enableSearch,
   searchPlaceholder,
   searchDebounceMs,
@@ -242,9 +247,9 @@ export function DataTable<TData extends RowData>({
   emptyTitle = 'No results found',
   emptyDescription = 'Try adjusting your search or filters.',
   errorMessage = 'Failed to load data. Please try again.',
-}: DataTableProps<TData>) {
+}: DataTableProps<TData, TFilters>) {
   return (
-    <DataTableProvider
+    <DataTableProvider<TData, TFilters>
       queryKey={queryKey}
       queryFn={queryFn}
       allowedSortBy={allowedSortBy}
@@ -253,7 +258,8 @@ export function DataTable<TData extends RowData>({
       defaultPage={defaultPage}
       defaultPerPage={defaultPerPage}
       perPageOptions={perPageOptions}
-      filterDefs={filterDefs}
+      defaultFilters={defaultFilters}
+      filterSchema={filterSchema}
       enableSearch={enableSearch}
       searchPlaceholder={searchPlaceholder}
       searchDebounceMs={searchDebounceMs}

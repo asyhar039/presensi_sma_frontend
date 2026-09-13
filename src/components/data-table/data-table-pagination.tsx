@@ -70,7 +70,7 @@ function PaginationSummary({ page, perPage, total }: PaginationSummaryProps) {
   const to = Math.min(page * perPage, total)
 
   return (
-    <p className="text-sm text-muted-foreground">
+    <p className="text-center text-sm text-muted-foreground sm:text-left">
       Showing <span className="font-medium text-foreground">{from}</span> to{' '}
       <span className="font-medium text-foreground">{to}</span> of{' '}
       <span className="font-medium text-foreground">{total}</span> results
@@ -136,7 +136,7 @@ function PageButtons({
   const nextDisabled = isLastPage || isLoading
 
   return (
-    <Pagination className="mx-0 w-auto">
+    <Pagination className="mx-0 w-auto max-w-full overflow-x-auto h-10">
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
@@ -205,10 +205,10 @@ export function DataTablePagination(props: DataTablePaginationProps) {
   const onPerPageChange = props.onPerPageChange ?? table.setPerPage
 
   return (
-    <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col-reverse items-center gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
       <PaginationSummary page={page} perPage={perPage} total={total} />
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+      <div className="flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-4">
         <PerPageSelect
           perPage={perPage}
           perPageOptions={perPageOptions}

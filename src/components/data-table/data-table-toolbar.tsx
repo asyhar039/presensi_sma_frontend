@@ -1,10 +1,8 @@
 import type { ReactNode } from 'react'
-import type { DataTableFilterDef } from './data-table-types'
 
-import { IconSearch, IconX } from '@tabler/icons-react'
+import { IconX } from '@tabler/icons-react'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -12,77 +10,50 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { cn } from '@/lib/class-name'
 import { useDataTable } from './data-table-context'
+import { DataTableSearchInput } from './data-table-search-input'
 
-export interface DataTableSearchInputProps {
+export interface DataTableFilterSelectOption {
+  label: string
   value: string
-  onChange: (value: string) => void
-  onClear: () => void
-  placeholder?: string
-  disabled?: boolean
-}
-
-export function DataTableSearchInput({
-  value,
-  onChange,
-  onClear,
-  placeholder = 'Search...',
-  disabled = false,
-}: DataTableSearchInputProps) {
-  const showClear = value !== ''
-
-  return (
-    <div className="relative w-full sm:max-w-xs">
-      <IconSearch className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-      <Input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        className="pr-8 pl-8"
-        aria-label={placeholder}
-        disabled={disabled}
-      />
-      {showClear && (
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          onClick={onClear}
-          aria-label="Clear search"
-          className="absolute top-1/2 right-1.5 -translate-y-1/2"
-        >
-          <IconX />
-        </Button>
-      )}
-    </div>
-  )
 }
 
 export interface DataTableFilterSelectProps {
-  def: DataTableFilterDef
+  label: string
   value: string
   onChange: (value: string) => void
+  options: DataTableFilterSelectOption[]
+  placeholder?: string
   disabled?: boolean
+  className?: string
 }
 
 export function DataTableFilterSelect({
-  def,
+  label,
   value,
   onChange,
+  options,
+  placeholder,
   disabled = false,
+  className,
 }: DataTableFilterSelectProps) {
-  if (!def.options || def.options.length === 0) return null
-
   return (
     <Select
       value={value}
-      onValueChange={(value) => onChange(value ?? '')}
+      onValueChange={(next) => onChange(next ?? '')}
       disabled={disabled}
+      items={options}
     >
-      <SelectTrigger size="default" aria-label={def.label}>
-        <SelectValue placeholder={def.placeholder ?? def.label} />
+      <SelectTrigger
+        size="default"
+        aria-label={label}
+        className={cn('w-full sm:w-auto', className)}
+      >
+        <SelectValue placeholder={placeholder ?? label} />
       </SelectTrigger>
       <SelectContent>
-        {def.options.map((option) => (
+        {options.map((option) => (
           <SelectItem key={option.value} value={option.value}>
             {option.label}
           </SelectItem>
@@ -101,50 +72,8 @@ export function DataTableResetButton({ onReset }: { onReset: () => void }) {
   )
 }
 
-function ToolbarSearch({ placeholder }: { placeholder?: string }) {
-  const {
-    enableSearch,
-    searchInput,
-    setSearchInput,
-    clearSearch,
-    searchPlaceholder,
-  } = useDataTable<unknown>()
-
-  if (!enableSearch) return null
-
-  return (
-    <DataTableSearchInput
-      value={searchInput}
-      onChange={setSearchInput}
-      onClear={clearSearch}
-      placeholder={placeholder ?? searchPlaceholder}
-    />
-  )
-}
-
-function ToolbarFilters() {
-  const { filterDefs, filters, setFilter, isFetching } = useDataTable<unknown>()
-  const selectDefs = filterDefs.filter(
-    (def) => def.options && def.options.length > 0,
-  )
-
-  return (
-    <>
-      {selectDefs.map((def) => (
-        <DataTableFilterSelect
-          key={def.key}
-          def={def}
-          value={filters[def.key] ?? ''}
-          onChange={(value) => setFilter(def.key, value)}
-          disabled={isFetching}
-        />
-      ))}
-    </>
-  )
-}
-
 function ToolbarReset() {
-  const { isFiltered, reset } = useDataTable<unknown>()
+  const { isFiltered, reset } = useDataTable()
   if (!isFiltered) return null
 
   return <DataTableResetButton onReset={reset} />
@@ -152,20 +81,39 @@ function ToolbarReset() {
 
 export interface DataTableToolbarProps {
   searchPlaceholder?: string
+  searchDebounceMs?: number
+  showSearch?: boolean
   showReset?: boolean
   children?: ReactNode
+  className?: string
 }
 
 export function DataTableToolbar({
   searchPlaceholder,
+  searchDebounceMs,
+  showSearch = true,
   showReset = true,
   children,
+  className,
 }: DataTableToolbarProps) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-      <ToolbarSearch placeholder={searchPlaceholder} />
-      <ToolbarFilters />
-      {children}
+    <div
+      className={cn(
+        'flex flex-col gap-2.5 lg:flex-row lg:items-center',
+        className,
+      )}
+    >
+      {showSearch && (
+        <div className="w-full shrink-0 lg:w-64 xl:w-72">
+          <DataTableSearchInput
+            placeholder={searchPlaceholder}
+            debounceMs={searchDebounceMs}
+          />
+        </div>
+      )}
+      {children && (
+        <div className="flex flex-wrap items-center gap-2">{children}</div>
+      )}
       {showReset && <ToolbarReset />}
     </div>
   )

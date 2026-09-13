@@ -1,4 +1,4 @@
-import type { DataTableFilterDef } from '@/components/data-table'
+import * as v from 'valibot'
 
 export const ACADEMIC_YEAR_SORT_BY = [
   'id',
@@ -13,31 +13,29 @@ export const ACADEMIC_YEAR_DEFAULT_SORT_BY = 'created_at'
 export const ACADEMIC_YEAR_DEFAULT_ORDER = 'desc' as const
 export const ACADEMIC_YEAR_PER_PAGE_OPTIONS = [10, 20, 30, 50]
 
-function isValidYear(value: string): boolean {
-  if (value === '') return true
-  if (!/^\d{1,4}$/.test(value)) return false
-  const year = Number(value)
-  return year >= 1900 && year <= 2100
+export const academicYearFilterSchema = v.object({
+  semester: v.picklist(['all', 'odd', 'even']),
+  year: v.optional(
+    v.pipe(
+      v.union([v.number(), v.string()]),
+      v.transform((value) => Number(value)),
+      v.number('Year must be a number.'),
+      v.integer('Year must be a whole number.'),
+      v.minValue(1900, 'Year must be between 1900 and 2100.'),
+      v.maxValue(2100, 'Year must be between 1900 and 2100.'),
+    ),
+  ),
+})
+
+export type AcademicYearFilters = v.InferOutput<typeof academicYearFilterSchema>
+
+export const ACADEMIC_YEAR_DEFAULT_FILTERS: AcademicYearFilters = {
+  semester: 'all',
+  year: undefined,
 }
 
-export const ACADEMIC_YEAR_FILTER_DEFS: DataTableFilterDef[] = [
-  {
-    key: 'semester',
-    label: 'Semester',
-    placeholder: 'All semesters',
-    defaultValue: 'all',
-    allowedValues: ['all', 'odd', 'even'],
-    options: [
-      { label: 'All semesters', value: 'all' },
-      { label: 'Odd', value: 'odd' },
-      { label: 'Even', value: 'even' },
-    ],
-  },
-  {
-    key: 'year',
-    label: 'Year',
-    placeholder: 'Year',
-    defaultValue: '',
-    validate: isValidYear,
-  },
+export const ACADEMIC_YEAR_SEMESTER_OPTIONS = [
+  { label: 'All semesters', value: 'all' },
+  { label: 'Odd', value: 'odd' },
+  { label: 'Even', value: 'even' },
 ]

@@ -1,7 +1,6 @@
 import { createDataTableSearchSchema } from '@/components/data-table'
-
-export const ACADEMIC_YEAR_FILTER_KEYS = ['semester', 'year'] as const
+import { academicYearFilterSchema } from '@/features/academic-years/lib/academic-year-table'
 
 export const academicYearSearch = createDataTableSearchSchema({
-  filterKeys: ACADEMIC_YEAR_FILTER_KEYS,
+  filterSchema: academicYearFilterSchema,
 })

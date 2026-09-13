@@ -18,11 +18,12 @@ import {
 import { AcademicYearToolbar } from '@/features/academic-years/components/academic-year-toolbar'
 import { academicYearKeys } from '@/features/academic-years/lib/academic-year-query-options'
 import {
+  ACADEMIC_YEAR_DEFAULT_FILTERS,
   ACADEMIC_YEAR_DEFAULT_ORDER,
   ACADEMIC_YEAR_DEFAULT_SORT_BY,
-  ACADEMIC_YEAR_FILTER_DEFS,
   ACADEMIC_YEAR_PER_PAGE_OPTIONS,
   ACADEMIC_YEAR_SORT_BY,
+  academicYearFilterSchema,
 } from '@/features/academic-years/lib/academic-year-table'
 import { getAcademicYears } from '@/features/academic-years/services/academic-year-api'
 
@@ -59,7 +60,8 @@ function AcademicYearContent() {
             defaultSortBy={ACADEMIC_YEAR_DEFAULT_SORT_BY}
             defaultOrder={ACADEMIC_YEAR_DEFAULT_ORDER}
             perPageOptions={ACADEMIC_YEAR_PER_PAGE_OPTIONS}
-            filterDefs={ACADEMIC_YEAR_FILTER_DEFS}
+            defaultFilters={ACADEMIC_YEAR_DEFAULT_FILTERS}
+            filterSchema={academicYearFilterSchema}
             toolbar={<AcademicYearToolbar />}
             syncWithQueryParams
           />

@@ -2,7 +2,8 @@ import type { SortingState } from '@tanstack/react-table'
 import type { ReactNode } from 'react'
 import type {
   DataTableApiParams,
-  DataTableFilterDef,
+  DataTableFilterSchema,
+  DataTableFilters,
   DataTableListResult,
   DataTablePaginationMeta,
   DataTableQueryFn,
@@ -21,10 +22,10 @@ import {
   useState,
 } from 'react'
 
-import { useDebouncedValue } from '@/hooks/use-debounced-value'
 import { useUpdateEffect } from '@/hooks/use-update-effect'
 import {
   fromSortingState,
+  getDataTableFilterKeys,
   getDataTableManagedKeys,
   mergeDataTableSearch,
   resolveDataTableDefaults,
@@ -33,7 +34,10 @@ import {
   toSortingState,
 } from './data-table-query'
 
-export interface DataTableProviderProps<TData> {
+export interface DataTableProviderProps<
+  TData,
+  TFilters extends DataTableFilters = DataTableFilters,
+> {
   children: ReactNode
   queryKey: readonly unknown[]
   queryFn: DataTableQueryFn<TData>
@@ -43,7 +47,8 @@ export interface DataTableProviderProps<TData> {
   defaultPage?: number
   defaultPerPage?: number
   perPageOptions?: number[]
-  filterDefs?: DataTableFilterDef[]
+  defaultFilters?: TFilters
+  filterSchema?: DataTableFilterSchema<TFilters>
   enableSearch?: boolean
   searchPlaceholder?: string
   searchDebounceMs?: number
@@ -51,37 +56,48 @@ export interface DataTableProviderProps<TData> {
   staleTime?: number
 }
 
-export interface DataTableFilterBinding {
-  value: string
-  setValue: (value: string) => void
-  def?: DataTableFilterDef
+export interface UseDataTableFilterOptions<TValue> {
+  defaultValue?: TValue
+  debounceMs?: number
 }
 
-export interface DataTableContextValue<TData> {
+export interface DataTableFilterBinding<TValue> {
+  value: TValue
+  setValue: (value: TValue) => void
+  clear: () => void
+  isDefault: boolean
+}
+
+export interface DataTableContextValue<
+  TData,
+  TFilters extends DataTableFilters = DataTableFilters,
+> {
   perPageOptions: number[]
   allowedSortBy: readonly string[]
-  filterDefs: DataTableFilterDef[]
+  defaultFilters: TFilters
   enableSearch: boolean
   searchPlaceholder: string
+  searchDebounceMs: number
   syncWithQueryParams: boolean
   page: number
   perPage: number
-  searchInput: string
   search: string
   sortBy?: string
   order?: DataTableSortOrder
-  filters: Record<string, string>
+  filters: TFilters
   sorting: SortingState
   apiParams: DataTableApiParams
   isFiltered: boolean
+  activeFilterCount: number
   setPage: (page: number) => void
   setPerPage: (perPage: number) => void
-  setSearchInput: (value: string) => void
+  setSearch: (value: string) => void
+  setFilter: (key: string, value: unknown) => void
   clearSearch: () => void
+  clearFilter: (key: string) => void
+  clearFilters: () => void
   setSorting: (sortBy?: string, order?: DataTableSortOrder) => void
   setSortingState: (sorting: SortingState) => void
-  setFilter: (key: string, value: string) => void
-  getFilter: (key: string) => string
   reset: () => void
   items: TData[]
   meta: DataTablePaginationMeta
@@ -92,17 +108,28 @@ export interface DataTableContextValue<TData> {
   refetch: () => void
 }
 
-const DataTableContext = createContext<DataTableContextValue<never> | null>(
-  null,
-)
+const DataTableContext = createContext<DataTableContextValue<
+  never,
+  never
+> | null>(null)
 
-function getDefaultFilters(filterDefs: DataTableFilterDef[]) {
-  const filters: Record<string, string> = {}
-  for (const def of filterDefs) filters[def.key] = def.defaultValue ?? ''
-  return filters
+const DATA_TABLE_DEFAULT_SEARCH_DEBOUNCE_MS = 500
+
+const DATA_TABLE_SEARCH_KEY = 'search'
+
+function areFiltersEqual<TFilters extends DataTableFilters>(
+  left: TFilters,
+  right: TFilters,
+): boolean {
+  const keys = Object.keys(right)
+  if (Object.keys(left).length !== keys.length) return false
+  return keys.every((key) => Object.is(left[key], right[key]))
 }
 
-export function DataTableProvider<TData>({
+export function DataTableProvider<
+  TData,
+  TFilters extends DataTableFilters = DataTableFilters,
+>({
   children,
   queryKey,
   queryFn,
@@ -112,13 +139,14 @@ export function DataTableProvider<TData>({
   defaultPage,
   defaultPerPage,
   perPageOptions,
-  filterDefs = [],
+  defaultFilters = {} as TFilters,
+  filterSchema,
   enableSearch = true,
   searchPlaceholder = 'Search...',
-  searchDebounceMs = 500,
+  searchDebounceMs = DATA_TABLE_DEFAULT_SEARCH_DEBOUNCE_MS,
   syncWithQueryParams = true,
   staleTime = 30_000,
-}: DataTableProviderProps<TData>) {
+}: DataTableProviderProps<TData, TFilters>) {
   const navigate = useNavigate()
   const routeSearch = useSearch({ strict: false }) as Record<string, unknown>
 
@@ -130,7 +158,8 @@ export function DataTableProvider<TData>({
       defaultPage,
       defaultPerPage,
       perPageOptions,
-      filterDefs,
+      defaultFilters,
+      filterSchema,
     }),
     [
       allowedSortBy,
@@ -139,16 +168,21 @@ export function DataTableProvider<TData>({
       defaultPage,
       defaultPerPage,
       perPageOptions,
-      filterDefs,
+      defaultFilters,
+      filterSchema,
     ],
   )
   const configRef = useRef(config)
   configRef.current = config
 
   const defaults = useMemo(() => resolveDataTableDefaults(config), [config])
+  const filterKeys = useMemo(
+    () => getDataTableFilterKeys(defaultFilters),
+    [defaultFilters],
+  )
   const managedKeys = useMemo(
-    () => getDataTableManagedKeys(filterDefs),
-    [filterDefs],
+    () => getDataTableManagedKeys(filterKeys),
+    [filterKeys],
   )
 
   const [initial] = useState(() =>
@@ -160,20 +194,12 @@ export function DataTableProvider<TData>({
 
   const [page, setPageState] = useState(initial.page)
   const [perPage, setPerPageState] = useState(initial.perPage)
-  const [searchInput, setSearchInputState] = useState(initial.search)
+  const [search, setSearchState] = useState(initial.search)
   const [sortBy, setSortByState] = useState<string | undefined>(initial.sortBy)
   const [order, setOrderState] = useState<DataTableSortOrder | undefined>(
     initial.order,
   )
-  const [filters, setFiltersState] = useState<Record<string, string>>(
-    initial.filters,
-  )
-
-  const search = useDebouncedValue(searchInput, searchDebounceMs)
-
-  useUpdateEffect(() => {
-    setPageState(defaults.page)
-  }, [search])
+  const [filters, setFiltersState] = useState<TFilters>(initial.filters)
 
   const sorting = useMemo(() => toSortingState(sortBy, order), [sortBy, order])
 
@@ -186,24 +212,37 @@ export function DataTableProvider<TData>({
     [page, perPage, search, sortBy, order, filters, config],
   )
 
-  const isFiltered = useMemo(() => {
+  const { isFiltered, activeFilterCount } = useMemo(() => {
+    let count = search !== '' ? 1 : 0
+    for (const key of filterKeys) {
+      const value = filters[key]
+      const fallback = defaultFilters[key]
+      if (value === undefined || value === fallback) continue
+      if (value === '' && (fallback === undefined || fallback === '')) continue
+      count += 1
+    }
     const serialized = serializeDataTableState(
       { page: defaults.page, perPage, search, sortBy, order, filters },
       config,
     )
-
-    return (
-      serialized.search !== undefined ||
-      serialized.sortBy !== undefined ||
-      Object.keys(serialized).some(
-        (key) =>
-          key !== 'search' &&
-          key !== 'sortBy' &&
-          key !== 'order' &&
-          key !== 'per_page',
-      )
-    )
-  }, [defaults.page, perPage, search, sortBy, order, filters, config])
+    return {
+      isFiltered:
+        serialized.search !== undefined ||
+        serialized.sortBy !== undefined ||
+        count > 0,
+      activeFilterCount: count,
+    }
+  }, [
+    search,
+    filters,
+    filterKeys,
+    defaultFilters,
+    defaults.page,
+    perPage,
+    sortBy,
+    order,
+    config,
+  ])
 
   const setPage = useCallback((next: number) => {
     const normalized = Math.floor(next)
@@ -222,12 +261,53 @@ export function DataTableProvider<TData>({
     [defaults],
   )
 
-  const setSearchInput = useCallback((value: string) => {
-    setSearchInputState(value)
-  }, [])
+  const setSearch = useCallback(
+    (value: string) => {
+      setSearchState(value)
+      setPageState(defaults.page)
+    },
+    [defaults.page],
+  )
+
+  const setFilter = useCallback(
+    (key: string, value: unknown) => {
+      setFiltersState((previous) => {
+        if (previous[key] === value) return previous
+        return { ...previous, [key]: value }
+      })
+      setPageState(defaults.page)
+    },
+    [defaults.page],
+  )
 
   const clearSearch = useCallback(() => {
-    setSearchInputState('')
+    setSearchState('')
+    setPageState(configRef.current.defaultPage ?? 1)
+  }, [])
+
+  const clearFilter = useCallback((key: string) => {
+    const current = configRef.current
+    const fallback = (current.defaultFilters as DataTableFilters)[key]
+    setFiltersState((previous) => {
+      if (previous[key] === fallback) return previous
+      return { ...previous, [key]: fallback }
+    })
+    setPageState(current.defaultPage ?? 1)
+  }, [])
+
+  const clearFilters = useCallback(() => {
+    const current = configRef.current
+    setSearchState((previous) => (previous === '' ? previous : ''))
+    setFiltersState((previous) =>
+      areFiltersEqual(previous, current.defaultFilters)
+        ? previous
+        : { ...current.defaultFilters },
+    )
+    setPageState((previous) =>
+      previous === (current.defaultPage ?? 1)
+        ? previous
+        : (current.defaultPage ?? 1),
+    )
   }, [])
 
   const setSorting = useCallback(
@@ -253,29 +333,18 @@ export function DataTableProvider<TData>({
     [allowedSortBy, defaults],
   )
 
-  const setFilter = useCallback(
-    (key: string, value: string) => {
-      setFiltersState((previous) => {
-        if (previous[key] === value) return previous
-        return { ...previous, [key]: value }
-      })
-      setPageState(defaults.page)
-    },
-    [defaults.page],
-  )
-
-  const getFilter = useCallback((key: string) => filters[key] ?? '', [filters])
-
   const reset = useCallback(() => {
-    setSearchInputState('')
-    setFiltersState(getDefaultFilters(configRef.current.filterDefs ?? []))
-    setSortByState(configRef.current.defaultSortBy)
-    setOrderState(
-      configRef.current.defaultSortBy
-        ? (configRef.current.defaultOrder ?? 'asc')
-        : undefined,
+    const current = configRef.current
+    const currentDefaults = resolveDataTableDefaults(current)
+    setSearchState((previous) => (previous === '' ? previous : ''))
+    setFiltersState((previous) =>
+      areFiltersEqual(previous, current.defaultFilters)
+        ? previous
+        : { ...current.defaultFilters },
     )
-    setPageState(configRef.current.defaultPage ?? 1)
+    setSortByState(current.defaultSortBy)
+    setOrderState(current.defaultSortBy ? currentDefaults.order : undefined)
+    setPageState(currentDefaults.page)
   }, [])
 
   const fullQueryKey = useMemo(
@@ -351,7 +420,7 @@ export function DataTableProvider<TData>({
     lastPushedRef.current = incomingKey
     setPageState(incoming.page)
     setPerPageState(incoming.perPage)
-    setSearchInputState(incoming.search)
+    setSearchState(incoming.search)
     setSortByState(incoming.sortBy)
     setOrderState(incoming.order)
     setFiltersState(incoming.filters)
@@ -361,17 +430,17 @@ export function DataTableProvider<TData>({
     void listQuery.refetch()
   }, [listQuery])
 
-  const value = useMemo<DataTableContextValue<TData>>(
+  const value = useMemo<DataTableContextValue<TData, TFilters>>(
     () => ({
       perPageOptions: defaults.perPageOptions,
       allowedSortBy,
-      filterDefs,
+      defaultFilters,
       enableSearch,
       searchPlaceholder,
+      searchDebounceMs,
       syncWithQueryParams,
       page,
       perPage,
-      searchInput,
       search,
       sortBy,
       order,
@@ -379,14 +448,16 @@ export function DataTableProvider<TData>({
       sorting,
       apiParams,
       isFiltered,
+      activeFilterCount,
       setPage,
       setPerPage,
-      setSearchInput,
+      setSearch,
+      setFilter,
       clearSearch,
+      clearFilter,
+      clearFilters,
       setSorting,
       setSortingState,
-      setFilter,
-      getFilter,
       reset,
       items,
       meta,
@@ -399,13 +470,13 @@ export function DataTableProvider<TData>({
     [
       defaults.perPageOptions,
       allowedSortBy,
-      filterDefs,
+      defaultFilters,
       enableSearch,
       searchPlaceholder,
+      searchDebounceMs,
       syncWithQueryParams,
       page,
       perPage,
-      searchInput,
       search,
       sortBy,
       order,
@@ -413,14 +484,16 @@ export function DataTableProvider<TData>({
       sorting,
       apiParams,
       isFiltered,
+      activeFilterCount,
       setPage,
       setPerPage,
-      setSearchInput,
+      setSearch,
+      setFilter,
       clearSearch,
+      clearFilter,
+      clearFilters,
       setSorting,
       setSortingState,
-      setFilter,
-      getFilter,
       reset,
       items,
       meta,
@@ -433,27 +506,103 @@ export function DataTableProvider<TData>({
   )
 
   return (
-    <DataTableContext.Provider value={value as DataTableContextValue<never>}>
+    <DataTableContext.Provider
+      value={value as DataTableContextValue<never, never>}
+    >
       {children}
     </DataTableContext.Provider>
   )
 }
 
-export function useDataTable<TData>() {
+export function useDataTable<
+  TData = unknown,
+  TFilters extends DataTableFilters = DataTableFilters,
+>() {
   const context = useContext(DataTableContext)
   if (!context) {
     throw new Error('useDataTable must be used within a DataTableProvider.')
   }
 
-  return context as DataTableContextValue<TData>
+  return context as DataTableContextValue<TData, TFilters>
 }
 
-export function useDataTableFilter(key: string): DataTableFilterBinding {
-  const { filters, filterDefs, setFilter } = useDataTable<unknown>()
-  const def = filterDefs.find((item) => item.key === key)
-  const setValue = useCallback(
-    (value: string) => setFilter(key, value),
-    [key, setFilter],
+export function useDataTableFilter<TValue = string>(
+  key: string,
+  options?: UseDataTableFilterOptions<TValue>,
+): DataTableFilterBinding<TValue> {
+  const {
+    defaultFilters,
+    filters,
+    search,
+    searchDebounceMs,
+    setFilter,
+    setSearch,
+  } = useDataTable<unknown, DataTableFilters>()
+
+  const isSearch = key === DATA_TABLE_SEARCH_KEY
+  const defaultValue = (options?.defaultValue ??
+    (isSearch ? '' : defaultFilters[key])) as TValue
+  const debounceMs = options?.debounceMs ?? (isSearch ? searchDebounceMs : 0)
+  const committed = (
+    isSearch ? search : (filters[key] ?? defaultValue)
+  ) as TValue
+
+  const [local, setLocal] = useState<TValue>(committed)
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+  const commit = useCallback(
+    (next: TValue) => {
+      if (isSearch) setSearch(next as string)
+      else setFilter(key, next)
+    },
+    [isSearch, key, setSearch, setFilter],
   )
-  return { value: filters[key] ?? '', setValue, def }
+  const commitRef = useRef(commit)
+  commitRef.current = commit
+  const committedRef = useRef(committed)
+  committedRef.current = committed
+
+  useEffect(() => {
+    setLocal((previous) =>
+      Object.is(previous, committed) ? previous : committed,
+    )
+  }, [committed])
+
+  useEffect(() => () => clearTimeout(timer.current), [])
+
+  const setValue = useCallback(
+    (next: TValue) => {
+      setLocal((previous) => (Object.is(previous, next) ? previous : next))
+      clearTimeout(timer.current)
+      timer.current = undefined
+      if (Object.is(next, committedRef.current)) return
+      if (!debounceMs || debounceMs <= 0) {
+        commitRef.current(next)
+        return
+      }
+      timer.current = setTimeout(() => commitRef.current(next), debounceMs)
+    },
+    [debounceMs],
+  )
+
+  const clear = useCallback(() => {
+    clearTimeout(timer.current)
+    timer.current = undefined
+    setLocal((previous) =>
+      Object.is(previous, defaultValue) ? previous : defaultValue,
+    )
+    if (!Object.is(defaultValue, committedRef.current)) {
+      commitRef.current(defaultValue)
+    }
+  }, [defaultValue])
+
+  return useMemo(
+    () => ({
+      value: local,
+      setValue,
+      clear,
+      isDefault: Object.is(local, defaultValue),
+    }),
+    [local, setValue, clear, defaultValue],
+  )
 }

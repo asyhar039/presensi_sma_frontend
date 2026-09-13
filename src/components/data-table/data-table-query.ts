@@ -1,7 +1,8 @@
 import type { SortingState } from '@tanstack/react-table'
 import type {
   DataTableApiParams,
-  DataTableFilterDef,
+  DataTableFilterSchema,
+  DataTableFilters,
   DataTableQueryState,
   DataTableSortOrder,
   DataTableStateConfig,
@@ -18,13 +19,21 @@ export const DATA_TABLE_SKELETON_MAX_ROWS = 50
 
 const BASE_MANAGED_KEYS = ['page', 'per_page', 'search', 'sortBy', 'order']
 
-export function getDataTableManagedKeys(
-  filterDefs: DataTableFilterDef[] = [],
+export function getDataTableFilterKeys<TFilters extends DataTableFilters>(
+  defaultFilters: TFilters,
 ): string[] {
-  return [...BASE_MANAGED_KEYS, ...filterDefs.map((def) => def.key)]
+  return Object.keys(defaultFilters)
 }
 
-export function resolveDataTableDefaults(config: DataTableStateConfig) {
+export function getDataTableManagedKeys(
+  filterKeys: readonly string[] = [],
+): string[] {
+  return [...BASE_MANAGED_KEYS, ...filterKeys]
+}
+
+export function resolveDataTableDefaults<TFilters extends DataTableFilters>(
+  config: DataTableStateConfig<TFilters>,
+) {
   return {
     page: config.defaultPage ?? DATA_TABLE_DEFAULT_PAGE,
     perPage: config.defaultPerPage ?? DATA_TABLE_DEFAULT_PER_PAGE,
@@ -46,24 +55,50 @@ function toCleanString(value: unknown, maxLength: number): string {
   return String(value).slice(0, maxLength)
 }
 
-function resolveFilterValue(raw: unknown, def: DataTableFilterDef): string {
-  const fallback = def.defaultValue ?? ''
-  const candidate = toCleanString(raw ?? fallback, DATA_TABLE_SEARCH_MAX_LENGTH)
-  if (candidate === '') return fallback === '' ? '' : fallback
-  if (def.allowedValues && !def.allowedValues.includes(candidate)) {
-    return fallback
-  }
-  if (def.validate && !def.validate(candidate)) return fallback
-  return candidate
+export function sanitizeDataTableSearch(value: unknown): string {
+  return toCleanString(value, DATA_TABLE_SEARCH_MAX_LENGTH).trim()
 }
 
-export function resolveDataTableState(
+type FilterEntries = Record<string, v.GenericSchema>
+
+function getFilterEntries(
+  filterSchema: DataTableFilterSchema<DataTableFilters>,
+): FilterEntries | undefined {
+  const candidate = filterSchema as unknown as { entries?: FilterEntries }
+  return candidate.entries
+}
+
+export function sanitizeDataTableFilters<TFilters extends DataTableFilters>(
+  filters: TFilters,
+  defaultFilters: TFilters,
+  filterSchema?: DataTableFilterSchema<TFilters>,
+): TFilters {
+  if (!filterSchema) return filters
+  const parsed = v.safeParse(filterSchema, filters)
+  if (parsed.success) return parsed.output
+  const entries = getFilterEntries(
+    filterSchema as DataTableFilterSchema<DataTableFilters>,
+  )
+  if (!entries) return { ...defaultFilters }
+  const sanitized: Record<string, unknown> = {}
+  for (const key of Object.keys(defaultFilters)) {
+    const entry = entries[key]
+    if (!entry) {
+      sanitized[key] = filters[key] ?? defaultFilters[key]
+      continue
+    }
+    const value = v.safeParse(entry, filters[key])
+    sanitized[key] = value.success ? value.output : defaultFilters[key]
+  }
+  return sanitized as TFilters
+}
+
+export function resolveDataTableState<TFilters extends DataTableFilters>(
   raw: Record<string, unknown> | undefined,
-  config: DataTableStateConfig,
-): DataTableQueryState {
+  config: DataTableStateConfig<TFilters>,
+): DataTableQueryState<TFilters> {
   const source = raw ?? {}
   const defaults = resolveDataTableDefaults(config)
-  const filterDefs = config.filterDefs ?? []
 
   const page = toPositiveInt(source.page) ?? defaults.page
 
@@ -73,10 +108,7 @@ export function resolveDataTableState(
       ? perPageCandidate
       : defaults.perPage
 
-  const search = toCleanString(
-    source.search,
-    DATA_TABLE_SEARCH_MAX_LENGTH,
-  ).trim()
+  const search = sanitizeDataTableSearch(source.search)
 
   const allowedSortBy = config.allowedSortBy ?? []
   const rawSortBy = toCleanString(source.sortBy, DATA_TABLE_SEARCH_MAX_LENGTH)
@@ -92,17 +124,23 @@ export function resolveDataTableState(
       : defaults.order
     : undefined
 
-  const filters: Record<string, string> = {}
-  for (const def of filterDefs) {
-    filters[def.key] = resolveFilterValue(source[def.key], def)
+  const candidate = {} as Record<string, unknown>
+  for (const key of Object.keys(config.defaultFilters)) {
+    const value = source[key]
+    candidate[key] = value === undefined ? config.defaultFilters[key] : value
   }
+  const filters = sanitizeDataTableFilters(
+    candidate as TFilters,
+    config.defaultFilters,
+    config.filterSchema,
+  )
 
   return { page, perPage, search, sortBy, order, filters }
 }
 
-function isDefaultSort(
-  state: DataTableQueryState,
-  config: DataTableStateConfig,
+function isDefaultSort<TFilters extends DataTableFilters>(
+  state: DataTableQueryState<TFilters>,
+  config: DataTableStateConfig<TFilters>,
 ): boolean {
   if (!state.sortBy) return true
   if (!config.defaultSortBy) return false
@@ -110,27 +148,42 @@ function isDefaultSort(
   return state.sortBy === config.defaultSortBy && state.order === defaults.order
 }
 
-export function serializeDataTableState(
-  state: DataTableQueryState,
-  config: DataTableStateConfig,
+function isDefaultFilterValue(value: unknown, defaultValue: unknown): boolean {
+  if (value === undefined) return true
+  if (value === defaultValue) return true
+  if (value === '' && (defaultValue === undefined || defaultValue === ''))
+    return true
+  return false
+}
+
+export function serializeDataTableState<TFilters extends DataTableFilters>(
+  state: DataTableQueryState<TFilters>,
+  config: DataTableStateConfig<TFilters>,
 ): DataTableApiParams {
   const defaults = resolveDataTableDefaults(config)
-  const filterDefs = config.filterDefs ?? []
   const params: DataTableApiParams = {}
 
+  const cleanSearch = sanitizeDataTableSearch(state.search)
   if (state.page !== defaults.page) params.page = state.page
   if (state.perPage !== defaults.perPage) params.per_page = state.perPage
-  if (state.search !== '') params.search = state.search
+  if (cleanSearch !== '') params.search = cleanSearch
 
   if (state.sortBy && !isDefaultSort(state, config)) {
     params.sortBy = state.sortBy
     params.order = state.order ?? defaults.order
   }
 
-  for (const def of filterDefs) {
-    const value = state.filters[def.key] ?? ''
-    const fallback = def.defaultValue ?? ''
-    if (value !== '' && value !== fallback) params[def.key] = value
+  const sanitized = sanitizeDataTableFilters(
+    state.filters,
+    config.defaultFilters,
+    config.filterSchema,
+  )
+  for (const key of Object.keys(config.defaultFilters)) {
+    const value = sanitized[key]
+    if (isDefaultFilterValue(value, config.defaultFilters[key])) continue
+    if (typeof value === 'string' || typeof value === 'number') {
+      params[key] = value
+    }
   }
 
   return params
@@ -164,7 +217,7 @@ export function fromSortingState(
 }
 
 export interface DataTableSearchSchemaOptions {
-  filterKeys?: readonly string[]
+  filterSchema?: DataTableFilterSchema<DataTableFilters>
 }
 
 const searchNumber = v.optional(
@@ -177,17 +230,20 @@ const searchNumber = v.optional(
 export function createDataTableSearchSchema(
   options: DataTableSearchSchemaOptions = {},
 ) {
-  const entries: Record<string, ReturnType<typeof v.optional>> = {
+  const entries: Record<string, v.GenericSchema> = {
     page: searchNumber,
     per_page: searchNumber,
     search: v.optional(v.string()),
     sortBy: v.optional(v.string()),
     order: v.optional(v.string()),
   }
-  for (const key of options.filterKeys ?? []) {
-    entries[key] = v.optional(v.union([v.string(), v.number()]))
+  if (options.filterSchema) {
+    const filterEntries = getFilterEntries(options.filterSchema)
+    if (filterEntries) {
+      for (const [key, entry] of Object.entries(filterEntries)) {
+        entries[key] = v.optional(entry)
+      }
+    }
   }
   return v.looseObject(entries)
 }
-
-export type DataTableSearchInput = Record<string, unknown>

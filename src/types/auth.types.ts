@@ -6,13 +6,11 @@ export type IAuthUser = {
   name: string
   email: string
   phone_number: string
-  roles: string[]
-  permissions: string[] | null
+  role: UserRole
 }
 
 export type IauthRole = {
   role: UserRole
-  roles: UserRole[]
   isAdmin: boolean
   isTeacher: boolean
   isStudent: boolean

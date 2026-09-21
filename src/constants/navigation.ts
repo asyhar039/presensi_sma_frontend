@@ -101,7 +101,13 @@ export const DASHBOARD_NAVIGATION: Record<UserRole, DashboardNavGroup[]> = {
   [ROLES.TEACHER]: [
     {
       title: 'Main Menu',
-      items: [{ title: 'Attendance', href: '/dashboard', icon: IconQrcode }],
+      items: [
+        {
+          title: 'Attendance',
+          href: '/dashboard/attendance',
+          icon: IconQrcode,
+        },
+      ],
     },
     {
       title: 'Teaching',

@@ -106,7 +106,11 @@ export const DASHBOARD_NAVIGATION: Record<UserRole, DashboardNavGroup[]> = {
     {
       title: 'Teaching',
       items: [
-        { title: 'Student Data', href: '/dashboard/students', icon: IconUsers },
+        {
+          title: 'Student Data',
+          href: '/dashboard/teacher/students',
+          icon: IconUsers,
+        },
         {
           title: 'Teaching Schedule',
           href: '/dashboard/schedules',

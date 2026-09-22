@@ -46,6 +46,7 @@ export interface IStudentParams {
   status?: string
   sortBy?: string
   order?: string
+  teacher_id?: number | string
 }
 
 export interface IStudentPayload {

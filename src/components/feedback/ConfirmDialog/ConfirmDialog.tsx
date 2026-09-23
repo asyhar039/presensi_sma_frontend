@@ -1,0 +1,40 @@
+import Button from '../../ui/Button/Button'
+import Modal from '../Modal/Modal'
+
+interface ConfirmDialogProps {
+  open: boolean
+  title?: string
+  message?: string
+  confirmLabel?: string
+  cancelLabel?: string
+  onConfirm?: () => void
+  onCancel?: () => void
+  variant?: string
+}
+
+const ConfirmDialog = ({
+  open,
+  title = 'Konfirmasi',
+  message = 'Apakah Anda yakin ingin melanjutkan?',
+  confirmLabel = 'Ya, Lanjutkan',
+  cancelLabel = 'Batal',
+  onConfirm,
+  onCancel,
+  variant = 'danger',
+}: ConfirmDialogProps) => {
+  return (
+    <Modal open={open} title={title} onClose={onCancel} size="sm">
+      <div className="mb-6">{message}</div>
+      <div className="flex justify-end gap-2">
+        <Button variant="secondary" onClick={onCancel}>
+          {cancelLabel}
+        </Button>
+        <Button variant={variant} onClick={onConfirm}>
+          {confirmLabel}
+        </Button>
+      </div>
+    </Modal>
+  )
+}
+
+export default ConfirmDialog

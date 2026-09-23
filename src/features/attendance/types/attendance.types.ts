@@ -54,6 +54,7 @@ export interface IAttendanceParams {
   status?: string
   sortBy?: string
   order?: string
+  teacher_id?: number
 }
 
 export interface IAttendanceSessionPayload {
@@ -96,6 +97,7 @@ export interface IAttendanceLogParams {
   status?: string
   sortBy?: string
   order?: string
+  teacher_id?: number
 }
 
 export interface IAttendanceLogListResult {

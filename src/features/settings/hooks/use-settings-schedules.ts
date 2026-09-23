@@ -5,7 +5,7 @@ import {
   daySchedulesQueryOptions,
   settingsKeys,
 } from '@/features/settings/lib/settings-query-options'
-import { putDaySchedule } from '@/features/settings/services/settings-api'
+import { putDaySchedule } from '@/features/settings/services/schedule-clock.api'
 import { getErrorMessage } from '@/utils/error'
 
 export function useDaySchedules() {

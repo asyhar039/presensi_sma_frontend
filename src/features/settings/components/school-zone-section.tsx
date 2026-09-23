@@ -3,7 +3,7 @@ import type { MapMouseEvent } from 'maplibre-gl'
 import type {
   ISchoolZone,
   SchoolZonePoint,
-} from '@/features/settings/types/settings.types'
+} from '@/features/settings/types/school-zone.types'
 
 import {
   IconCheck,
@@ -48,7 +48,7 @@ import {
   useSaveSchoolZones,
   useSchoolZones,
 } from '@/features/settings/hooks/use-settings-zones'
-import { schoolZoneSchema } from '@/features/settings/schemas/settings-schema'
+import { schoolZoneSchema } from '@/features/settings/schemas/school-zone.schema'
 import { cn } from '@/lib/class-name'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 

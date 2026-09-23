@@ -8,7 +8,7 @@ import {
 import {
   deleteSchoolZone,
   putSchoolZones,
-} from '@/features/settings/services/settings-api'
+} from '@/features/settings/services/school-zone.api'
 import { getErrorMessage } from '@/utils/error'
 
 export function useSchoolZones() {

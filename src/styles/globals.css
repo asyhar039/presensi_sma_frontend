@@ -173,7 +173,7 @@
       @apply opacity-0;
     }
 
-    *:hover>.resizer {
+    *:hover > .resizer {
       @apply opacity-100;
     }
   }

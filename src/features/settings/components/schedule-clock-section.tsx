@@ -1,7 +1,7 @@
 import type {
   IScheduleSlot,
   WeekDay,
-} from '@/features/settings/types/settings.types'
+} from '@/features/settings/types/schedule-clock.types'
 
 import {
   IconCalendarOff,
@@ -45,7 +45,7 @@ import {
   WEEK_DAYS,
   WEEK_DAY_LABELS,
   isWeekDay,
-} from '@/features/settings/types/settings.types'
+} from '@/features/settings/types/schedule-clock.types'
 import { cn } from '@/lib/class-name'
 
 type SlotDraft = IScheduleSlot & { key: string }

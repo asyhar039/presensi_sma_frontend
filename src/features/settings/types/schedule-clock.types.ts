@@ -39,15 +39,3 @@ export interface IUpdateDaySchedulePayload {
   day: string
   schedules: IScheduleSlot[]
 }
-
-export interface IPublicHoliday {
-  name: string
-  date: string
-}
-
-export type SchoolZonePoint = [number, number]
-
-export interface ISchoolZone {
-  name: string
-  points: SchoolZonePoint[]
-}

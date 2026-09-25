@@ -17,10 +17,14 @@ import { Route as DashboardAcademicYearsRouteImport } from './routes/dashboard/a
 import { Route as DashboardAttendanceRecapRouteImport } from './routes/dashboard/attendance-recap'
 import { Route as DashboardClassroomsRouteImport } from './routes/dashboard/classrooms'
 import { Route as DashboardRoomsRouteImport } from './routes/dashboard/rooms'
+import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardStudentsRouteImport } from './routes/dashboard/students'
 import { Route as DashboardSubjectsRouteImport } from './routes/dashboard/subjects'
 import { Route as DashboardTeachersRouteImport } from './routes/dashboard/teachers'
 import { Route as DashboardAttendanceRecapStudentIdRouteImport } from './routes/dashboard/attendance-recap.$studentId'
+import { Route as DashboardSettingsIndexRouteImport } from './routes/dashboard/settings.index'
+import { Route as DashboardSettingsPublicHolidaysRouteImport } from './routes/dashboard/settings.public-holidays'
+import { Route as DashboardSettingsSchoolZonesRouteImport } from './routes/dashboard/settings.school-zones'
 import { Route as DashboardTeacherStudentsRouteImport } from './routes/dashboard/teacher/students'
 
 const IndexRoute = IndexRouteImport.update({
@@ -64,6 +68,11 @@ const DashboardRoomsRoute = DashboardRoomsRouteImport.update({
   path: '/rooms',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardStudentsRoute = DashboardStudentsRouteImport.update({
   id: '/students',
   path: '/students',
@@ -85,6 +94,23 @@ const DashboardAttendanceRecapStudentIdRoute =
     path: '/$studentId',
     getParentRoute: () => DashboardAttendanceRecapRoute,
   } as any)
+const DashboardSettingsIndexRoute = DashboardSettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardSettingsRoute,
+} as any)
+const DashboardSettingsPublicHolidaysRoute =
+  DashboardSettingsPublicHolidaysRouteImport.update({
+    id: '/public-holidays',
+    path: '/public-holidays',
+    getParentRoute: () => DashboardSettingsRoute,
+  } as any)
+const DashboardSettingsSchoolZonesRoute =
+  DashboardSettingsSchoolZonesRouteImport.update({
+    id: '/school-zones',
+    path: '/school-zones',
+    getParentRoute: () => DashboardSettingsRoute,
+  } as any)
 const DashboardTeacherStudentsRoute =
   DashboardTeacherStudentsRouteImport.update({
     id: '/teacher/students',
@@ -100,12 +126,16 @@ export interface FileRoutesByFullPath {
   '/dashboard/attendance-recap': typeof DashboardAttendanceRecapRouteWithChildren
   '/dashboard/classrooms': typeof DashboardClassroomsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
+  '/dashboard/settings': typeof DashboardSettingsRouteWithChildren
   '/dashboard/students': typeof DashboardStudentsRoute
   '/dashboard/subjects': typeof DashboardSubjectsRoute
   '/dashboard/teachers': typeof DashboardTeachersRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/attendance-recap/$studentId': typeof DashboardAttendanceRecapStudentIdRoute
+  '/dashboard/settings/public-holidays': typeof DashboardSettingsPublicHolidaysRoute
+  '/dashboard/settings/school-zones': typeof DashboardSettingsSchoolZonesRoute
   '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
+  '/dashboard/settings/': typeof DashboardSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -119,7 +149,10 @@ export interface FileRoutesByTo {
   '/dashboard/teachers': typeof DashboardTeachersRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/attendance-recap/$studentId': typeof DashboardAttendanceRecapStudentIdRoute
+  '/dashboard/settings/public-holidays': typeof DashboardSettingsPublicHolidaysRoute
+  '/dashboard/settings/school-zones': typeof DashboardSettingsSchoolZonesRoute
   '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
+  '/dashboard/settings': typeof DashboardSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -130,12 +163,16 @@ export interface FileRoutesById {
   '/dashboard/attendance-recap': typeof DashboardAttendanceRecapRouteWithChildren
   '/dashboard/classrooms': typeof DashboardClassroomsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
+  '/dashboard/settings': typeof DashboardSettingsRouteWithChildren
   '/dashboard/students': typeof DashboardStudentsRoute
   '/dashboard/subjects': typeof DashboardSubjectsRoute
   '/dashboard/teachers': typeof DashboardTeachersRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/attendance-recap/$studentId': typeof DashboardAttendanceRecapStudentIdRoute
+  '/dashboard/settings/public-holidays': typeof DashboardSettingsPublicHolidaysRoute
+  '/dashboard/settings/school-zones': typeof DashboardSettingsSchoolZonesRoute
   '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
+  '/dashboard/settings/': typeof DashboardSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -147,12 +184,16 @@ export interface FileRouteTypes {
     | '/dashboard/attendance-recap'
     | '/dashboard/classrooms'
     | '/dashboard/rooms'
+    | '/dashboard/settings'
     | '/dashboard/students'
     | '/dashboard/subjects'
     | '/dashboard/teachers'
     | '/dashboard/'
     | '/dashboard/attendance-recap/$studentId'
+    | '/dashboard/settings/public-holidays'
+    | '/dashboard/settings/school-zones'
     | '/dashboard/teacher/students'
+    | '/dashboard/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -166,7 +207,10 @@ export interface FileRouteTypes {
     | '/dashboard/teachers'
     | '/dashboard'
     | '/dashboard/attendance-recap/$studentId'
+    | '/dashboard/settings/public-holidays'
+    | '/dashboard/settings/school-zones'
     | '/dashboard/teacher/students'
+    | '/dashboard/settings'
   id:
     | '__root__'
     | '/'
@@ -176,12 +220,16 @@ export interface FileRouteTypes {
     | '/dashboard/attendance-recap'
     | '/dashboard/classrooms'
     | '/dashboard/rooms'
+    | '/dashboard/settings'
     | '/dashboard/students'
     | '/dashboard/subjects'
     | '/dashboard/teachers'
     | '/dashboard/'
     | '/dashboard/attendance-recap/$studentId'
+    | '/dashboard/settings/public-holidays'
+    | '/dashboard/settings/school-zones'
     | '/dashboard/teacher/students'
+    | '/dashboard/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -248,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRoomsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/settings': {
+      id: '/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/students': {
       id: '/dashboard/students'
       path: '/students'
@@ -276,6 +331,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAttendanceRecapStudentIdRouteImport
       parentRoute: typeof DashboardAttendanceRecapRoute
     }
+    '/dashboard/settings/': {
+      id: '/dashboard/settings/'
+      path: '/'
+      fullPath: '/dashboard/settings/'
+      preLoaderRoute: typeof DashboardSettingsIndexRouteImport
+      parentRoute: typeof DashboardSettingsRoute
+    }
+    '/dashboard/settings/public-holidays': {
+      id: '/dashboard/settings/public-holidays'
+      path: '/public-holidays'
+      fullPath: '/dashboard/settings/public-holidays'
+      preLoaderRoute: typeof DashboardSettingsPublicHolidaysRouteImport
+      parentRoute: typeof DashboardSettingsRoute
+    }
+    '/dashboard/settings/school-zones': {
+      id: '/dashboard/settings/school-zones'
+      path: '/school-zones'
+      fullPath: '/dashboard/settings/school-zones'
+      preLoaderRoute: typeof DashboardSettingsSchoolZonesRouteImport
+      parentRoute: typeof DashboardSettingsRoute
+    }
     '/dashboard/teacher/students': {
       id: '/dashboard/teacher/students'
       path: '/teacher/students'
@@ -301,11 +377,27 @@ const DashboardAttendanceRecapRouteWithChildren =
     DashboardAttendanceRecapRouteChildren,
   )
 
+interface DashboardSettingsRouteChildren {
+  DashboardSettingsPublicHolidaysRoute: typeof DashboardSettingsPublicHolidaysRoute
+  DashboardSettingsSchoolZonesRoute: typeof DashboardSettingsSchoolZonesRoute
+  DashboardSettingsIndexRoute: typeof DashboardSettingsIndexRoute
+}
+
+const DashboardSettingsRouteChildren: DashboardSettingsRouteChildren = {
+  DashboardSettingsPublicHolidaysRoute: DashboardSettingsPublicHolidaysRoute,
+  DashboardSettingsSchoolZonesRoute: DashboardSettingsSchoolZonesRoute,
+  DashboardSettingsIndexRoute: DashboardSettingsIndexRoute,
+}
+
+const DashboardSettingsRouteWithChildren =
+  DashboardSettingsRoute._addFileChildren(DashboardSettingsRouteChildren)
+
 interface DashboardRouteChildren {
   DashboardAcademicYearsRoute: typeof DashboardAcademicYearsRoute
   DashboardAttendanceRecapRoute: typeof DashboardAttendanceRecapRouteWithChildren
   DashboardClassroomsRoute: typeof DashboardClassroomsRoute
   DashboardRoomsRoute: typeof DashboardRoomsRoute
+  DashboardSettingsRoute: typeof DashboardSettingsRouteWithChildren
   DashboardStudentsRoute: typeof DashboardStudentsRoute
   DashboardSubjectsRoute: typeof DashboardSubjectsRoute
   DashboardTeachersRoute: typeof DashboardTeachersRoute
@@ -318,6 +410,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAttendanceRecapRoute: DashboardAttendanceRecapRouteWithChildren,
   DashboardClassroomsRoute: DashboardClassroomsRoute,
   DashboardRoomsRoute: DashboardRoomsRoute,
+  DashboardSettingsRoute: DashboardSettingsRouteWithChildren,
   DashboardStudentsRoute: DashboardStudentsRoute,
   DashboardSubjectsRoute: DashboardSubjectsRoute,
   DashboardTeachersRoute: DashboardTeachersRoute,

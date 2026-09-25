@@ -1,3 +1,5 @@
+import type { SchoolZoneStatusFilter } from '@/features/settings/types/school-zone.types'
+
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
 
 import { getPublicHolidays } from '@/features/settings/services/public-holiday.api'
@@ -11,7 +13,10 @@ export const settingsKeys = {
     month
       ? ([...settingsKeys.all, 'public-holidays', month] as const)
       : ([...settingsKeys.all, 'public-holidays'] as const),
-  zones: () => [...settingsKeys.all, 'school-zones'] as const,
+  zones: (filter?: SchoolZoneStatusFilter) =>
+    filter
+      ? ([...settingsKeys.all, 'school-zones', filter] as const)
+      : ([...settingsKeys.all, 'school-zones'] as const),
 }
 
 export function daySchedulesQueryOptions() {
@@ -31,10 +36,12 @@ export function publicHolidaysQueryOptions(month?: string) {
   })
 }
 
-export function schoolZonesQueryOptions() {
+export function schoolZonesQueryOptions(
+  filter: SchoolZoneStatusFilter = 'all',
+) {
   return queryOptions({
-    queryKey: settingsKeys.zones(),
-    queryFn: getSchoolZones,
+    queryKey: settingsKeys.zones(filter),
+    queryFn: () => getSchoolZones(filter),
     staleTime: 30_000,
   })
 }

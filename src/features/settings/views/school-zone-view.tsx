@@ -1,4 +1,4 @@
-import { SchoolZoneSection } from '@/features/settings/components/school-zone-section'
+import { SchoolZoneSection } from '@/features/settings/components/school-zone-section/school-zone-section'
 
 export function SchoolZoneView() {
   return (

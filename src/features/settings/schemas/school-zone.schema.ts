@@ -17,10 +17,11 @@ export const schoolZoneSchema = v.object({
     v.string('Name must be a string.'),
     v.trim(),
     v.nonEmpty('Please enter a zone name.'),
-    v.maxLength(120, 'Name must be at most 120 characters.'),
+    v.maxLength(32, 'Name must be at most 32 characters.'),
   ),
   points: v.pipe(
     v.array(v.tuple([latitudeSchema, longitudeSchema])),
     v.minLength(3, 'Draw at least 3 points to form a school zone.'),
   ),
+  is_active: v.boolean(),
 })

@@ -76,7 +76,7 @@ export function useAttendanceColumns(): ColumnDef<
         header: dataTableHeader('NIS'),
         cell: ({ row }) => (
           <span className="font-medium whitespace-nowrap text-muted-foreground">
-            {row.original.student.user.identity_number}
+            {row.original.student?.user?.identity_number}
           </span>
         ),
       },
@@ -85,7 +85,7 @@ export function useAttendanceColumns(): ColumnDef<
         header: dataTableHeader('Nama Lengkap'),
         cell: ({ row }) => (
           <span className="font-medium whitespace-nowrap">
-            {row.original.student.user.name}
+            {row.original.student?.user?.name}
           </span>
         ),
       },

@@ -136,7 +136,7 @@ export function useAttendanceSummaryColumns(): ColumnDef<
         header: dataTableHeader('Kehadiran (%)'),
         cell: ({ row }) => (
           <span className="font-medium whitespace-nowrap">
-            {row.original.attendance_rate.toFixed(1)}%
+            {(row.original.attendance_rate ?? 0).toFixed(1)}%
           </span>
         ),
       },

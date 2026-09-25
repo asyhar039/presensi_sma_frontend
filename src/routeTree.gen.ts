@@ -21,14 +21,11 @@ import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settin
 import { Route as DashboardStudentsRouteImport } from './routes/dashboard/students'
 import { Route as DashboardSubjectsRouteImport } from './routes/dashboard/subjects'
 import { Route as DashboardTeachersRouteImport } from './routes/dashboard/teachers'
-<<<<<<< HEAD
 import { Route as DashboardAttendanceRecapStudentIdRouteImport } from './routes/dashboard/attendance-recap.$studentId'
-import { Route as DashboardTeacherStudentsRouteImport } from './routes/dashboard/teacher/students'
-=======
 import { Route as DashboardSettingsIndexRouteImport } from './routes/dashboard/settings.index'
 import { Route as DashboardSettingsPublicHolidaysRouteImport } from './routes/dashboard/settings.public-holidays'
 import { Route as DashboardSettingsSchoolZonesRouteImport } from './routes/dashboard/settings.school-zones'
->>>>>>> 1bbe87a (feat: add school zone management feature with map integration)
+import { Route as DashboardTeacherStudentsRouteImport } from './routes/dashboard/teacher/students'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -91,19 +88,12 @@ const DashboardTeachersRoute = DashboardTeachersRouteImport.update({
   path: '/teachers',
   getParentRoute: () => DashboardRoute,
 } as any)
-<<<<<<< HEAD
 const DashboardAttendanceRecapStudentIdRoute =
   DashboardAttendanceRecapStudentIdRouteImport.update({
     id: '/$studentId',
     path: '/$studentId',
     getParentRoute: () => DashboardAttendanceRecapRoute,
   } as any)
-const DashboardTeacherStudentsRoute =
-  DashboardTeacherStudentsRouteImport.update({
-    id: '/teacher/students',
-    path: '/teacher/students',
-    getParentRoute: () => DashboardRoute,
-=======
 const DashboardSettingsIndexRoute = DashboardSettingsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -120,7 +110,12 @@ const DashboardSettingsSchoolZonesRoute =
     id: '/school-zones',
     path: '/school-zones',
     getParentRoute: () => DashboardSettingsRoute,
->>>>>>> 1bbe87a (feat: add school zone management feature with map integration)
+  } as any)
+const DashboardTeacherStudentsRoute =
+  DashboardTeacherStudentsRouteImport.update({
+    id: '/teacher/students',
+    path: '/teacher/students',
+    getParentRoute: () => DashboardRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -136,14 +131,11 @@ export interface FileRoutesByFullPath {
   '/dashboard/subjects': typeof DashboardSubjectsRoute
   '/dashboard/teachers': typeof DashboardTeachersRoute
   '/dashboard/': typeof DashboardIndexRoute
-<<<<<<< HEAD
   '/dashboard/attendance-recap/$studentId': typeof DashboardAttendanceRecapStudentIdRoute
-  '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
-=======
   '/dashboard/settings/public-holidays': typeof DashboardSettingsPublicHolidaysRoute
   '/dashboard/settings/school-zones': typeof DashboardSettingsSchoolZonesRoute
+  '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
   '/dashboard/settings/': typeof DashboardSettingsIndexRoute
->>>>>>> 1bbe87a (feat: add school zone management feature with map integration)
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -156,14 +148,11 @@ export interface FileRoutesByTo {
   '/dashboard/subjects': typeof DashboardSubjectsRoute
   '/dashboard/teachers': typeof DashboardTeachersRoute
   '/dashboard': typeof DashboardIndexRoute
-<<<<<<< HEAD
   '/dashboard/attendance-recap/$studentId': typeof DashboardAttendanceRecapStudentIdRoute
-  '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
-=======
   '/dashboard/settings/public-holidays': typeof DashboardSettingsPublicHolidaysRoute
   '/dashboard/settings/school-zones': typeof DashboardSettingsSchoolZonesRoute
+  '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
   '/dashboard/settings': typeof DashboardSettingsIndexRoute
->>>>>>> 1bbe87a (feat: add school zone management feature with map integration)
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -179,14 +168,11 @@ export interface FileRoutesById {
   '/dashboard/subjects': typeof DashboardSubjectsRoute
   '/dashboard/teachers': typeof DashboardTeachersRoute
   '/dashboard/': typeof DashboardIndexRoute
-<<<<<<< HEAD
   '/dashboard/attendance-recap/$studentId': typeof DashboardAttendanceRecapStudentIdRoute
-  '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
-=======
   '/dashboard/settings/public-holidays': typeof DashboardSettingsPublicHolidaysRoute
   '/dashboard/settings/school-zones': typeof DashboardSettingsSchoolZonesRoute
+  '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
   '/dashboard/settings/': typeof DashboardSettingsIndexRoute
->>>>>>> 1bbe87a (feat: add school zone management feature with map integration)
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -203,14 +189,11 @@ export interface FileRouteTypes {
     | '/dashboard/subjects'
     | '/dashboard/teachers'
     | '/dashboard/'
-<<<<<<< HEAD
     | '/dashboard/attendance-recap/$studentId'
-    | '/dashboard/teacher/students'
-=======
     | '/dashboard/settings/public-holidays'
     | '/dashboard/settings/school-zones'
+    | '/dashboard/teacher/students'
     | '/dashboard/settings/'
->>>>>>> 1bbe87a (feat: add school zone management feature with map integration)
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -223,14 +206,11 @@ export interface FileRouteTypes {
     | '/dashboard/subjects'
     | '/dashboard/teachers'
     | '/dashboard'
-<<<<<<< HEAD
     | '/dashboard/attendance-recap/$studentId'
-    | '/dashboard/teacher/students'
-=======
     | '/dashboard/settings/public-holidays'
     | '/dashboard/settings/school-zones'
+    | '/dashboard/teacher/students'
     | '/dashboard/settings'
->>>>>>> 1bbe87a (feat: add school zone management feature with map integration)
   id:
     | '__root__'
     | '/'
@@ -245,14 +225,11 @@ export interface FileRouteTypes {
     | '/dashboard/subjects'
     | '/dashboard/teachers'
     | '/dashboard/'
-<<<<<<< HEAD
     | '/dashboard/attendance-recap/$studentId'
-    | '/dashboard/teacher/students'
-=======
     | '/dashboard/settings/public-holidays'
     | '/dashboard/settings/school-zones'
+    | '/dashboard/teacher/students'
     | '/dashboard/settings/'
->>>>>>> 1bbe87a (feat: add school zone management feature with map integration)
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -347,7 +324,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTeachersRouteImport
       parentRoute: typeof DashboardRoute
     }
-<<<<<<< HEAD
     '/dashboard/attendance-recap/$studentId': {
       id: '/dashboard/attendance-recap/$studentId'
       path: '/$studentId'
@@ -355,13 +331,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAttendanceRecapStudentIdRouteImport
       parentRoute: typeof DashboardAttendanceRecapRoute
     }
-    '/dashboard/teacher/students': {
-      id: '/dashboard/teacher/students'
-      path: '/teacher/students'
-      fullPath: '/dashboard/teacher/students'
-      preLoaderRoute: typeof DashboardTeacherStudentsRouteImport
-      parentRoute: typeof DashboardRoute
-=======
     '/dashboard/settings/': {
       id: '/dashboard/settings/'
       path: '/'
@@ -382,12 +351,17 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/settings/school-zones'
       preLoaderRoute: typeof DashboardSettingsSchoolZonesRouteImport
       parentRoute: typeof DashboardSettingsRoute
->>>>>>> 1bbe87a (feat: add school zone management feature with map integration)
+    }
+    '/dashboard/teacher/students': {
+      id: '/dashboard/teacher/students'
+      path: '/teacher/students'
+      fullPath: '/dashboard/teacher/students'
+      preLoaderRoute: typeof DashboardTeacherStudentsRouteImport
+      parentRoute: typeof DashboardRoute
     }
   }
 }
 
-<<<<<<< HEAD
 interface DashboardAttendanceRecapRouteChildren {
   DashboardAttendanceRecapStudentIdRoute: typeof DashboardAttendanceRecapStudentIdRoute
 }
@@ -402,7 +376,7 @@ const DashboardAttendanceRecapRouteWithChildren =
   DashboardAttendanceRecapRoute._addFileChildren(
     DashboardAttendanceRecapRouteChildren,
   )
-=======
+
 interface DashboardSettingsRouteChildren {
   DashboardSettingsPublicHolidaysRoute: typeof DashboardSettingsPublicHolidaysRoute
   DashboardSettingsSchoolZonesRoute: typeof DashboardSettingsSchoolZonesRoute
@@ -417,7 +391,6 @@ const DashboardSettingsRouteChildren: DashboardSettingsRouteChildren = {
 
 const DashboardSettingsRouteWithChildren =
   DashboardSettingsRoute._addFileChildren(DashboardSettingsRouteChildren)
->>>>>>> 1bbe87a (feat: add school zone management feature with map integration)
 
 interface DashboardRouteChildren {
   DashboardAcademicYearsRoute: typeof DashboardAcademicYearsRoute

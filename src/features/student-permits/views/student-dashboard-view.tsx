@@ -1,30 +1,17 @@
-import type {
-  IStudentProfile,
-  PermitType,
-} from '@/features/student-permits/types/permit.types'
+import type { IStudentProfile } from '@/features/student-permits/types/permit.types'
 
 import { IconLogout, IconQrcode } from '@tabler/icons-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { FileUploadDropzone } from '@/features/student-permits/components/file-upload-dropzone'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { ExitLeaveForm } from '@/features/student-permits/components/forms/exit-leave-form'
 import { LateArrivalLeaveForm } from '@/features/student-permits/components/forms/late-arrival-leave-form'
-import { OutOfSchoolLeaveForm } from '@/features/student-permits/components/forms/out-of-school-leave-form'
+import { SickLeaveForm } from '@/features/student-permits/components/forms/sick-leave-form'
 import { LeaveTypeSelector } from '@/features/student-permits/components/leave-type-selector'
 import { StudentProfileCard } from '@/features/student-permits/components/student-profile-card'
-import { permitApplicationSchema } from '@/features/student-permits/schemas/permit-application'
-import { useAppForm } from '@/hooks/use-form'
 
 const MOCK_STUDENT: IStudentProfile = {
   id: 1,
@@ -40,31 +27,9 @@ export function StudentDashboardView() {
   const [files, setFiles] = useState<File[]>([])
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-  const [activeTab, setActiveTab] = useState<PermitType>('sick')
-
-  const form = useAppForm({
-    defaultValues: {
-      type: 'sick' as PermitType,
-      start_date: '',
-      end_date: '',
-      reason: '',
-    },
-    validators: {
-      onChange: permitApplicationSchema,
-    },
-    onSubmit: async ({ value }) => {
-      try {
-        console.log('Form submitted:', value, files)
-        toast.success('Permohonan izin berhasil diterbitkan!')
-        form.reset()
-        setFiles([])
-        setStartDate('')
-        setEndDate('')
-      } catch {
-        toast.error('Gagal menyimpan permohonan')
-      }
-    },
-  })
+  const [activeTab, setActiveTab] = useState<
+    'sick' | 'leave_school' | 'leave_in'
+  >('sick')
 
   const handleViewHistory = () => {
     toast.info('Fitur riwayat akan segera hadir')
@@ -87,6 +52,12 @@ export function StudentDashboardView() {
   }
 
   const totalDays = calculateDays(startDate, endDate)
+
+  const handleCancel = () => {
+    setFiles([])
+    setStartDate('')
+    setEndDate('')
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800">
@@ -159,155 +130,36 @@ export function StudentDashboardView() {
             </h3>
             <Card>
               <CardContent className="pt-6">
-                <form
-                  noValidate
-                  onSubmit={(event) => {
-                    event.preventDefault()
-                    form.handleSubmit()
-                  }}
-                >
-                  <form.AppForm>
-                    <FieldGroup>
-                      <form.AppField name="type">
-                        {(field) => (
-                          <Field>
-                            <FieldLabel>Jenis Izin</FieldLabel>
-                            <LeaveTypeSelector
-                              value={activeTab}
-                              onChange={(value) => {
-                                field.handleChange(value)
-                                setActiveTab(value)
-                              }}
-                            />
-                            <FieldError errors={field.state.meta.errors} />
-                          </Field>
-                        )}
-                      </form.AppField>
+                <FieldGroup>
+                  <Field>
+                    <FieldLabel>Jenis Izin</FieldLabel>
+                    <LeaveTypeSelector
+                      value={activeTab}
+                      onChange={(value) => setActiveTab(value)}
+                    />
+                  </Field>
 
-                      {activeTab === 'sick' && (
-                        <>
-                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <form.AppField name="start_date">
-                              {(field) => (
-                                <Field>
-                                  <FieldLabel>Tanggal Mulai Izin</FieldLabel>
-                                  <Input
-                                    type="date"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                      field.handleChange(e.target.value)
-                                      setStartDate(e.target.value)
-                                    }}
-                                    aria-invalid={
-                                      field.state.meta.errors.length > 0
-                                    }
-                                  />
-                                  <FieldError
-                                    errors={field.state.meta.errors}
-                                  />
-                                </Field>
-                              )}
-                            </form.AppField>
+                  {activeTab === 'sick' && (
+                    <SickLeaveForm
+                      files={files}
+                      setFiles={setFiles}
+                      startDate={startDate}
+                      endDate={endDate}
+                      setStartDate={setStartDate}
+                      setEndDate={setEndDate}
+                      totalDays={totalDays}
+                    />
+                  )}
 
-                            <form.AppField name="end_date">
-                              {(field) => (
-                                <Field>
-                                  <FieldLabel>Tanggal Selesai Izin</FieldLabel>
-                                  <Input
-                                    type="date"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                      field.handleChange(e.target.value)
-                                      setEndDate(e.target.value)
-                                    }}
-                                    aria-invalid={
-                                      field.state.meta.errors.length > 0
-                                    }
-                                  />
-                                  <FieldError
-                                    errors={field.state.meta.errors}
-                                  />
-                                </Field>
-                              )}
-                            </form.AppField>
-                          </div>
+                  {activeTab === 'leave_school' && (
+                    <ExitLeaveForm
+                      student={MOCK_STUDENT}
+                      onCancel={handleCancel}
+                    />
+                  )}
 
-                          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/30">
-                            <p className="mb-2 text-sm text-blue-700 dark:text-blue-300">
-                              Pilih rentang tanggal sesuai surat keterangan
-                              dokter
-                            </p>
-                            <Badge
-                              variant="secondary"
-                              className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                            >
-                              Total: {totalDays} Hari
-                            </Badge>
-                          </div>
-
-                          <form.AppField name="reason">
-                            {(field) => (
-                              <Field>
-                                <FieldLabel>Keterangan / Diagnosa</FieldLabel>
-                                <Textarea
-                                  placeholder="Masukkan detail keterangan sakit..."
-                                  rows={4}
-                                  value={field.state.value}
-                                  onChange={(e) =>
-                                    field.handleChange(e.target.value)
-                                  }
-                                  aria-invalid={
-                                    field.state.meta.errors.length > 0
-                                  }
-                                />
-                                <FieldError errors={field.state.meta.errors} />
-                              </Field>
-                            )}
-                          </form.AppField>
-
-                          <Field>
-                            <FieldLabel>
-                              Lampiran Surat Dokter (PDF, JPG, PNG)
-                            </FieldLabel>
-                            <FileUploadDropzone
-                              files={files}
-                              onFilesChange={setFiles}
-                              maxSizeMB={5}
-                              acceptedTypes={[
-                                'application/pdf',
-                                'image/jpeg',
-                                'image/png',
-                              ]}
-                            />
-                          </Field>
-                        </>
-                      )}
-
-                      {activeTab === 'leave_school' && <OutOfSchoolLeaveForm />}
-                      {activeTab === 'leave_in' && <LateArrivalLeaveForm />}
-
-                      <div className="flex gap-3 pt-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => {
-                            form.reset()
-                            setFiles([])
-                            setStartDate('')
-                            setEndDate('')
-                          }}
-                          className="flex-1"
-                        >
-                          Batal
-                        </Button>
-                        <form.ButtonSubmit
-                          label="Simpan & Terbitkan Surat Izin"
-                          className="flex-1"
-                        />
-                      </div>
-                    </FieldGroup>
-                  </form.AppForm>
-                </form>
+                  {activeTab === 'leave_in' && <LateArrivalLeaveForm />}
+                </FieldGroup>
               </CardContent>
             </Card>
           </div>

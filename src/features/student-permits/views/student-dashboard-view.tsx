@@ -19,6 +19,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { FileUploadDropzone } from '@/features/student-permits/components/file-upload-dropzone'
+import { LateArrivalLeaveForm } from '@/features/student-permits/components/forms/late-arrival-leave-form'
+import { OutOfSchoolLeaveForm } from '@/features/student-permits/components/forms/out-of-school-leave-form'
 import { LeaveTypeSelector } from '@/features/student-permits/components/leave-type-selector'
 import { StudentProfileCard } from '@/features/student-permits/components/student-profile-card'
 import { permitApplicationSchema } from '@/features/student-permits/schemas/permit-application'
@@ -38,6 +40,7 @@ export function StudentDashboardView() {
   const [files, setFiles] = useState<File[]>([])
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
+  const [activeTab, setActiveTab] = useState<PermitType>('sick')
 
   const form = useAppForm({
     defaultValues: {
@@ -86,9 +89,9 @@ export function StudentDashboardView() {
   const totalDays = calculateDays(startDate, endDate)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800 relative overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800">
       <div className="absolute inset-0 opacity-10">
-        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern
               id="cloud-pattern"
@@ -107,13 +110,13 @@ export function StudentDashboardView() {
         </svg>
       </div>
 
-      <div className="relative z-10 container mx-auto px-4 py-8 max-w-7xl">
-        <div className="flex items-start justify-between mb-8">
+      <div className="container relative z-10 mx-auto max-w-7xl px-4 py-8">
+        <div className="mb-8 flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">
+            <h1 className="mb-2 text-3xl font-bold text-white">
               Presensi Siswa Real-Time
             </h1>
-            <p className="text-indigo-200 text-sm">
+            <p className="text-sm text-indigo-200">
               Monitor daily attendance, quickly scan student IDs, and manage
               leave requests in one central hub.
             </p>
@@ -122,25 +125,25 @@ export function StudentDashboardView() {
             onClick={handleScanQR}
             className="bg-primary hover:bg-primary/90"
           >
-            <IconQrcode className="h-5 w-5 mr-2" />
+            <IconQrcode className="mr-2 h-5 w-5" />
             Scan QR Absen
           </Button>
         </div>
 
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-white mb-1">
+          <h2 className="mb-1 text-xl font-semibold text-white">
             Pengajuan & Input Surat Izin
           </h2>
-          <p className="text-indigo-200 text-sm">
+          <p className="text-sm text-indigo-200">
             Pencatatan resmi dispensasi, izin keluar, sakit, dan keterlambatan
             siswa
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-1">
             <div className="mb-4">
-              <h3 className="text-base font-medium text-white mb-3">
+              <h3 className="mb-3 text-base font-medium text-white">
                 Data Siswa
               </h3>
               <StudentProfileCard
@@ -151,7 +154,7 @@ export function StudentDashboardView() {
           </div>
 
           <div className="lg:col-span-2">
-            <h3 className="text-base font-medium text-white mb-3">
+            <h3 className="mb-3 text-base font-medium text-white">
               Detail Pengajuan Izin
             </h3>
             <Card>
@@ -170,9 +173,10 @@ export function StudentDashboardView() {
                           <Field>
                             <FieldLabel>Jenis Izin</FieldLabel>
                             <LeaveTypeSelector
-                              value={field.state.value}
+                              value={activeTab}
                               onChange={(value) => {
                                 field.handleChange(value)
+                                setActiveTab(value)
                               }}
                             />
                             <FieldError errors={field.state.meta.errors} />
@@ -180,93 +184,107 @@ export function StudentDashboardView() {
                         )}
                       </form.AppField>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <form.AppField name="start_date">
-                          {(field) => (
-                            <Field>
-                              <FieldLabel>Tanggal Mulai Izin</FieldLabel>
-                              <Input
-                                type="date"
-                                value={field.state.value}
-                                onChange={(e) => {
-                                  field.handleChange(e.target.value)
-                                  setStartDate(e.target.value)
-                                }}
-                                aria-invalid={
-                                  field.state.meta.errors.length > 0
-                                }
-                              />
-                              <FieldError errors={field.state.meta.errors} />
-                            </Field>
-                          )}
-                        </form.AppField>
+                      {activeTab === 'sick' && (
+                        <>
+                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <form.AppField name="start_date">
+                              {(field) => (
+                                <Field>
+                                  <FieldLabel>Tanggal Mulai Izin</FieldLabel>
+                                  <Input
+                                    type="date"
+                                    value={field.state.value}
+                                    onChange={(e) => {
+                                      field.handleChange(e.target.value)
+                                      setStartDate(e.target.value)
+                                    }}
+                                    aria-invalid={
+                                      field.state.meta.errors.length > 0
+                                    }
+                                  />
+                                  <FieldError
+                                    errors={field.state.meta.errors}
+                                  />
+                                </Field>
+                              )}
+                            </form.AppField>
 
-                        <form.AppField name="end_date">
-                          {(field) => (
-                            <Field>
-                              <FieldLabel>Tanggal Selesai Izin</FieldLabel>
-                              <Input
-                                type="date"
-                                value={field.state.value}
-                                onChange={(e) => {
-                                  field.handleChange(e.target.value)
-                                  setEndDate(e.target.value)
-                                }}
-                                aria-invalid={
-                                  field.state.meta.errors.length > 0
-                                }
-                              />
-                              <FieldError errors={field.state.meta.errors} />
-                            </Field>
-                          )}
-                        </form.AppField>
-                      </div>
+                            <form.AppField name="end_date">
+                              {(field) => (
+                                <Field>
+                                  <FieldLabel>Tanggal Selesai Izin</FieldLabel>
+                                  <Input
+                                    type="date"
+                                    value={field.state.value}
+                                    onChange={(e) => {
+                                      field.handleChange(e.target.value)
+                                      setEndDate(e.target.value)
+                                    }}
+                                    aria-invalid={
+                                      field.state.meta.errors.length > 0
+                                    }
+                                  />
+                                  <FieldError
+                                    errors={field.state.meta.errors}
+                                  />
+                                </Field>
+                              )}
+                            </form.AppField>
+                          </div>
 
-                      <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 p-3 border border-blue-200 dark:border-blue-800">
-                        <p className="text-sm text-blue-700 dark:text-blue-300 mb-2">
-                          Pilih rentang tanggal sesuai surat keterangan dokter
-                        </p>
-                        <Badge
-                          variant="secondary"
-                          className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                        >
-                          Total: {totalDays} Hari
-                        </Badge>
-                      </div>
+                          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/30">
+                            <p className="mb-2 text-sm text-blue-700 dark:text-blue-300">
+                              Pilih rentang tanggal sesuai surat keterangan
+                              dokter
+                            </p>
+                            <Badge
+                              variant="secondary"
+                              className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                            >
+                              Total: {totalDays} Hari
+                            </Badge>
+                          </div>
 
-                      <form.AppField name="reason">
-                        {(field) => (
+                          <form.AppField name="reason">
+                            {(field) => (
+                              <Field>
+                                <FieldLabel>Keterangan / Diagnosa</FieldLabel>
+                                <Textarea
+                                  placeholder="Masukkan detail keterangan sakit..."
+                                  rows={4}
+                                  value={field.state.value}
+                                  onChange={(e) =>
+                                    field.handleChange(e.target.value)
+                                  }
+                                  aria-invalid={
+                                    field.state.meta.errors.length > 0
+                                  }
+                                />
+                                <FieldError errors={field.state.meta.errors} />
+                              </Field>
+                            )}
+                          </form.AppField>
+
                           <Field>
-                            <FieldLabel>Keterangan / Diagnosa</FieldLabel>
-                            <Textarea
-                              placeholder="Masukkan detail keterangan sakit..."
-                              rows={4}
-                              value={field.state.value}
-                              onChange={(e) =>
-                                field.handleChange(e.target.value)
-                              }
-                              aria-invalid={field.state.meta.errors.length > 0}
+                            <FieldLabel>
+                              Lampiran Surat Dokter (PDF, JPG, PNG)
+                            </FieldLabel>
+                            <FileUploadDropzone
+                              files={files}
+                              onFilesChange={setFiles}
+                              maxSizeMB={5}
+                              acceptedTypes={[
+                                'application/pdf',
+                                'image/jpeg',
+                                'image/png',
+                              ]}
                             />
-                            <FieldError errors={field.state.meta.errors} />
                           </Field>
-                        )}
-                      </form.AppField>
+                        </>
+                      )}
 
-                      <Field>
-                        <FieldLabel>
-                          Lampiran Surat Dokter (PDF, JPG, PNG)
-                        </FieldLabel>
-                        <FileUploadDropzone
-                          files={files}
-                          onFilesChange={setFiles}
-                          maxSizeMB={5}
-                          acceptedTypes={[
-                            'application/pdf',
-                            'image/jpeg',
-                            'image/png',
-                          ]}
-                        />
-                      </Field>
+                      {activeTab === 'leave_school' && <OutOfSchoolLeaveForm />}
+                      {activeTab === 'leave_in' && <LateArrivalLeaveForm />}
 
                       <div className="flex gap-3 pt-2">
                         <Button
@@ -299,9 +317,9 @@ export function StudentDashboardView() {
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className="text-white hover:text-white hover:bg-white/10"
+            className="text-white hover:bg-white/10 hover:text-white"
           >
-            <IconLogout className="h-4 w-4 mr-2" />
+            <IconLogout className="mr-2 h-4 w-4" />
             Keluar
           </Button>
         </div>

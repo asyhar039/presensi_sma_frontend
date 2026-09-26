@@ -15,6 +15,7 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAcademicYearsRouteImport } from './routes/dashboard/academic-years'
 import { Route as DashboardClassroomsRouteImport } from './routes/dashboard/classrooms'
+import { Route as DashboardPermitsRouteImport } from './routes/dashboard/permits'
 import { Route as DashboardRoomsRouteImport } from './routes/dashboard/rooms'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardStudentsRouteImport } from './routes/dashboard/students'
@@ -55,6 +56,11 @@ const DashboardAcademicYearsRoute = DashboardAcademicYearsRouteImport.update({
 const DashboardClassroomsRoute = DashboardClassroomsRouteImport.update({
   id: '/classrooms',
   path: '/classrooms',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardPermitsRoute = DashboardPermitsRouteImport.update({
+  id: '/permits',
+  path: '/permits',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardRoomsRoute = DashboardRoomsRouteImport.update({
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/dashboard/academic-years': typeof DashboardAcademicYearsRoute
   '/dashboard/classrooms': typeof DashboardClassroomsRoute
+  '/dashboard/permits': typeof DashboardPermitsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRouteWithChildren
   '/dashboard/students': typeof DashboardStudentsRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/dashboard/academic-years': typeof DashboardAcademicYearsRoute
   '/dashboard/classrooms': typeof DashboardClassroomsRoute
+  '/dashboard/permits': typeof DashboardPermitsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/students': typeof DashboardStudentsRoute
   '/dashboard/subjects': typeof DashboardSubjectsRoute
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/dashboard/academic-years': typeof DashboardAcademicYearsRoute
   '/dashboard/classrooms': typeof DashboardClassroomsRoute
+  '/dashboard/permits': typeof DashboardPermitsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRouteWithChildren
   '/dashboard/students': typeof DashboardStudentsRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/dashboard/academic-years'
     | '/dashboard/classrooms'
+    | '/dashboard/permits'
     | '/dashboard/rooms'
     | '/dashboard/settings'
     | '/dashboard/students'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/dashboard/academic-years'
     | '/dashboard/classrooms'
+    | '/dashboard/permits'
     | '/dashboard/rooms'
     | '/dashboard/students'
     | '/dashboard/subjects'
@@ -218,6 +229,7 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/dashboard/academic-years'
     | '/dashboard/classrooms'
+    | '/dashboard/permits'
     | '/dashboard/rooms'
     | '/dashboard/settings'
     | '/dashboard/students'
@@ -280,6 +292,13 @@ declare module '@tanstack/react-router' {
       path: '/classrooms'
       fullPath: '/dashboard/classrooms'
       preLoaderRoute: typeof DashboardClassroomsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/permits': {
+      id: '/dashboard/permits'
+      path: '/permits'
+      fullPath: '/dashboard/permits'
+      preLoaderRoute: typeof DashboardPermitsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/rooms': {
@@ -380,6 +399,7 @@ const DashboardSettingsRouteWithChildren =
 interface DashboardRouteChildren {
   DashboardAcademicYearsRoute: typeof DashboardAcademicYearsRoute
   DashboardClassroomsRoute: typeof DashboardClassroomsRoute
+  DashboardPermitsRoute: typeof DashboardPermitsRoute
   DashboardRoomsRoute: typeof DashboardRoomsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRouteWithChildren
   DashboardStudentsRoute: typeof DashboardStudentsRoute
@@ -394,6 +414,7 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAcademicYearsRoute: DashboardAcademicYearsRoute,
   DashboardClassroomsRoute: DashboardClassroomsRoute,
+  DashboardPermitsRoute: DashboardPermitsRoute,
   DashboardRoomsRoute: DashboardRoomsRoute,
   DashboardSettingsRoute: DashboardSettingsRouteWithChildren,
   DashboardStudentsRoute: DashboardStudentsRoute,

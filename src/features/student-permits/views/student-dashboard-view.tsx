@@ -1,6 +1,7 @@
 import type { IStudentProfile } from '@/features/student-permits/types/permit.types'
 
 import { IconLogout, IconQrcode } from '@tabler/icons-react'
+import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -8,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { ExitLeaveForm } from '@/features/student-permits/components/forms/exit-leave-form'
-import { LateArrivalLeaveForm } from '@/features/student-permits/components/forms/late-arrival-leave-form'
+import { LateLeaveForm } from '@/features/student-permits/components/forms/late-leave-form'
 import { SickLeaveForm } from '@/features/student-permits/components/forms/sick-leave-form'
 import { LeaveTypeSelector } from '@/features/student-permits/components/leave-type-selector'
 import { StudentProfileCard } from '@/features/student-permits/components/student-profile-card'
@@ -31,8 +32,10 @@ export function StudentDashboardView() {
     'sick' | 'leave_school' | 'leave_in'
   >('sick')
 
+  const navigate = useNavigate()
+
   const handleViewHistory = () => {
-    toast.info('Fitur riwayat akan segera hadir')
+    navigate({ to: '/dashboard/student/attendance-history' })
   }
 
   const handleScanQR = () => {
@@ -158,7 +161,12 @@ export function StudentDashboardView() {
                     />
                   )}
 
-                  {activeTab === 'leave_in' && <LateArrivalLeaveForm />}
+                  {activeTab === 'leave_in' && (
+                    <LateLeaveForm
+                      student={MOCK_STUDENT}
+                      onCancel={handleCancel}
+                    />
+                  )}
                 </FieldGroup>
               </CardContent>
             </Card>

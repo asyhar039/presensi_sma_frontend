@@ -3,6 +3,7 @@ import type { DataTableFeatures } from '@/components/data-table/data-table'
 import type { IStudentAttendanceSummary } from '@/features/attendance/types/attendance.types'
 
 import { IconEye } from '@tabler/icons-react'
+import { Link } from '@tanstack/react-router'
 import { useMemo } from 'react'
 
 import {
@@ -51,11 +52,15 @@ function SummaryActions({ item }: { item: IStudentAttendanceSummary }) {
       />
       <DropdownMenuContent align="end" side="bottom" className="w-48">
         <DropdownMenuItem
-          onClick={() =>
-            window.open(
-              `/dashboard/attendance-recap/${item.student_id}`,
-              '_blank',
-            )
+          render={
+            <Link
+              to="/dashboard/attendance-recap/$studentId"
+              params={{ studentId: item.student_id.toString() }}
+              className="flex items-center gap-2"
+            >
+              <IconEye />
+              <span>Lihat Detail Siswa</span>
+            </Link>
           }
         >
           <IconEye />
@@ -131,7 +136,7 @@ export function useAttendanceSummaryColumns(): ColumnDef<
         header: dataTableHeader('Kehadiran (%)'),
         cell: ({ row }) => (
           <span className="font-medium whitespace-nowrap">
-            {row.original.attendance_rate.toFixed(1)}%
+            {(row.original.attendance_rate ?? 0).toFixed(1)}%
           </span>
         ),
       },

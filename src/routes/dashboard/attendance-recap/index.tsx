@@ -5,7 +5,7 @@ import { attendanceSearch } from '@/features/attendance/schemas/attendance-searc
 import { AttendanceRecapView } from '@/features/attendance/views/attendance-recap-view'
 import { mustBeLoggedIn } from '@/utils/router'
 
-export const Route = createFileRoute('/dashboard/attendance-recap')({
+export const Route = createFileRoute('/dashboard/attendance-recap/')({
   beforeLoad: async ({ context, location }) => {
     await mustBeLoggedIn(context, location)
   },

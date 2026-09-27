@@ -3,6 +3,7 @@ import type { DataTableFeatures } from '@/components/data-table/data-table'
 import type { IAttendanceRecord } from '@/features/attendance/types/attendance.types'
 
 import { IconEye } from '@tabler/icons-react'
+import { Link } from '@tanstack/react-router'
 import { useMemo } from 'react'
 
 import {
@@ -46,16 +47,17 @@ function AttendanceActions({ item }: { item: IAttendanceRecord }) {
       />
       <DropdownMenuContent align="end" side="bottom" className="w-48">
         <DropdownMenuItem
-          onClick={() =>
-            window.open(
-              `/dashboard/attendance-recap/${item.student_id}`,
-              '_blank',
-            )
+          render={
+            <Link
+              to="/dashboard/attendance-recap/$studentId"
+              params={{ studentId: item.student_id.toString() }}
+              className="flex items-center gap-2"
+            >
+              <IconEye />
+              <span>Lihat Detail Siswa</span>
+            </Link>
           }
-        >
-          <IconEye />
-          <span>Lihat Detail Siswa</span>
-        </DropdownMenuItem>
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   )
@@ -74,7 +76,7 @@ export function useAttendanceColumns(): ColumnDef<
         header: dataTableHeader('NIS'),
         cell: ({ row }) => (
           <span className="font-medium whitespace-nowrap text-muted-foreground">
-            {row.original.student.user.identity_number}
+            {row.original.student?.user?.identity_number}
           </span>
         ),
       },
@@ -83,7 +85,7 @@ export function useAttendanceColumns(): ColumnDef<
         header: dataTableHeader('Nama Lengkap'),
         cell: ({ row }) => (
           <span className="font-medium whitespace-nowrap">
-            {row.original.student.user.name}
+            {row.original.student?.user?.name}
           </span>
         ),
       },

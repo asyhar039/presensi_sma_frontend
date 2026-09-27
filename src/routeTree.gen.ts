@@ -14,17 +14,19 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAcademicYearsRouteImport } from './routes/dashboard/academic-years'
-import { Route as DashboardAttendanceRecapRouteImport } from './routes/dashboard/attendance-recap'
 import { Route as DashboardClassroomsRouteImport } from './routes/dashboard/classrooms'
+import { Route as DashboardPermitsRouteImport } from './routes/dashboard/permits'
 import { Route as DashboardRoomsRouteImport } from './routes/dashboard/rooms'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardStudentsRouteImport } from './routes/dashboard/students'
 import { Route as DashboardSubjectsRouteImport } from './routes/dashboard/subjects'
 import { Route as DashboardTeachersRouteImport } from './routes/dashboard/teachers'
-import { Route as DashboardAttendanceRecapStudentIdRouteImport } from './routes/dashboard/attendance-recap.$studentId'
+import { Route as DashboardAttendanceRecapIndexRouteImport } from './routes/dashboard/attendance-recap/index'
+import { Route as DashboardAttendanceRecapStudentIdRouteImport } from './routes/dashboard/attendance-recap/$studentId'
 import { Route as DashboardSettingsIndexRouteImport } from './routes/dashboard/settings.index'
 import { Route as DashboardSettingsPublicHolidaysRouteImport } from './routes/dashboard/settings.public-holidays'
 import { Route as DashboardSettingsSchoolZonesRouteImport } from './routes/dashboard/settings.school-zones'
+import { Route as DashboardStudentAttendanceHistoryRouteImport } from './routes/dashboard/student/attendance-history'
 import { Route as DashboardTeacherStudentsRouteImport } from './routes/dashboard/teacher/students'
 
 const IndexRoute = IndexRouteImport.update({
@@ -52,15 +54,14 @@ const DashboardAcademicYearsRoute = DashboardAcademicYearsRouteImport.update({
   path: '/academic-years',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardAttendanceRecapRoute =
-  DashboardAttendanceRecapRouteImport.update({
-    id: '/attendance-recap',
-    path: '/attendance-recap',
-    getParentRoute: () => DashboardRoute,
-  } as any)
 const DashboardClassroomsRoute = DashboardClassroomsRouteImport.update({
   id: '/classrooms',
   path: '/classrooms',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardPermitsRoute = DashboardPermitsRouteImport.update({
+  id: '/permits',
+  path: '/permits',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardRoomsRoute = DashboardRoomsRouteImport.update({
@@ -88,11 +89,17 @@ const DashboardTeachersRoute = DashboardTeachersRouteImport.update({
   path: '/teachers',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardAttendanceRecapIndexRoute =
+  DashboardAttendanceRecapIndexRouteImport.update({
+    id: '/attendance-recap/',
+    path: '/attendance-recap/',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardAttendanceRecapStudentIdRoute =
   DashboardAttendanceRecapStudentIdRouteImport.update({
-    id: '/$studentId',
-    path: '/$studentId',
-    getParentRoute: () => DashboardAttendanceRecapRoute,
+    id: '/attendance-recap/$studentId',
+    path: '/attendance-recap/$studentId',
+    getParentRoute: () => DashboardRoute,
   } as any)
 const DashboardSettingsIndexRoute = DashboardSettingsIndexRouteImport.update({
   id: '/',
@@ -111,6 +118,12 @@ const DashboardSettingsSchoolZonesRoute =
     path: '/school-zones',
     getParentRoute: () => DashboardSettingsRoute,
   } as any)
+const DashboardStudentAttendanceHistoryRoute =
+  DashboardStudentAttendanceHistoryRouteImport.update({
+    id: '/student/attendance-history',
+    path: '/student/attendance-history',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardTeacherStudentsRoute =
   DashboardTeacherStudentsRouteImport.update({
     id: '/teacher/students',
@@ -123,8 +136,8 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/login': typeof AuthLoginRoute
   '/dashboard/academic-years': typeof DashboardAcademicYearsRoute
-  '/dashboard/attendance-recap': typeof DashboardAttendanceRecapRouteWithChildren
   '/dashboard/classrooms': typeof DashboardClassroomsRoute
+  '/dashboard/permits': typeof DashboardPermitsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRouteWithChildren
   '/dashboard/students': typeof DashboardStudentsRoute
@@ -134,15 +147,17 @@ export interface FileRoutesByFullPath {
   '/dashboard/attendance-recap/$studentId': typeof DashboardAttendanceRecapStudentIdRoute
   '/dashboard/settings/public-holidays': typeof DashboardSettingsPublicHolidaysRoute
   '/dashboard/settings/school-zones': typeof DashboardSettingsSchoolZonesRoute
+  '/dashboard/student/attendance-history': typeof DashboardStudentAttendanceHistoryRoute
   '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
+  '/dashboard/attendance-recap/': typeof DashboardAttendanceRecapIndexRoute
   '/dashboard/settings/': typeof DashboardSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof AuthLoginRoute
   '/dashboard/academic-years': typeof DashboardAcademicYearsRoute
-  '/dashboard/attendance-recap': typeof DashboardAttendanceRecapRouteWithChildren
   '/dashboard/classrooms': typeof DashboardClassroomsRoute
+  '/dashboard/permits': typeof DashboardPermitsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/students': typeof DashboardStudentsRoute
   '/dashboard/subjects': typeof DashboardSubjectsRoute
@@ -151,7 +166,9 @@ export interface FileRoutesByTo {
   '/dashboard/attendance-recap/$studentId': typeof DashboardAttendanceRecapStudentIdRoute
   '/dashboard/settings/public-holidays': typeof DashboardSettingsPublicHolidaysRoute
   '/dashboard/settings/school-zones': typeof DashboardSettingsSchoolZonesRoute
+  '/dashboard/student/attendance-history': typeof DashboardStudentAttendanceHistoryRoute
   '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
+  '/dashboard/attendance-recap': typeof DashboardAttendanceRecapIndexRoute
   '/dashboard/settings': typeof DashboardSettingsIndexRoute
 }
 export interface FileRoutesById {
@@ -160,8 +177,8 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/dashboard/academic-years': typeof DashboardAcademicYearsRoute
-  '/dashboard/attendance-recap': typeof DashboardAttendanceRecapRouteWithChildren
   '/dashboard/classrooms': typeof DashboardClassroomsRoute
+  '/dashboard/permits': typeof DashboardPermitsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRouteWithChildren
   '/dashboard/students': typeof DashboardStudentsRoute
@@ -171,7 +188,9 @@ export interface FileRoutesById {
   '/dashboard/attendance-recap/$studentId': typeof DashboardAttendanceRecapStudentIdRoute
   '/dashboard/settings/public-holidays': typeof DashboardSettingsPublicHolidaysRoute
   '/dashboard/settings/school-zones': typeof DashboardSettingsSchoolZonesRoute
+  '/dashboard/student/attendance-history': typeof DashboardStudentAttendanceHistoryRoute
   '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
+  '/dashboard/attendance-recap/': typeof DashboardAttendanceRecapIndexRoute
   '/dashboard/settings/': typeof DashboardSettingsIndexRoute
 }
 export interface FileRouteTypes {
@@ -181,8 +200,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/dashboard/academic-years'
-    | '/dashboard/attendance-recap'
     | '/dashboard/classrooms'
+    | '/dashboard/permits'
     | '/dashboard/rooms'
     | '/dashboard/settings'
     | '/dashboard/students'
@@ -192,15 +211,17 @@ export interface FileRouteTypes {
     | '/dashboard/attendance-recap/$studentId'
     | '/dashboard/settings/public-holidays'
     | '/dashboard/settings/school-zones'
+    | '/dashboard/student/attendance-history'
     | '/dashboard/teacher/students'
+    | '/dashboard/attendance-recap/'
     | '/dashboard/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/dashboard/academic-years'
-    | '/dashboard/attendance-recap'
     | '/dashboard/classrooms'
+    | '/dashboard/permits'
     | '/dashboard/rooms'
     | '/dashboard/students'
     | '/dashboard/subjects'
@@ -209,7 +230,9 @@ export interface FileRouteTypes {
     | '/dashboard/attendance-recap/$studentId'
     | '/dashboard/settings/public-holidays'
     | '/dashboard/settings/school-zones'
+    | '/dashboard/student/attendance-history'
     | '/dashboard/teacher/students'
+    | '/dashboard/attendance-recap'
     | '/dashboard/settings'
   id:
     | '__root__'
@@ -217,8 +240,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/_auth/login'
     | '/dashboard/academic-years'
-    | '/dashboard/attendance-recap'
     | '/dashboard/classrooms'
+    | '/dashboard/permits'
     | '/dashboard/rooms'
     | '/dashboard/settings'
     | '/dashboard/students'
@@ -228,7 +251,9 @@ export interface FileRouteTypes {
     | '/dashboard/attendance-recap/$studentId'
     | '/dashboard/settings/public-holidays'
     | '/dashboard/settings/school-zones'
+    | '/dashboard/student/attendance-history'
     | '/dashboard/teacher/students'
+    | '/dashboard/attendance-recap/'
     | '/dashboard/settings/'
   fileRoutesById: FileRoutesById
 }
@@ -275,18 +300,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAcademicYearsRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/dashboard/attendance-recap': {
-      id: '/dashboard/attendance-recap'
-      path: '/attendance-recap'
-      fullPath: '/dashboard/attendance-recap'
-      preLoaderRoute: typeof DashboardAttendanceRecapRouteImport
-      parentRoute: typeof DashboardRoute
-    }
     '/dashboard/classrooms': {
       id: '/dashboard/classrooms'
       path: '/classrooms'
       fullPath: '/dashboard/classrooms'
       preLoaderRoute: typeof DashboardClassroomsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/permits': {
+      id: '/dashboard/permits'
+      path: '/permits'
+      fullPath: '/dashboard/permits'
+      preLoaderRoute: typeof DashboardPermitsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/rooms': {
@@ -324,12 +349,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTeachersRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/attendance-recap/': {
+      id: '/dashboard/attendance-recap/'
+      path: '/attendance-recap'
+      fullPath: '/dashboard/attendance-recap/'
+      preLoaderRoute: typeof DashboardAttendanceRecapIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/attendance-recap/$studentId': {
       id: '/dashboard/attendance-recap/$studentId'
-      path: '/$studentId'
+      path: '/attendance-recap/$studentId'
       fullPath: '/dashboard/attendance-recap/$studentId'
       preLoaderRoute: typeof DashboardAttendanceRecapStudentIdRouteImport
-      parentRoute: typeof DashboardAttendanceRecapRoute
+      parentRoute: typeof DashboardRoute
     }
     '/dashboard/settings/': {
       id: '/dashboard/settings/'
@@ -352,6 +384,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsSchoolZonesRouteImport
       parentRoute: typeof DashboardSettingsRoute
     }
+    '/dashboard/student/attendance-history': {
+      id: '/dashboard/student/attendance-history'
+      path: '/student/attendance-history'
+      fullPath: '/dashboard/student/attendance-history'
+      preLoaderRoute: typeof DashboardStudentAttendanceHistoryRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/teacher/students': {
       id: '/dashboard/teacher/students'
       path: '/teacher/students'
@@ -361,21 +400,6 @@ declare module '@tanstack/react-router' {
     }
   }
 }
-
-interface DashboardAttendanceRecapRouteChildren {
-  DashboardAttendanceRecapStudentIdRoute: typeof DashboardAttendanceRecapStudentIdRoute
-}
-
-const DashboardAttendanceRecapRouteChildren: DashboardAttendanceRecapRouteChildren =
-  {
-    DashboardAttendanceRecapStudentIdRoute:
-      DashboardAttendanceRecapStudentIdRoute,
-  }
-
-const DashboardAttendanceRecapRouteWithChildren =
-  DashboardAttendanceRecapRoute._addFileChildren(
-    DashboardAttendanceRecapRouteChildren,
-  )
 
 interface DashboardSettingsRouteChildren {
   DashboardSettingsPublicHolidaysRoute: typeof DashboardSettingsPublicHolidaysRoute
@@ -394,28 +418,36 @@ const DashboardSettingsRouteWithChildren =
 
 interface DashboardRouteChildren {
   DashboardAcademicYearsRoute: typeof DashboardAcademicYearsRoute
-  DashboardAttendanceRecapRoute: typeof DashboardAttendanceRecapRouteWithChildren
   DashboardClassroomsRoute: typeof DashboardClassroomsRoute
+  DashboardPermitsRoute: typeof DashboardPermitsRoute
   DashboardRoomsRoute: typeof DashboardRoomsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRouteWithChildren
   DashboardStudentsRoute: typeof DashboardStudentsRoute
   DashboardSubjectsRoute: typeof DashboardSubjectsRoute
   DashboardTeachersRoute: typeof DashboardTeachersRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardAttendanceRecapStudentIdRoute: typeof DashboardAttendanceRecapStudentIdRoute
+  DashboardStudentAttendanceHistoryRoute: typeof DashboardStudentAttendanceHistoryRoute
   DashboardTeacherStudentsRoute: typeof DashboardTeacherStudentsRoute
+  DashboardAttendanceRecapIndexRoute: typeof DashboardAttendanceRecapIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAcademicYearsRoute: DashboardAcademicYearsRoute,
-  DashboardAttendanceRecapRoute: DashboardAttendanceRecapRouteWithChildren,
   DashboardClassroomsRoute: DashboardClassroomsRoute,
+  DashboardPermitsRoute: DashboardPermitsRoute,
   DashboardRoomsRoute: DashboardRoomsRoute,
   DashboardSettingsRoute: DashboardSettingsRouteWithChildren,
   DashboardStudentsRoute: DashboardStudentsRoute,
   DashboardSubjectsRoute: DashboardSubjectsRoute,
   DashboardTeachersRoute: DashboardTeachersRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardAttendanceRecapStudentIdRoute:
+    DashboardAttendanceRecapStudentIdRoute,
+  DashboardStudentAttendanceHistoryRoute:
+    DashboardStudentAttendanceHistoryRoute,
   DashboardTeacherStudentsRoute: DashboardTeacherStudentsRoute,
+  DashboardAttendanceRecapIndexRoute: DashboardAttendanceRecapIndexRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(

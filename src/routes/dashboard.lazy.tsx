@@ -8,6 +8,7 @@ import { ForbiddenInline } from '@/components/composite/forbidden'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { AdminDashboardView } from '@/features/admin/views/admin-dashboard-view'
 import { StudentDashboardView } from '@/features/student-permits/views/student-dashboard-view'
+import { TeacherAttendanceView } from '@/features/teacher-attendance/views/teacher-attendance-view'
 
 export const Route = createLazyFileRoute('/dashboard')({
   component: DashboardRouteLayout,
@@ -48,7 +49,7 @@ function RootDashboardContent({ auth }: RootDashboardContentProps) {
   }
 
   if (auth?.role?.isTeacher) {
-    return <AdminDashboardView />
+    return <TeacherAttendanceView classroomId={1} classroomName="XII IPA 1" />
   }
 
   return <ForbiddenInline />

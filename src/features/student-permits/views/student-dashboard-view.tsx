@@ -6,13 +6,22 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { useAuth } from '@/context/auth-context'
 import { ExitLeaveForm } from '@/features/student-permits/components/forms/exit-leave-form'
 import { LateLeaveForm } from '@/features/student-permits/components/forms/late-leave-form'
 import { SickLeaveForm } from '@/features/student-permits/components/forms/sick-leave-form'
 import { LeaveTypeSelector } from '@/features/student-permits/components/leave-type-selector'
 import { StudentProfileCard } from '@/features/student-permits/components/student-profile-card'
+import { useConfirmationStore } from '@/stores/confirmation-store'
+import { delay } from '@/utils/time'
 
 const MOCK_STUDENT: IStudentProfile = {
   id: 1,
@@ -33,6 +42,8 @@ export function StudentDashboardView() {
   >('sick')
 
   const navigate = useNavigate()
+  const { logout } = useAuth()
+  const confirm = useConfirmationStore((state) => state.show)
 
   const handleViewHistory = () => {
     navigate({ to: '/dashboard/student/attendance-history' })
@@ -42,8 +53,22 @@ export function StudentDashboardView() {
     toast.info('Fitur scan QR akan segera hadir')
   }
 
-  const handleLogout = () => {
-    toast.info('Logout')
+  const handleLogout = async () => {
+    confirm({
+      icon: IconLogout,
+      title: 'Confirm Logout',
+      description: 'Are you sure you want to log out?',
+      actionLabel: 'Log out',
+      actionVariant: 'destructive',
+      cancelLabel: 'Cancel',
+      onAction: async (props) => {
+        props.close()
+        await logout()
+        await delay(100)
+        toast.success('Logged out successfully')
+        await navigate({ to: '/login', replace: true })
+      },
+    })
   }
 
   const calculateDays = (start: string, end: string): number => {
@@ -84,104 +109,96 @@ export function StudentDashboardView() {
         </svg>
       </div>
 
-      <div className="container relative z-10 mx-auto max-w-7xl px-4 py-8">
-        <div className="mb-8 flex items-start justify-between">
-          <div>
-            <h1 className="mb-2 text-3xl font-bold text-white">
-              Presensi Siswa Real-Time
-            </h1>
-            <p className="text-sm text-indigo-200">
-              Monitor daily attendance, quickly scan student IDs, and manage
-              leave requests in one central hub.
-            </p>
-          </div>
-          <Button
-            onClick={handleScanQR}
-            className="bg-primary hover:bg-primary/90"
-          >
-            <IconQrcode className="mr-2 h-5 w-5" />
-            Scan QR Absen
-          </Button>
-        </div>
-
-        <div className="mb-6">
-          <h2 className="mb-1 text-xl font-semibold text-white">
-            Pengajuan & Input Surat Izin
-          </h2>
-          <p className="text-sm text-indigo-200">
-            Pencatatan resmi dispensasi, izin keluar, sakit, dan keterlambatan
-            siswa
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-1">
-            <div className="mb-4">
-              <h3 className="mb-3 text-base font-medium text-white">
-                Data Siswa
-              </h3>
-              <StudentProfileCard
-                student={MOCK_STUDENT}
-                onViewHistory={handleViewHistory}
-              />
+      <div className="relative z-10 min-h-screen w-full bg-[#0B132B] py-6">
+        <div className="container mx-auto max-w-7xl px-4">
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-white">
+                Presensi Siswa Real-Time
+              </h1>
             </div>
+            <Button
+              onClick={handleScanQR}
+              className="bg-primary hover:bg-primary/90"
+            >
+              <IconQrcode className="mr-2 h-5 w-5" />
+              Scan QR Absen
+            </Button>
           </div>
 
-          <div className="lg:col-span-2">
-            <h3 className="mb-3 text-base font-medium text-white">
-              Detail Pengajuan Izin
-            </h3>
-            <Card>
-              <CardContent className="pt-6">
-                <FieldGroup>
-                  <Field>
-                    <FieldLabel>Jenis Izin</FieldLabel>
-                    <LeaveTypeSelector
-                      value={activeTab}
-                      onChange={(value) => setActiveTab(value)}
-                    />
-                  </Field>
+          <Card className="rounded-2xl">
+            <CardHeader className="border-b pb-6">
+              <CardTitle className="text-xl font-bold text-foreground">
+                Pengajuan & Input Surat Izin
+              </CardTitle>
+              <CardDescription className="mt-1 text-sm text-muted-foreground">
+                Pencatatan resmi dispensasi, izin keluar, sakit, dan
+                keterlambatan siswa
+              </CardDescription>
+            </CardHeader>
 
-                  {activeTab === 'sick' && (
-                    <SickLeaveForm
-                      files={files}
-                      setFiles={setFiles}
-                      startDate={startDate}
-                      endDate={endDate}
-                      setStartDate={setStartDate}
-                      setEndDate={setEndDate}
-                      totalDays={totalDays}
-                    />
-                  )}
+            <CardContent className="pt-8">
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+                <div className="lg:col-span-4">
+                  <StudentProfileCard
+                    student={MOCK_STUDENT}
+                    onViewHistory={handleViewHistory}
+                  />
+                </div>
 
-                  {activeTab === 'leave_school' && (
-                    <ExitLeaveForm
-                      student={MOCK_STUDENT}
-                      onCancel={handleCancel}
-                    />
-                  )}
+                <div className="lg:col-span-8">
+                  <div className="space-y-6">
+                    <FieldGroup>
+                      <Field>
+                        <FieldLabel>Jenis Izin</FieldLabel>
+                        <LeaveTypeSelector
+                          value={activeTab}
+                          onChange={(value) => setActiveTab(value)}
+                        />
+                      </Field>
+                    </FieldGroup>
 
-                  {activeTab === 'leave_in' && (
-                    <LateLeaveForm
-                      student={MOCK_STUDENT}
-                      onCancel={handleCancel}
-                    />
-                  )}
-                </FieldGroup>
-              </CardContent>
-            </Card>
+                    {activeTab === 'sick' && (
+                      <SickLeaveForm
+                        files={files}
+                        setFiles={setFiles}
+                        startDate={startDate}
+                        endDate={endDate}
+                        setStartDate={setStartDate}
+                        setEndDate={setEndDate}
+                        totalDays={totalDays}
+                      />
+                    )}
+
+                    {activeTab === 'leave_school' && (
+                      <ExitLeaveForm
+                        student={MOCK_STUDENT}
+                        onCancel={handleCancel}
+                      />
+                    )}
+
+                    {activeTab === 'leave_in' && (
+                      <LateLeaveForm
+                        student={MOCK_STUDENT}
+                        onCancel={handleCancel}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="mt-8 flex justify-start">
+            <Button
+              variant="ghost"
+              onClick={() => void handleLogout()}
+              className="text-white hover:bg-white/10 hover:text-white"
+            >
+              <IconLogout className="mr-2 h-4 w-4" />
+              Keluar
+            </Button>
           </div>
-        </div>
-
-        <div className="mt-8">
-          <Button
-            variant="ghost"
-            onClick={handleLogout}
-            className="text-white hover:bg-white/10 hover:text-white"
-          >
-            <IconLogout className="mr-2 h-4 w-4" />
-            Keluar
-          </Button>
         </div>
       </div>
     </div>

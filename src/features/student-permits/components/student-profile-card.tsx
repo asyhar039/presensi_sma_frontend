@@ -16,29 +16,33 @@ export function StudentProfileCard({
 }: StudentProfileCardProps) {
   return (
     <Card className="h-full">
-      <CardContent className="pt-6">
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <IconUsers className="h-6 w-6 text-primary" />
+      <CardContent className="pt-8">
+        <div className="space-y-6 text-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+              <IconUsers className="h-8 w-8 text-primary" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">{student.name}</h3>
+              <h3 className="text-xl font-semibold">{student.name}</h3>
               <p className="text-sm text-muted-foreground">
                 NISN: {student.identity_number}
               </p>
             </div>
           </div>
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <IconUsers className="h-4 w-4" />
-              <span>Kelas: {student.classroom_name}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <IconUsers className="h-4 w-4" />
-              <span>Wali Kelas: {student.homeroom_teacher}</span>
+
+          <div className="border-t border-foreground/10 pt-6">
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <div className="flex items-center justify-center gap-2">
+                <IconUsers className="h-4 w-4" />
+                <span>Kelas: {student.classroom_name}</span>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <IconUsers className="h-4 w-4" />
+                <span>Wali Kelas: {student.homeroom_teacher}</span>
+              </div>
             </div>
           </div>
+
           <Button variant="outline" className="w-full" onClick={onViewHistory}>
             Lihat Riwayat Saya
           </Button>

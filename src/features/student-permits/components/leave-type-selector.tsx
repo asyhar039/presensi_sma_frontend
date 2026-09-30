@@ -49,7 +49,7 @@ export function LeaveTypeSelector({
   disabled,
 }: LeaveTypeSelectorProps) {
   return (
-    <div className="flex gap-2" role="radiogroup" aria-label="Jenis Izin">
+    <div className="flex gap-3" role="radiogroup" aria-label="Jenis Izin">
       {LEAVE_TYPES.map(
         ({
           value: typeValue,
@@ -64,7 +64,7 @@ export function LeaveTypeSelector({
             type="button"
             variant={value === typeValue ? 'default' : 'outline'}
             className={cn(
-              'flex-1 py-2.5 text-sm font-medium transition-all',
+              'flex-1 py-3 px-4 text-sm font-medium transition-all',
               value === typeValue
                 ? `${activeBg} ${activeText} ${activeBorder} shadow-sm`
                 : `border-2 ${outlineBorder} hover:bg-amber-50 hover:border-amber-500 dark:hover:bg-amber-950/30`,

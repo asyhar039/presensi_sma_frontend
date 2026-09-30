@@ -72,8 +72,8 @@ export function ExitLeaveForm({ student, onCancel }: ExitLeaveFormProps) {
         }}
       >
         <form.AppForm>
-          <FieldGroup>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <FieldGroup className="space-y-5">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <Field>
                 <FieldLabel>Nama Pemohon</FieldLabel>
                 <Input value={student.name} disabled className="bg-muted" />
@@ -88,7 +88,7 @@ export function ExitLeaveForm({ student, onCancel }: ExitLeaveFormProps) {
               </Field>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
               <Field>
                 <FieldLabel>Tanggal</FieldLabel>
                 <Input
@@ -128,7 +128,7 @@ export function ExitLeaveForm({ student, onCancel }: ExitLeaveFormProps) {
               </form.AppField>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <form.AppField name="reason_type">
                 {(field) => (
                   <Field>
@@ -188,7 +188,7 @@ export function ExitLeaveForm({ student, onCancel }: ExitLeaveFormProps) {
               )}
             </form.AppField>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <form.AppField name="emergency_contact">
                 {(field) => (
                   <Field>
@@ -215,7 +215,7 @@ export function ExitLeaveForm({ student, onCancel }: ExitLeaveFormProps) {
               />
             </Field>
 
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-3 pt-4">
               <Button
                 type="button"
                 variant="outline"

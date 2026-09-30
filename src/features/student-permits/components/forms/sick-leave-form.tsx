@@ -71,8 +71,8 @@ export function SickLeaveForm({
       }}
     >
       <form.AppForm>
-        <FieldGroup>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <FieldGroup className="space-y-5">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <form.AppField name="start_date">
               {(field) => (
                 <Field>
@@ -148,7 +148,7 @@ export function SickLeaveForm({
             />
           </Field>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-4">
             <Button
               type="button"
               variant="outline"

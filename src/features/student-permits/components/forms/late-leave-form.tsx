@@ -66,9 +66,8 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
       }}
     >
       <form.AppForm>
-        <FieldGroup>
-          {/* SECTION: DATA MAHASISWA / SISWA */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <FieldGroup className="space-y-5">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
             <Field>
               <FieldLabel>Nama Lengkap</FieldLabel>
               <Input value={student.name} disabled className="bg-muted" />
@@ -88,7 +87,7 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
           </div>
 
           {/* SECTION: DETAIL KETERLAMBATAN */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
             <Field>
               <FieldLabel>Jam Masuk Seharusnya</FieldLabel>
               <Input
@@ -165,7 +164,7 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
           </Field>
 
           {/* ACTION BUTTONS */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-4">
             <Button
               type="button"
               variant="outline"

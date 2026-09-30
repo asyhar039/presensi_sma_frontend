@@ -12,6 +12,7 @@ import { ExitLeaveForm } from '@/features/student-permits/components/forms/exit-
 import { LateLeaveForm } from '@/features/student-permits/components/forms/late-leave-form'
 import { SickLeaveForm } from '@/features/student-permits/components/forms/sick-leave-form'
 import { LeaveTypeSelector } from '@/features/student-permits/components/leave-type-selector'
+import { StudentAttendanceScanner } from '@/features/student-permits/components/student-attendance-scanner'
 import { StudentProfileCard } from '@/features/student-permits/components/student-profile-card'
 
 const MOCK_STUDENT: IStudentProfile = {
@@ -31,6 +32,7 @@ export function StudentDashboardView() {
   const [activeTab, setActiveTab] = useState<
     'sick' | 'leave_school' | 'leave_in'
   >('sick')
+  const [isScannerOpen, setIsScannerOpen] = useState(false)
 
   const navigate = useNavigate()
 
@@ -39,7 +41,7 @@ export function StudentDashboardView() {
   }
 
   const handleScanQR = () => {
-    toast.info('Fitur scan QR akan segera hadir')
+    setIsScannerOpen(true)
   }
 
   const handleLogout = () => {
@@ -63,127 +65,137 @@ export function StudentDashboardView() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800">
-      <div className="absolute inset-0 opacity-10">
-        <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern
-              id="cloud-pattern"
-              x="0"
-              y="0"
-              width="200"
-              height="200"
-              patternUnits="userSpaceOnUse"
-            >
-              <circle cx="50" cy="50" r="30" fill="white" opacity="0.3" />
-              <circle cx="100" cy="100" r="40" fill="white" opacity="0.2" />
-              <circle cx="150" cy="50" r="25" fill="white" opacity="0.25" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#cloud-pattern)" />
-        </svg>
-      </div>
+    <>
+      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800">
+        <div className="absolute inset-0 opacity-10">
+          <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern
+                id="cloud-pattern"
+                x="0"
+                y="0"
+                width="200"
+                height="200"
+                patternUnits="userSpaceOnUse"
+              >
+                <circle cx="50" cy="50" r="30" fill="white" opacity="0.3" />
+                <circle cx="100" cy="100" r="40" fill="white" opacity="0.2" />
+                <circle cx="150" cy="50" r="25" fill="white" opacity="0.25" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#cloud-pattern)" />
+          </svg>
+        </div>
 
-      <div className="container relative z-10 mx-auto max-w-7xl px-4 py-8">
-        <div className="mb-8 flex items-start justify-between">
-          <div>
-            <h1 className="mb-2 text-3xl font-bold text-white">
-              Presensi Siswa Real-Time
-            </h1>
+        <div className="container relative z-10 mx-auto max-w-7xl px-4 py-8">
+          <div className="mb-8 flex items-start justify-between">
+            <div>
+              <h1 className="mb-2 text-3xl font-bold text-white">
+                Presensi Siswa Real-Time
+              </h1>
+              <p className="text-sm text-indigo-200">
+                Monitor daily attendance, quickly scan student IDs, and manage
+                leave requests in one central hub.
+              </p>
+            </div>
+            <Button
+              onClick={handleScanQR}
+              className="bg-primary hover:bg-primary/90"
+            >
+              <IconQrcode className="mr-2 h-5 w-5" />
+              Scan QR Absen
+            </Button>
+          </div>
+
+          <div className="mb-6">
+            <h2 className="mb-1 text-xl font-semibold text-white">
+              Pengajuan & Input Surat Izin
+            </h2>
             <p className="text-sm text-indigo-200">
-              Monitor daily attendance, quickly scan student IDs, and manage
-              leave requests in one central hub.
+              Pencatatan resmi dispensasi, izin keluar, sakit, dan keterlambatan
+              siswa
             </p>
           </div>
-          <Button
-            onClick={handleScanQR}
-            className="bg-primary hover:bg-primary/90"
-          >
-            <IconQrcode className="mr-2 h-5 w-5" />
-            Scan QR Absen
-          </Button>
-        </div>
 
-        <div className="mb-6">
-          <h2 className="mb-1 text-xl font-semibold text-white">
-            Pengajuan & Input Surat Izin
-          </h2>
-          <p className="text-sm text-indigo-200">
-            Pencatatan resmi dispensasi, izin keluar, sakit, dan keterlambatan
-            siswa
-          </p>
-        </div>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-1">
+              <div className="mb-4">
+                <h3 className="mb-3 text-base font-medium text-white">
+                  Data Siswa
+                </h3>
+                <StudentProfileCard
+                  student={MOCK_STUDENT}
+                  onViewHistory={handleViewHistory}
+                />
+              </div>
+            </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-1">
-            <div className="mb-4">
+            <div className="lg:col-span-2">
               <h3 className="mb-3 text-base font-medium text-white">
-                Data Siswa
+                Detail Pengajuan Izin
               </h3>
-              <StudentProfileCard
-                student={MOCK_STUDENT}
-                onViewHistory={handleViewHistory}
-              />
+              <Card>
+                <CardContent className="pt-6">
+                  <FieldGroup>
+                    <Field>
+                      <FieldLabel>Jenis Izin</FieldLabel>
+                      <LeaveTypeSelector
+                        value={activeTab}
+                        onChange={(value) => setActiveTab(value)}
+                      />
+                    </Field>
+
+                    {activeTab === 'sick' && (
+                      <SickLeaveForm
+                        files={files}
+                        setFiles={setFiles}
+                        startDate={startDate}
+                        endDate={endDate}
+                        setStartDate={setStartDate}
+                        setEndDate={setEndDate}
+                        totalDays={totalDays}
+                      />
+                    )}
+
+                    {activeTab === 'leave_school' && (
+                      <ExitLeaveForm
+                        student={MOCK_STUDENT}
+                        onCancel={handleCancel}
+                      />
+                    )}
+
+                    {activeTab === 'leave_in' && (
+                      <LateLeaveForm
+                        student={MOCK_STUDENT}
+                        onCancel={handleCancel}
+                      />
+                    )}
+                  </FieldGroup>
+                </CardContent>
+              </Card>
             </div>
           </div>
 
-          <div className="lg:col-span-2">
-            <h3 className="mb-3 text-base font-medium text-white">
-              Detail Pengajuan Izin
-            </h3>
-            <Card>
-              <CardContent className="pt-6">
-                <FieldGroup>
-                  <Field>
-                    <FieldLabel>Jenis Izin</FieldLabel>
-                    <LeaveTypeSelector
-                      value={activeTab}
-                      onChange={(value) => setActiveTab(value)}
-                    />
-                  </Field>
-
-                  {activeTab === 'sick' && (
-                    <SickLeaveForm
-                      files={files}
-                      setFiles={setFiles}
-                      startDate={startDate}
-                      endDate={endDate}
-                      setStartDate={setStartDate}
-                      setEndDate={setEndDate}
-                      totalDays={totalDays}
-                    />
-                  )}
-
-                  {activeTab === 'leave_school' && (
-                    <ExitLeaveForm
-                      student={MOCK_STUDENT}
-                      onCancel={handleCancel}
-                    />
-                  )}
-
-                  {activeTab === 'leave_in' && (
-                    <LateLeaveForm
-                      student={MOCK_STUDENT}
-                      onCancel={handleCancel}
-                    />
-                  )}
-                </FieldGroup>
-              </CardContent>
-            </Card>
+          <div className="mt-8">
+            <Button
+              variant="ghost"
+              onClick={handleLogout}
+              className="text-white hover:bg-white/10 hover:text-white"
+            >
+              <IconLogout className="mr-2 h-4 w-4" />
+              Keluar
+            </Button>
           </div>
         </div>
-
-        <div className="mt-8">
-          <Button
-            variant="ghost"
-            onClick={handleLogout}
-            className="text-white hover:bg-white/10 hover:text-white"
-          >
-            <IconLogout className="mr-2 h-4 w-4" />
-            Keluar
-          </Button>
-        </div>
       </div>
-    </div>
+
+      <StudentAttendanceScanner
+        studentId={MOCK_STUDENT.id}
+        studentName={MOCK_STUDENT.name}
+        classroomName={MOCK_STUDENT.classroom_name}
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+      />
+    </>
   )
 }

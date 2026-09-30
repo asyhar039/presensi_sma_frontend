@@ -15,6 +15,7 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAcademicYearsRouteImport } from './routes/dashboard/academic-years'
 import { Route as DashboardClassroomsRouteImport } from './routes/dashboard/classrooms'
+import { Route as DashboardDutyTeacherRouteImport } from './routes/dashboard/duty-teacher'
 import { Route as DashboardPermitsRouteImport } from './routes/dashboard/permits'
 import { Route as DashboardRoomsRouteImport } from './routes/dashboard/rooms'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
@@ -57,6 +58,11 @@ const DashboardAcademicYearsRoute = DashboardAcademicYearsRouteImport.update({
 const DashboardClassroomsRoute = DashboardClassroomsRouteImport.update({
   id: '/classrooms',
   path: '/classrooms',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDutyTeacherRoute = DashboardDutyTeacherRouteImport.update({
+  id: '/duty-teacher',
+  path: '/duty-teacher',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardPermitsRoute = DashboardPermitsRouteImport.update({
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/dashboard/academic-years': typeof DashboardAcademicYearsRoute
   '/dashboard/classrooms': typeof DashboardClassroomsRoute
+  '/dashboard/duty-teacher': typeof DashboardDutyTeacherRoute
   '/dashboard/permits': typeof DashboardPermitsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRouteWithChildren
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/dashboard/academic-years': typeof DashboardAcademicYearsRoute
   '/dashboard/classrooms': typeof DashboardClassroomsRoute
+  '/dashboard/duty-teacher': typeof DashboardDutyTeacherRoute
   '/dashboard/permits': typeof DashboardPermitsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/students': typeof DashboardStudentsRoute
@@ -178,6 +186,7 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/dashboard/academic-years': typeof DashboardAcademicYearsRoute
   '/dashboard/classrooms': typeof DashboardClassroomsRoute
+  '/dashboard/duty-teacher': typeof DashboardDutyTeacherRoute
   '/dashboard/permits': typeof DashboardPermitsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
   '/dashboard/settings': typeof DashboardSettingsRouteWithChildren
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/dashboard/academic-years'
     | '/dashboard/classrooms'
+    | '/dashboard/duty-teacher'
     | '/dashboard/permits'
     | '/dashboard/rooms'
     | '/dashboard/settings'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/dashboard/academic-years'
     | '/dashboard/classrooms'
+    | '/dashboard/duty-teacher'
     | '/dashboard/permits'
     | '/dashboard/rooms'
     | '/dashboard/students'
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/dashboard/academic-years'
     | '/dashboard/classrooms'
+    | '/dashboard/duty-teacher'
     | '/dashboard/permits'
     | '/dashboard/rooms'
     | '/dashboard/settings'
@@ -305,6 +317,13 @@ declare module '@tanstack/react-router' {
       path: '/classrooms'
       fullPath: '/dashboard/classrooms'
       preLoaderRoute: typeof DashboardClassroomsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/duty-teacher': {
+      id: '/dashboard/duty-teacher'
+      path: '/duty-teacher'
+      fullPath: '/dashboard/duty-teacher'
+      preLoaderRoute: typeof DashboardDutyTeacherRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/permits': {
@@ -419,6 +438,7 @@ const DashboardSettingsRouteWithChildren =
 interface DashboardRouteChildren {
   DashboardAcademicYearsRoute: typeof DashboardAcademicYearsRoute
   DashboardClassroomsRoute: typeof DashboardClassroomsRoute
+  DashboardDutyTeacherRoute: typeof DashboardDutyTeacherRoute
   DashboardPermitsRoute: typeof DashboardPermitsRoute
   DashboardRoomsRoute: typeof DashboardRoomsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRouteWithChildren
@@ -435,6 +455,7 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAcademicYearsRoute: DashboardAcademicYearsRoute,
   DashboardClassroomsRoute: DashboardClassroomsRoute,
+  DashboardDutyTeacherRoute: DashboardDutyTeacherRoute,
   DashboardPermitsRoute: DashboardPermitsRoute,
   DashboardRoomsRoute: DashboardRoomsRoute,
   DashboardSettingsRoute: DashboardSettingsRouteWithChildren,

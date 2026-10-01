@@ -1,5 +1,7 @@
 import type { PermitType } from '@/features/student-permits/types/permit.types'
 
+import { IconBriefcase, IconClock, IconStethoscope } from '@tabler/icons-react'
+
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/class-name'
 
@@ -16,6 +18,7 @@ const LEAVE_TYPES: {
   activeText: string
   activeBorder: string
   outlineBorder: string
+  icon: typeof IconStethoscope
 }[] = [
   {
     value: 'sick',
@@ -24,6 +27,7 @@ const LEAVE_TYPES: {
     activeText: 'text-white',
     activeBorder: 'border-green-600',
     outlineBorder: 'border-green-600',
+    icon: IconStethoscope,
   },
   {
     value: 'leave_school',
@@ -32,6 +36,7 @@ const LEAVE_TYPES: {
     activeText: 'text-white',
     activeBorder: 'border-blue-600',
     outlineBorder: 'border-blue-600',
+    icon: IconBriefcase,
   },
   {
     value: 'leave_in',
@@ -40,6 +45,7 @@ const LEAVE_TYPES: {
     activeText: 'text-white',
     activeBorder: 'border-amber-500',
     outlineBorder: 'border-amber-500',
+    icon: IconClock,
   },
 ]
 
@@ -58,23 +64,25 @@ export function LeaveTypeSelector({
           activeText,
           activeBorder,
           outlineBorder,
+          icon: Icon,
         }) => (
           <Button
             key={typeValue}
             type="button"
             variant={value === typeValue ? 'default' : 'outline'}
             className={cn(
-              'flex-1 py-3 px-4 text-sm font-medium transition-all',
+              'flex flex-1 flex-col items-center justify-center gap-2 py-4 px-4 text-sm font-semibold transition-all h-auto',
               value === typeValue
-                ? `${activeBg} ${activeText} ${activeBorder} shadow-sm`
-                : `border-2 ${outlineBorder} hover:bg-amber-50 hover:border-amber-500 dark:hover:bg-amber-950/30`,
+                ? `${activeBg} ${activeText} ${activeBorder} shadow-sm ring-2 ring-offset-2 ring-primary/20`
+                : `border-2 ${outlineBorder} hover:bg-muted/50`,
             )}
             onClick={() => !disabled && onChange(typeValue)}
             disabled={disabled}
             role="radio"
             aria-checked={value === typeValue}
           >
-            {label}
+            <Icon className="size-5" />
+            <span>{label}</span>
           </Button>
         ),
       )}

@@ -106,106 +106,103 @@ export function StudentDashboardView() {
           </svg>
         </div>
 
-        <div className="container relative z-10 mx-auto max-w-7xl px-4 py-8">
-          <div className="mb-8 flex items-start justify-between">
-            <div>
-              <h1 className="mb-2 text-3xl font-bold text-white">
+        <div className="relative z-10 min-h-screen w-full">
+          <header className="w-full bg-[#0B132B] px-6 py-6 sm:px-8">
+            <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+              <h1 className="text-2xl font-bold text-white sm:text-3xl">
                 Presensi Siswa Real-Time
               </h1>
-              <p className="text-sm text-indigo-200">
-                Monitor daily attendance, quickly scan student IDs, and manage
-                leave requests in one central hub.
-              </p>
+              <Button
+                onClick={handleScanQR}
+                className="bg-primary hover:bg-primary/90"
+              >
+                <IconQrcode className="mr-2 h-5 w-5" />
+                Scan QR Absen
+              </Button>
             </div>
-            <Button
-              onClick={handleScanQR}
-              className="bg-primary hover:bg-primary/90"
-            >
-              <IconQrcode className="mr-2 h-5 w-5" />
-              Scan QR Absen
-            </Button>
-          </div>
+          </header>
 
-          <div className="mb-6">
-            <h2 className="mb-1 text-xl font-semibold text-white">
-              Pengajuan & Input Surat Izin
-            </h2>
-            <p className="text-sm text-indigo-200">
-              Pencatatan resmi dispensasi, izin keluar, sakit, dan keterlambatan
-              siswa
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-1">
-              <div className="mb-4">
-                <h3 className="mb-3 text-base font-medium text-white">
-                  Data Siswa
-                </h3>
-                <StudentProfileCard
-                  student={MOCK_STUDENT}
-                  onViewHistory={handleViewHistory}
-                />
+          <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <Card className="rounded-2xl bg-white p-2 shadow-sm">
+              <div className="px-6 pt-6 sm:px-8 sm:pt-8">
+                <h2 className="text-xl font-bold text-foreground sm:text-2xl">
+                  Pengajuan & Input Surat Izin
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Pencatatan resmi dispensasi, izin keluar, sakit, dan
+                  keterlambatan siswa
+                </p>
               </div>
-            </div>
 
-            <div className="lg:col-span-2">
-              <h3 className="mb-3 text-base font-medium text-white">
-                Detail Pengajuan Izin
-              </h3>
-              <Card>
-                <CardContent className="pt-6">
-                  <FieldGroup>
-                    <Field>
-                      <FieldLabel>Jenis Izin</FieldLabel>
-                      <LeaveTypeSelector
-                        value={activeTab}
-                        onChange={(value) => setActiveTab(value)}
-                      />
-                    </Field>
-
-                    {activeTab === 'sick' && (
-                      <SickLeaveForm
-                        files={files}
-                        setFiles={setFiles}
-                        startDate={startDate}
-                        endDate={endDate}
-                        setStartDate={setStartDate}
-                        setEndDate={setEndDate}
-                        totalDays={totalDays}
-                      />
-                    )}
-
-                    {activeTab === 'leave_school' && (
-                      <ExitLeaveForm
+              <CardContent className="p-6 sm:p-8">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+                  <div className="lg:col-span-4">
+                    <div className="mb-4">
+                      <h3 className="mb-3 text-base font-semibold text-foreground">
+                        Data Siswa
+                      </h3>
+                      <StudentProfileCard
                         student={MOCK_STUDENT}
-                        onCancel={handleCancel}
+                        onViewHistory={handleViewHistory}
                       />
-                    )}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={handleLogout}
+                      className="mt-4 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      <IconLogout className="mr-2 h-4 w-4" />
+                      Keluar
+                    </Button>
+                  </div>
 
-                    {activeTab === 'leave_in' && (
-                      <LateLeaveForm
-                        student={MOCK_STUDENT}
-                        onCancel={handleCancel}
-                      />
-                    )}
-                  </FieldGroup>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+                  <div className="lg:col-span-8">
+                    <h3 className="mb-3 text-base font-semibold text-foreground">
+                      Detail Pengajuan Izin
+                    </h3>
+                    <div className="rounded-xl border bg-card p-6 shadow-sm sm:p-8">
+                      <FieldGroup className="space-y-5">
+                        <Field>
+                          <FieldLabel>Jenis Izin</FieldLabel>
+                          <LeaveTypeSelector
+                            value={activeTab}
+                            onChange={(value) => setActiveTab(value)}
+                          />
+                        </Field>
 
-          <div className="mt-8 flex justify-start">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleLogout}
-              className="text-red-300 hover:bg-red-500/10 hover:text-red-200"
-            >
-              <IconLogout className="mr-2 h-4 w-4" />
-              Keluar
-            </Button>
-          </div>
+                        {activeTab === 'sick' && (
+                          <SickLeaveForm
+                            files={files}
+                            setFiles={setFiles}
+                            startDate={startDate}
+                            endDate={endDate}
+                            setStartDate={setStartDate}
+                            setEndDate={setEndDate}
+                            totalDays={totalDays}
+                          />
+                        )}
+
+                        {activeTab === 'leave_school' && (
+                          <ExitLeaveForm
+                            student={MOCK_STUDENT}
+                            onCancel={handleCancel}
+                          />
+                        )}
+
+                        {activeTab === 'leave_in' && (
+                          <LateLeaveForm
+                            student={MOCK_STUDENT}
+                            onCancel={handleCancel}
+                          />
+                        )}
+                      </FieldGroup>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </main>
         </div>
       </div>
 

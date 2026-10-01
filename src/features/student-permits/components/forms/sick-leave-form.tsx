@@ -1,3 +1,4 @@
+import { shallow, useSelector } from '@tanstack/react-store'
 import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'
@@ -32,15 +33,8 @@ export function SickLeaveForm({
   totalDays,
 }: SickLeaveFormProps) {
   const form = useAppForm({
-    defaultValues: {
-      type: 'sick',
-      start_date: '',
-      end_date: '',
-      reason: '',
-    },
-    validators: {
-      onChange: permitApplicationSchema,
-    },
+    defaultValues: { type: 'sick', start_date: '', end_date: '', reason: '' },
+    validators: { onChange: permitApplicationSchema },
     onSubmit: async ({ value }) => {
       try {
         console.log('Sick Leave submitted:', value, files)
@@ -61,6 +55,11 @@ export function SickLeaveForm({
     setStartDate('')
     setEndDate('')
   }
+  const [canSubmit, isSubmitting] = useSelector(
+    form.store,
+    (state) => [state.canSubmit, state.isSubmitting],
+    { compare: shallow },
+  )
 
   return (
     <form
@@ -76,7 +75,9 @@ export function SickLeaveForm({
             <form.AppField name="start_date">
               {(field) => (
                 <Field>
-                  <FieldLabel>Tanggal Mulai Izin</FieldLabel>
+                  <FieldLabel>
+                    Tanggal Mulai Izin <span className="text-red-500">*</span>
+                  </FieldLabel>
                   <Input
                     type="date"
                     value={field.state.value}
@@ -90,11 +91,12 @@ export function SickLeaveForm({
                 </Field>
               )}
             </form.AppField>
-
             <form.AppField name="end_date">
               {(field) => (
                 <Field>
-                  <FieldLabel>Tanggal Selesai Izin</FieldLabel>
+                  <FieldLabel>
+                    Tanggal Selesai Izin <span className="text-red-500">*</span>
+                  </FieldLabel>
                   <Input
                     type="date"
                     value={field.state.value}
@@ -109,7 +111,6 @@ export function SickLeaveForm({
               )}
             </form.AppField>
           </div>
-
           <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/30">
             <p className="mb-2 text-sm text-blue-700 dark:text-blue-300">
               Pilih rentang tanggal sesuai surat keterangan dokter
@@ -121,11 +122,12 @@ export function SickLeaveForm({
               Total: {totalDays} Hari
             </Badge>
           </div>
-
           <form.AppField name="reason">
             {(field) => (
               <Field>
-                <FieldLabel>Keterangan / Diagnosa</FieldLabel>
+                <FieldLabel>
+                  Keterangan / Diagnosa <span className="text-red-500">*</span>
+                </FieldLabel>
                 <Textarea
                   placeholder="Masukkan detail keterangan sakit..."
                   rows={4}
@@ -137,9 +139,8 @@ export function SickLeaveForm({
               </Field>
             )}
           </form.AppField>
-
           <Field>
-            <FieldLabel>Lampiran Surat Dokter (PDF, JPG, PNG)</FieldLabel>
+            <FieldLabel>Lampiran Surat Dokter (Opsional)</FieldLabel>
             <FileUploadDropzone
               files={files}
               onFilesChange={setFiles}
@@ -147,7 +148,6 @@ export function SickLeaveForm({
               acceptedTypes={['application/pdf', 'image/jpeg', 'image/png']}
             />
           </Field>
-
           <div className="flex gap-3 pt-4">
             <Button
               type="button"
@@ -158,6 +158,8 @@ export function SickLeaveForm({
               Batal
             </Button>
             <form.ButtonSubmit
+              isDisabled={!canSubmit || isSubmitting}
+              loadingLabel="Menyimpan..."
               label="Simpan & Terbitkan Surat Izin"
               className="flex-1"
             />

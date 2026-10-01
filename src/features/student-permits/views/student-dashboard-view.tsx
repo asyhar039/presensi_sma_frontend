@@ -144,6 +144,16 @@ export function StudentDashboardView() {
                     student={MOCK_STUDENT}
                     onViewHistory={handleViewHistory}
                   />
+                  <div className="mt-6 flex justify-start">
+                    <Button
+                      variant="ghost"
+                      onClick={() => void handleLogout()}
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      <IconLogout className="mr-2 h-4 w-4" />
+                      Keluar
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="lg:col-span-8">
@@ -188,17 +198,6 @@ export function StudentDashboardView() {
               </div>
             </CardContent>
           </Card>
-
-          <div className="mt-8 flex justify-start">
-            <Button
-              variant="ghost"
-              onClick={() => void handleLogout()}
-              className="text-white hover:bg-white/10 hover:text-white"
-            >
-              <IconLogout className="mr-2 h-4 w-4" />
-              Keluar
-            </Button>
-          </div>
         </div>
       </div>
     </div>

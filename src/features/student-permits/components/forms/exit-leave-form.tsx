@@ -1,6 +1,7 @@
 import type { IStudentProfile } from '@/features/student-permits/types/permit.types'
 
 import { IconMapPin } from '@tabler/icons-react'
+import { shallow, useSelector } from '@tanstack/react-store'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -62,6 +63,12 @@ export function ExitLeaveForm({ student, onCancel }: ExitLeaveFormProps) {
     onCancel()
   }
 
+  const [canSubmit, isSubmitting] = useSelector(
+    form.store,
+    (state) => [state.canSubmit, state.isSubmitting],
+    { compare: shallow },
+  )
+
   return (
     <>
       <form
@@ -101,7 +108,9 @@ export function ExitLeaveForm({ student, onCancel }: ExitLeaveFormProps) {
               <form.AppField name="departure_time">
                 {(field) => (
                   <Field>
-                    <FieldLabel>Jam Keluar *</FieldLabel>
+                    <FieldLabel>
+                      Jam Keluar <span className="text-red-500">*</span>
+                    </FieldLabel>
                     <Input
                       type="time"
                       value={field.state.value}
@@ -115,7 +124,9 @@ export function ExitLeaveForm({ student, onCancel }: ExitLeaveFormProps) {
               <form.AppField name="return_time">
                 {(field) => (
                   <Field>
-                    <FieldLabel>Perkiraan Kembali *</FieldLabel>
+                    <FieldLabel>
+                      Perkiraan Kembali <span className="text-red-500">*</span>
+                    </FieldLabel>
                     <Input
                       type="time"
                       value={field.state.value}
@@ -132,7 +143,9 @@ export function ExitLeaveForm({ student, onCancel }: ExitLeaveFormProps) {
               <form.AppField name="reason_type">
                 {(field) => (
                   <Field>
-                    <FieldLabel>Alasan Keluar *</FieldLabel>
+                    <FieldLabel>
+                      Alasan Keluar <span className="text-red-500">*</span>
+                    </FieldLabel>
                     <Select
                       value={field.state.value}
                       onValueChange={(val) => field.handleChange(val ?? '')}
@@ -155,7 +168,9 @@ export function ExitLeaveForm({ student, onCancel }: ExitLeaveFormProps) {
               <form.AppField name="destination">
                 {(field) => (
                   <Field>
-                    <FieldLabel>Tujuan / Lokasi *</FieldLabel>
+                    <FieldLabel>
+                      Tujuan / Lokasi <span className="text-red-500">*</span>
+                    </FieldLabel>
                     <div className="relative">
                       <Input
                         placeholder="Contoh: Rumah Sakit Permata"
@@ -175,7 +190,9 @@ export function ExitLeaveForm({ student, onCancel }: ExitLeaveFormProps) {
             <form.AppField name="reason">
               {(field) => (
                 <Field>
-                  <FieldLabel>Keterangan *</FieldLabel>
+                  <FieldLabel>
+                    Keterangan <span className="text-red-500">*</span>
+                  </FieldLabel>
                   <Textarea
                     placeholder="Jelaskan secara detail keperluan keluar Anda..."
                     rows={3}
@@ -229,6 +246,8 @@ export function ExitLeaveForm({ student, onCancel }: ExitLeaveFormProps) {
                 Batal
               </Button>
               <form.ButtonSubmit
+                isDisabled={!canSubmit || isSubmitting}
+                loadingLabel="Mengirim..."
                 label="Kirim Pengajuan"
                 className="flex-1 bg-primary text-primary-foreground"
               />

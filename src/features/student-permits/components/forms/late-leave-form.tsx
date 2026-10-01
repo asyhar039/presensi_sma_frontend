@@ -1,5 +1,6 @@
 import type { IStudentProfile } from '@/features/student-permits/types/permit.types'
 
+import { shallow, useSelector } from '@tanstack/react-store'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -57,6 +58,12 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
     },
   })
 
+  const [canSubmit, isSubmitting] = useSelector(
+    form.store,
+    (state) => [state.canSubmit, state.isSubmitting],
+    { compare: shallow },
+  )
+
   return (
     <form
       noValidate
@@ -100,7 +107,9 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
             <form.AppField name="arrival_time">
               {(field) => (
                 <Field>
-                  <FieldLabel>Perkiraan Jam Datang *</FieldLabel>
+                  <FieldLabel>
+                    Perkiraan Jam Datang <span className="text-red-500">*</span>
+                  </FieldLabel>
                   <Input
                     type="time"
                     value={field.state.value}
@@ -114,7 +123,9 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
             <form.AppField name="reason_type">
               {(field) => (
                 <Field>
-                  <FieldLabel>Alasan Terlambat *</FieldLabel>
+                  <FieldLabel>
+                    Alasan Terlambat <span className="text-red-500">*</span>
+                  </FieldLabel>
                   <Select
                     value={field.state.value}
                     onValueChange={(val) => field.handleChange(val ?? '')}
@@ -140,7 +151,9 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
           <form.AppField name="reason">
             {(field) => (
               <Field>
-                <FieldLabel>Penjelasan *</FieldLabel>
+                <FieldLabel>
+                  Penjelasan <span className="text-red-500">*</span>
+                </FieldLabel>
                 <Textarea
                   placeholder="Berikan penjelasan singkat mengenai kendala yang dihadapi..."
                   rows={3}
@@ -178,6 +191,8 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
               Batal
             </Button>
             <form.ButtonSubmit
+              isDisabled={!canSubmit || isSubmitting}
+              loadingLabel="Mengirim..."
               label="Kirim Pengajuan"
               className="flex-1 bg-primary text-primary-foreground"
             />

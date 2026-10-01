@@ -1,6 +1,12 @@
 import type { IAttendanceLog } from '@/features/teacher-attendance/types/teacher-attendance.types'
 
-import { IconCheck, IconRefresh, IconX } from '@tabler/icons-react'
+import {
+  IconCheck,
+  IconCircleX,
+  IconClock,
+  IconRefresh,
+  IconX,
+} from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
@@ -125,47 +131,56 @@ export function TeacherAttendanceView({
 
       {isSessionActive && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <Card className="lg:col-span-5 sticky top-6 transition-shadow hover:shadow-md">
-            <CardHeader>
-              <CardTitle>QR Code Kehadiran</CardTitle>
-              <CardDescription>Scan untuk mencatat kehadiran</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-8 dark:border-gray-700 dark:bg-gray-900">
-                <div className="space-y-2 text-center">
-                  <div className="text-4xl">⬜</div>
-                  <p className="text-xs text-muted-foreground">QR Code</p>
+          <div className="sticky top-6 self-start lg:col-span-5">
+            <Card className="transition-shadow hover:shadow-md">
+              <CardContent className="space-y-5 p-6">
+                <div className="flex items-center justify-center rounded-xl bg-white p-6 shadow-sm ring-1 ring-border">
+                  <div className="flex aspect-square w-full max-w-64 items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/20 p-3">
+                    {qrCode ? (
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(qrCode.code)}`}
+                        alt="QR Code Kehadiran"
+                        className="size-full rounded-sm object-contain"
+                      />
+                    ) : (
+                      <div className="space-y-2 text-center">
+                        <div className="text-4xl">⬜</div>
+                        <p className="text-xs text-muted-foreground">QR Code</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-              {qrCode && (
-                <p className="text-xs text-muted-foreground text-center">
-                  Berlaku hingga:{' '}
-                  {new Date(qrCode.expires_at).toLocaleTimeString()}
-                </p>
-              )}
-              <div className="flex gap-2">
-                <Button
-                  onClick={regenerateQRCode}
-                  disabled={isLoading}
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                >
-                  <IconRefresh className="size-4 mr-2" />
-                  Baru
-                </Button>
-                <Button
-                  onClick={endSession}
-                  disabled={isLoading}
-                  variant="destructive"
-                  size="sm"
-                  className="flex-1"
-                >
-                  Tutup
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                {qrCode && (
+                  <div className="flex items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-center text-xs font-medium text-red-600">
+                    <IconClock className="size-4" />
+                    <span>
+                      Berlaku hingga:{' '}
+                      {new Date(qrCode.expires_at).toLocaleTimeString()}
+                    </span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <Button
+                onClick={regenerateQRCode}
+                disabled={isLoading}
+                variant="outline"
+              >
+                <IconRefresh className="mr-2 size-4" />
+                Generate QR Baru
+              </Button>
+              <Button
+                onClick={endSession}
+                disabled={isLoading}
+                variant="outline"
+                className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              >
+                <IconCircleX className="mr-2 size-4" />
+                Tutup Presensi
+              </Button>
+            </div>
+          </div>
 
           <div className="space-y-6 lg:col-span-7">
             <Card className="transition-shadow hover:shadow-md">

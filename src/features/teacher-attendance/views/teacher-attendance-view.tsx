@@ -1,6 +1,12 @@
 import type { IAttendanceLog } from '@/features/teacher-attendance/types/teacher-attendance.types'
 
-import { IconCheck, IconRefresh, IconX } from '@tabler/icons-react'
+import {
+  IconCheck,
+  IconCircleX,
+  IconClock,
+  IconRefresh,
+  IconX,
+} from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
@@ -20,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Typography } from '@/components/ui/typography'
 import { useTeacherAttendance } from '@/features/teacher-attendance/hooks/use-teacher-attendance'
 
 interface TeacherAttendanceViewProps {
@@ -50,6 +57,16 @@ export function TeacherAttendanceView({
   useEffect(() => {
     setDisplayLogs(attendanceLogs)
   }, [attendanceLogs])
+
+  const totalStudents =
+    attendanceStats.present +
+    attendanceStats.permission +
+    attendanceStats.sick +
+    attendanceStats.absent
+  const attendancePercentage =
+    totalStudents > 0
+      ? Math.round((attendanceStats.present / totalStudents) * 100)
+      : 0
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -113,153 +130,140 @@ export function TeacherAttendanceView({
       )}
 
       {isSessionActive && (
-        <>
-          {/* QR Code and Controls Section */}
-          <div className="grid gap-6 lg:grid-cols-3">
-            {/* QR Code Card */}
-            <Card className="lg:col-span-1">
-              <CardHeader>
-                <CardTitle>QR Code Kehadiran</CardTitle>
-                <CardDescription>Scan untuk mencatat kehadiran</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-8 dark:border-gray-700 dark:bg-gray-900">
-                  <div className="space-y-2 text-center">
-                    <div className="text-4xl">⬜</div>
-                    <p className="text-xs text-muted-foreground">QR Code</p>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <div className="sticky top-6 self-start lg:col-span-5">
+            <Card className="transition-shadow hover:shadow-md">
+              <CardContent className="space-y-5 p-6">
+                <div className="flex items-center justify-center rounded-xl bg-white p-6 shadow-sm ring-1 ring-border">
+                  <div className="flex aspect-square w-full max-w-64 items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/20 p-3">
+                    {qrCode ? (
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(qrCode.code)}`}
+                        alt="QR Code Kehadiran"
+                        className="size-full rounded-sm object-contain"
+                      />
+                    ) : (
+                      <div className="space-y-2 text-center">
+                        <div className="text-4xl">⬜</div>
+                        <p className="text-xs text-muted-foreground">QR Code</p>
+                      </div>
+                    )}
                   </div>
                 </div>
                 {qrCode && (
-                  <p className="text-xs text-muted-foreground text-center">
-                    Berlaku hingga:{' '}
-                    {new Date(qrCode.expires_at).toLocaleTimeString()}
-                  </p>
+                  <div className="flex items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-center text-xs font-medium text-red-600">
+                    <IconClock className="size-4" />
+                    <span>
+                      Berlaku hingga:{' '}
+                      {new Date(qrCode.expires_at).toLocaleTimeString()}
+                    </span>
+                  </div>
                 )}
-                <div className="flex gap-2">
-                  <Button
-                    onClick={regenerateQRCode}
-                    disabled={isLoading}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                  >
-                    <IconRefresh className="size-4 mr-2" />
-                    Baru
-                  </Button>
-                  <Button
-                    onClick={endSession}
-                    disabled={isLoading}
-                    variant="destructive"
-                    size="sm"
-                    className="flex-1"
-                  >
-                    Tutup
-                  </Button>
+              </CardContent>
+            </Card>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <Button
+                onClick={regenerateQRCode}
+                disabled={isLoading}
+                variant="outline"
+              >
+                <IconRefresh className="mr-2 size-4" />
+                Generate QR Baru
+              </Button>
+              <Button
+                onClick={endSession}
+                disabled={isLoading}
+                variant="outline"
+                className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              >
+                <IconCircleX className="mr-2 size-4" />
+                Tutup Presensi
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-6 lg:col-span-7">
+            <Card className="transition-shadow hover:shadow-md">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <Typography
+                      as="p"
+                      variant="small"
+                      className="uppercase tracking-wide text-muted-foreground"
+                    >
+                      Status Kehadiran
+                    </Typography>
+                    <Typography as="p" variant="h1" className="mt-3 font-bold">
+                      <span className="text-primary">
+                        {attendanceStats.present}
+                      </span>{' '}
+                      <span className="text-lg font-medium">
+                        / {totalStudents} Siswa Sudah Presensi
+                      </span>
+                    </Typography>
+                  </div>
+                  <Badge className="rounded-xl border border-primary/40 bg-primary/15 px-4 py-2 text-xl font-bold text-primary hover:bg-primary/15 min-h-20 min-w-24 items-center justify-center">
+                    {attendancePercentage}%
+                  </Badge>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Attendance Status Cards */}
-            <div className="lg:col-span-2 space-y-4">
-              <div className="grid gap-4 grid-cols-2 sm:grid-cols-4">
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Hadir
-                      </p>
-                      <p className="text-3xl font-bold text-green-600">
-                        {attendanceStats.present}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Izin
-                      </p>
-                      <p className="text-3xl font-bold text-yellow-600">
-                        {attendanceStats.permission}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Sakit
-                      </p>
-                      <p className="text-3xl font-bold text-orange-600">
-                        {attendanceStats.sick}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-muted-foreground">
-                        Alpa
-                      </p>
-                      <p className="text-3xl font-bold text-red-600">
-                        {attendanceStats.absent}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+            <Card className="transition-shadow hover:shadow-md">
+              <CardHeader>
+                <CardTitle>Log Kehadiran Real-time</CardTitle>
+                <CardDescription>
+                  Daftar siswa yang telah melakukan presensi
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="max-h-96 space-y-3 overflow-y-auto pr-2">
+                  {displayLogs.length === 0 ? (
+                    <p className="py-8 text-center text-sm text-muted-foreground">
+                      Belum ada presensi siswa
+                    </p>
+                  ) : (
+                    displayLogs.map((log) => (
+                      <div
+                        key={log.id}
+                        className="flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-gray-800"
+                      >
+                        <div className="flex-1 space-y-1">
+                          <Typography
+                            as="p"
+                            variant="small"
+                            className="font-medium"
+                          >
+                            {log.student_name}
+                          </Typography>
+                          <Typography
+                            as="p"
+                            variant="muted"
+                            className="text-xs"
+                          >
+                            NIS: {log.student_nis}
+                          </Typography>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Badge
+                            variant="secondary"
+                            className={getStatusColor(log.status)}
+                          >
+                            {getStatusLabel(log.status)}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(log.timestamp).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
-
-          {/* Real-time Attendance Log */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Log Kehadiran Real-time</CardTitle>
-              <CardDescription>
-                Daftar siswa yang telah melakukan presensi
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {displayLogs.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">
-                    Belum ada presensi siswa
-                  </p>
-                ) : (
-                  displayLogs.map((log) => (
-                    <div
-                      key={log.id}
-                      className="flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-gray-800"
-                    >
-                      <div className="flex-1 space-y-1">
-                        <p className="font-medium text-sm">
-                          {log.student_name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          NIS: {log.student_nis}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Badge
-                          variant="secondary"
-                          className={getStatusColor(log.status)}
-                        >
-                          {getStatusLabel(log.status)}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(log.timestamp).toLocaleTimeString()}
-                        </span>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </>
+        </div>
       )}
 
       {/* Permits Approval Table */}

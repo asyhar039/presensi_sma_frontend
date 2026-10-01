@@ -18,6 +18,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     return null
   }
 
+  if (role?.isStudent) {
+    return (
+      <div className="flex min-h-svh w-full flex-col bg-background text-foreground">
+        {children}
+      </div>
+    )
+  }
+
   return (
     <div className="flex min-h-svh w-full bg-background text-foreground">
       <aside className="sticky top-0 hidden h-svh w-72 shrink-0 border-r border-sidebar-border lg:block">

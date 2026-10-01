@@ -1,5 +1,6 @@
 import type { IStudentProfile } from '@/features/student-permits/types/permit.types'
 
+import { shallow, useSelector } from '@tanstack/react-store'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -57,6 +58,12 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
     },
   })
 
+  const [canSubmit, isSubmitting] = useSelector(
+    form.store,
+    (state) => [state.canSubmit, state.isSubmitting],
+    { compare: shallow },
+  )
+
   return (
     <form
       noValidate
@@ -66,9 +73,8 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
       }}
     >
       <form.AppForm>
-        <FieldGroup>
-          {/* SECTION: DATA MAHASISWA / SISWA */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <FieldGroup className="space-y-5">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
             <Field>
               <FieldLabel>Nama Lengkap</FieldLabel>
               <Input value={student.name} disabled className="bg-muted" />
@@ -88,7 +94,7 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
           </div>
 
           {/* SECTION: DETAIL KETERLAMBATAN */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
             <Field>
               <FieldLabel>Jam Masuk Seharusnya</FieldLabel>
               <Input
@@ -101,7 +107,9 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
             <form.AppField name="arrival_time">
               {(field) => (
                 <Field>
-                  <FieldLabel>Perkiraan Jam Datang *</FieldLabel>
+                  <FieldLabel>
+                    Perkiraan Jam Datang <span className="text-red-500">*</span>
+                  </FieldLabel>
                   <Input
                     type="time"
                     value={field.state.value}
@@ -115,7 +123,9 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
             <form.AppField name="reason_type">
               {(field) => (
                 <Field>
-                  <FieldLabel>Alasan Terlambat *</FieldLabel>
+                  <FieldLabel>
+                    Alasan Terlambat <span className="text-red-500">*</span>
+                  </FieldLabel>
                   <Select
                     value={field.state.value}
                     onValueChange={(val) => field.handleChange(val ?? '')}
@@ -141,7 +151,9 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
           <form.AppField name="reason">
             {(field) => (
               <Field>
-                <FieldLabel>Penjelasan *</FieldLabel>
+                <FieldLabel>
+                  Penjelasan <span className="text-red-500">*</span>
+                </FieldLabel>
                 <Textarea
                   placeholder="Berikan penjelasan singkat mengenai kendala yang dihadapi..."
                   rows={3}
@@ -165,7 +177,7 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
           </Field>
 
           {/* ACTION BUTTONS */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-4">
             <Button
               type="button"
               variant="outline"
@@ -179,6 +191,8 @@ export function LateLeaveForm({ student, onCancel }: LateLeaveFormProps) {
               Batal
             </Button>
             <form.ButtonSubmit
+              isDisabled={!canSubmit || isSubmitting}
+              loadingLabel="Mengirim..."
               label="Kirim Pengajuan"
               className="flex-1 bg-primary text-primary-foreground"
             />

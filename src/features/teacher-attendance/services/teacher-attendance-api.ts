@@ -104,9 +104,14 @@ const MOCK_PERMIT_RECORDS: ITeacherPermitRecord[] = [
 
 export async function generateQRCode(_sessionId: string): Promise<IQRCode> {
   await new Promise((resolve) => setTimeout(resolve, 300))
+  const createdAt = new Date()
+
   return {
     ...MOCK_QR_CODE,
     id: _sessionId,
+    code: `https://api.example.com/attend/${_sessionId}`,
+    created_at: createdAt.toISOString(),
+    expires_at: new Date(createdAt.getTime() + 3600000).toISOString(),
   }
 }
 

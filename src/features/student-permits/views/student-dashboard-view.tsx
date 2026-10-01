@@ -6,22 +6,16 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { useAuth } from '@/context/auth-context'
 import { ExitLeaveForm } from '@/features/student-permits/components/forms/exit-leave-form'
 import { LateLeaveForm } from '@/features/student-permits/components/forms/late-leave-form'
 import { SickLeaveForm } from '@/features/student-permits/components/forms/sick-leave-form'
 import { LeaveTypeSelector } from '@/features/student-permits/components/leave-type-selector'
+import { StudentAttendanceScanner } from '@/features/student-permits/components/student-attendance-scanner'
 import { StudentProfileCard } from '@/features/student-permits/components/student-profile-card'
 import { useConfirmationStore } from '@/stores/confirmation-store'
-import { delay } from '@/utils/time'
 
 const MOCK_STUDENT: IStudentProfile = {
   id: 1,
@@ -40,35 +34,22 @@ export function StudentDashboardView() {
   const [activeTab, setActiveTab] = useState<
     'sick' | 'leave_school' | 'leave_in'
   >('sick')
+  const [isScannerOpen, setIsScannerOpen] = useState(false)
 
   const navigate = useNavigate()
   const { logout } = useAuth()
-  const confirm = useConfirmationStore((state) => state.show)
+  const _confirm = useConfirmationStore((state) => state.show)
 
   const handleViewHistory = () => {
     navigate({ to: '/dashboard/student/attendance-history' })
   }
 
   const handleScanQR = () => {
-    toast.info('Fitur scan QR akan segera hadir')
+    setIsScannerOpen(true)
   }
 
-  const handleLogout = async () => {
-    confirm({
-      icon: IconLogout,
-      title: 'Confirm Logout',
-      description: 'Are you sure you want to log out?',
-      actionLabel: 'Log out',
-      actionVariant: 'destructive',
-      cancelLabel: 'Cancel',
-      onAction: async (props) => {
-        props.close()
-        await logout()
-        await delay(100)
-        toast.success('Logged out successfully')
-        await navigate({ to: '/login', replace: true })
-      },
-    })
+  const handleLogout = () => {
+    toast.info('Logout')
   }
 
   const calculateDays = (start: string, end: string): number => {
@@ -88,34 +69,38 @@ export function StudentDashboardView() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800">
-      <div className="absolute inset-0 opacity-10">
-        <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern
-              id="cloud-pattern"
-              x="0"
-              y="0"
-              width="200"
-              height="200"
-              patternUnits="userSpaceOnUse"
-            >
-              <circle cx="50" cy="50" r="30" fill="white" opacity="0.3" />
-              <circle cx="100" cy="100" r="40" fill="white" opacity="0.2" />
-              <circle cx="150" cy="50" r="25" fill="white" opacity="0.25" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#cloud-pattern)" />
-        </svg>
-      </div>
+    <>
+      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo-950 via-indigo-900 to-indigo-800">
+        <div className="absolute inset-0 opacity-10">
+          <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern
+                id="cloud-pattern"
+                x="0"
+                y="0"
+                width="200"
+                height="200"
+                patternUnits="userSpaceOnUse"
+              >
+                <circle cx="50" cy="50" r="30" fill="white" opacity="0.3" />
+                <circle cx="100" cy="100" r="40" fill="white" opacity="0.2" />
+                <circle cx="150" cy="50" r="25" fill="white" opacity="0.25" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#cloud-pattern)" />
+          </svg>
+        </div>
 
-      <div className="relative z-10 min-h-screen w-full bg-[#0B132B] py-6">
-        <div className="container mx-auto max-w-7xl px-4">
-          <div className="mb-8 flex items-center justify-between">
+        <div className="container relative z-10 mx-auto max-w-7xl px-4 py-8">
+          <div className="mb-8 flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white">
+              <h1 className="mb-2 text-3xl font-bold text-white">
                 Presensi Siswa Real-Time
               </h1>
+              <p className="text-sm text-indigo-200">
+                Monitor daily attendance, quickly scan student IDs, and manage
+                leave requests in one central hub.
+              </p>
             </div>
             <Button
               onClick={handleScanQR}
@@ -126,47 +111,43 @@ export function StudentDashboardView() {
             </Button>
           </div>
 
-          <Card className="rounded-2xl">
-            <CardHeader className="border-b pb-6">
-              <CardTitle className="text-xl font-bold text-foreground">
-                Pengajuan & Input Surat Izin
-              </CardTitle>
-              <CardDescription className="mt-1 text-sm text-muted-foreground">
-                Pencatatan resmi dispensasi, izin keluar, sakit, dan
-                keterlambatan siswa
-              </CardDescription>
-            </CardHeader>
+          <div className="mb-6">
+            <h2 className="mb-1 text-xl font-semibold text-white">
+              Pengajuan & Input Surat Izin
+            </h2>
+            <p className="text-sm text-indigo-200">
+              Pencatatan resmi dispensasi, izin keluar, sakit, dan keterlambatan
+              siswa
+            </p>
+          </div>
 
-            <CardContent className="pt-8">
-              <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-                <div className="lg:col-span-4">
-                  <StudentProfileCard
-                    student={MOCK_STUDENT}
-                    onViewHistory={handleViewHistory}
-                  />
-                  <div className="mt-6 flex justify-start">
-                    <Button
-                      variant="ghost"
-                      onClick={() => void handleLogout()}
-                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    >
-                      <IconLogout className="mr-2 h-4 w-4" />
-                      Keluar
-                    </Button>
-                  </div>
-                </div>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-1">
+              <div className="mb-4">
+                <h3 className="mb-3 text-base font-medium text-white">
+                  Data Siswa
+                </h3>
+                <StudentProfileCard
+                  student={MOCK_STUDENT}
+                  onViewHistory={handleViewHistory}
+                />
+              </div>
+            </div>
 
-                <div className="lg:col-span-8">
-                  <div className="space-y-6">
-                    <FieldGroup>
-                      <Field>
-                        <FieldLabel>Jenis Izin</FieldLabel>
-                        <LeaveTypeSelector
-                          value={activeTab}
-                          onChange={(value) => setActiveTab(value)}
-                        />
-                      </Field>
-                    </FieldGroup>
+            <div className="lg:col-span-2">
+              <h3 className="mb-3 text-base font-medium text-white">
+                Detail Pengajuan Izin
+              </h3>
+              <Card>
+                <CardContent className="pt-6">
+                  <FieldGroup>
+                    <Field>
+                      <FieldLabel>Jenis Izin</FieldLabel>
+                      <LeaveTypeSelector
+                        value={activeTab}
+                        onChange={(value) => setActiveTab(value)}
+                      />
+                    </Field>
 
                     {activeTab === 'sick' && (
                       <SickLeaveForm
@@ -193,13 +174,32 @@ export function StudentDashboardView() {
                         onCancel={handleCancel}
                       />
                     )}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                  </FieldGroup>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <Button
+              variant="ghost"
+              onClick={handleLogout}
+              className="text-white hover:bg-white/10 hover:text-white"
+            >
+              <IconLogout className="mr-2 h-4 w-4" />
+              Keluar
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+
+      <StudentAttendanceScanner
+        studentId={MOCK_STUDENT.id}
+        studentName={MOCK_STUDENT.name}
+        classroomName={MOCK_STUDENT.classroom_name}
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+      />
+    </>
   )
 }

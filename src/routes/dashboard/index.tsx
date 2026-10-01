@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { ForbiddenInline } from '@/components/composite/forbidden'
-import { Typography } from '@/components/ui/typography'
+import { AdminDashboardView } from '@/features/admin/views/admin-dashboard-view'
 import { StudentDashboardView } from '@/features/student-permits/views/student-dashboard-view'
 import { mustBeLoggedIn } from '@/utils/router'
 
@@ -16,14 +16,12 @@ export const Route = createFileRoute('/dashboard/')({
       return <StudentDashboardView />
     }
 
-    if (auth?.role?.isTeacher || auth?.role?.isAdmin) {
-      return (
-        <div className="flex h-full min-h-svh w-full flex-col items-center justify-center gap-6 p-6">
-          <Typography as="h1" variant="h1">
-            Dashboard Page
-          </Typography>
-        </div>
-      )
+    if (auth?.role?.isAdmin) {
+      return <AdminDashboardView />
+    }
+
+    if (auth?.role?.isTeacher) {
+      return <AdminDashboardView />
     }
 
     return <ForbiddenInline />

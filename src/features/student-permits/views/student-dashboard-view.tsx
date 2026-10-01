@@ -16,6 +16,7 @@ import { LeaveTypeSelector } from '@/features/student-permits/components/leave-t
 import { StudentAttendanceScanner } from '@/features/student-permits/components/student-attendance-scanner'
 import { StudentProfileCard } from '@/features/student-permits/components/student-profile-card'
 import { useConfirmationStore } from '@/stores/confirmation-store'
+import { delay } from '@/utils/time'
 
 const MOCK_STUDENT: IStudentProfile = {
   id: 1,
@@ -38,7 +39,7 @@ export function StudentDashboardView() {
 
   const navigate = useNavigate()
   const { logout } = useAuth()
-  const _confirm = useConfirmationStore((state) => state.show)
+  const confirm = useConfirmationStore((state) => state.show)
 
   const handleViewHistory = () => {
     navigate({ to: '/dashboard/student/attendance-history' })
@@ -49,7 +50,21 @@ export function StudentDashboardView() {
   }
 
   const handleLogout = () => {
-    toast.info('Logout')
+    confirm({
+      icon: IconLogout,
+      title: 'Confirm Logout',
+      description: 'Are you sure you want to log out?',
+      actionLabel: 'Log out',
+      actionVariant: 'destructive',
+      cancelLabel: 'Cancel',
+      onAction: async (props) => {
+        props.close()
+        await logout()
+        await delay(100)
+        toast.success('Logged out successfully')
+        await navigate({ to: '/login', replace: true })
+      },
+    })
   }
 
   const calculateDays = (start: string, end: string): number => {
@@ -180,11 +195,12 @@ export function StudentDashboardView() {
             </div>
           </div>
 
-          <div className="mt-8">
+          <div className="mt-8 flex justify-start">
             <Button
+              type="button"
               variant="ghost"
               onClick={handleLogout}
-              className="text-white hover:bg-white/10 hover:text-white"
+              className="text-red-300 hover:bg-red-500/10 hover:text-red-200"
             >
               <IconLogout className="mr-2 h-4 w-4" />
               Keluar

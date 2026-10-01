@@ -45,9 +45,8 @@ export function ExitLeaveForm({ student, onCancel }: ExitLeaveFormProps) {
       reason: '',
       emergency_contact: '',
     },
-    onSubmit: async (value) => {
+    onSubmit: async (_value) => {
       try {
-        console.log('Exit Leave submitted:', { ...value, files, date: today })
         toast.success('Pengajuan izin keluar berhasil dikirim!')
         setIsSuccessModalOpen(true)
       } catch {

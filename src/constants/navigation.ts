@@ -9,9 +9,9 @@ import {
   IconClipboardData,
   IconDoor,
   IconFileCheck,
-  IconHistory,
   IconLayoutDashboard,
   IconQrcode,
+  IconQrcodeOff,
   IconReportAnalytics,
   IconSettings,
   IconUsers,
@@ -83,6 +83,16 @@ export const DASHBOARD_NAVIGATION: Record<UserRole, DashboardNavGroup[]> = {
       ],
     },
     {
+      title: 'Monitoring',
+      items: [
+        {
+          title: 'Class Attendance Recap',
+          href: '/dashboard/attendance-recap',
+          icon: IconClipboardCheck,
+        },
+      ],
+    },
+    {
       title: 'Others',
       items: [
         {
@@ -106,7 +116,11 @@ export const DASHBOARD_NAVIGATION: Record<UserRole, DashboardNavGroup[]> = {
     {
       title: 'Teaching',
       items: [
-        { title: 'Student Data', href: '/dashboard/students', icon: IconUsers },
+        {
+          title: 'Student Data',
+          href: '/dashboard/teacher/students',
+          icon: IconUsers,
+        },
         {
           title: 'Teaching Schedule',
           href: '/dashboard/schedules',
@@ -118,19 +132,19 @@ export const DASHBOARD_NAVIGATION: Record<UserRole, DashboardNavGroup[]> = {
       title: 'Monitoring',
       items: [
         {
-          title: 'Attendance History',
-          href: '/dashboard/attendance-history',
-          icon: IconHistory,
-        },
-        {
-          title: 'Class Attendance Summary',
-          href: '/dashboard/attendance-summary',
+          title: 'Class Attendance Recap',
+          href: '/dashboard/attendance-recap',
           icon: IconClipboardCheck,
         },
         {
           title: 'Permits',
           href: '/dashboard/permits',
           icon: IconFileCheck,
+        },
+        {
+          title: 'Duty Teacher',
+          href: '/dashboard/duty-teacher',
+          icon: IconQrcodeOff,
         },
       ],
     },

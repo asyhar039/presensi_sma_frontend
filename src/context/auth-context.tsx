@@ -28,7 +28,7 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
   const value = useMemo<IAuthContext>((): IAuthContext => {
     return {
       user: userData || null,
-      role: parseRole(userData?.roles),
+      role: parseRole(userData?.role),
       refetch: async () => {
         await queryRefetch()
       },

@@ -16,6 +16,24 @@ export function getErrorMessage(
   return defaultMessage
 }
 
+export function setFormErrors(
+  form: AnyFormApi,
+  errors: Record<string, string[]>,
+): void {
+  const fields = Object.fromEntries(
+    Object.entries(errors).map(([key, value]) => {
+      const messages = Array.isArray(value) ? value : [value]
+      return [key, messages.map((message) => ({ message }))]
+    }),
+  )
+
+  form.setErrorMap({
+    onServer: {
+      fields,
+    },
+  })
+}
+
 export function formErrorHandler(
   error: unknown,
   form: AnyFormApi,
@@ -26,19 +44,7 @@ export function formErrorHandler(
     error.data &&
     Object.keys(error.data).length > 0
   ) {
-    const fields = Object.fromEntries(
-      Object.entries(error.data).map(([key, value]) => {
-        const messages = Array.isArray(value) ? value : [value]
-        return [key, messages.map((message) => ({ message }))]
-      }),
-    )
-
-    form.setErrorMap({
-      onServer: {
-        fields,
-      },
-    })
-
+    setFormErrors(form, error.data)
     return
   }
 

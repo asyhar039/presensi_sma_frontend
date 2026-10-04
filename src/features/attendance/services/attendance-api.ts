@@ -48,9 +48,8 @@ const CLASSROOMS: IClassOption[] = [
     name: 'X IPA 1',
     academic_year: {
       id: 1,
-      start_date: '2024-07-01',
-      end_date: '2025-06-30',
-      semester: 'Ganjil',
+      odd_start_date: '2024-07-01',
+      even_end_date: '2025-06-30',
     },
   },
   {
@@ -58,9 +57,8 @@ const CLASSROOMS: IClassOption[] = [
     name: 'X IPA 2',
     academic_year: {
       id: 1,
-      start_date: '2024-07-01',
-      end_date: '2025-06-30',
-      semester: 'Ganjil',
+      odd_start_date: '2024-07-01',
+      even_end_date: '2025-06-30',
     },
   },
   {
@@ -68,9 +66,8 @@ const CLASSROOMS: IClassOption[] = [
     name: 'X IPS 1',
     academic_year: {
       id: 1,
-      start_date: '2024-07-01',
-      end_date: '2025-06-30',
-      semester: 'Ganjil',
+      odd_start_date: '2024-07-01',
+      even_end_date: '2025-06-30',
     },
   },
   {
@@ -78,9 +75,8 @@ const CLASSROOMS: IClassOption[] = [
     name: 'XI IPA 1',
     academic_year: {
       id: 1,
-      start_date: '2024-07-01',
-      end_date: '2025-06-30',
-      semester: 'Ganjil',
+      odd_start_date: '2024-07-01',
+      even_end_date: '2025-06-30',
     },
   },
   {
@@ -88,9 +84,8 @@ const CLASSROOMS: IClassOption[] = [
     name: 'XI IPS 1',
     academic_year: {
       id: 1,
-      start_date: '2024-07-01',
-      end_date: '2025-06-30',
-      semester: 'Ganjil',
+      odd_start_date: '2024-07-01',
+      even_end_date: '2025-06-30',
     },
   },
   {
@@ -98,9 +93,8 @@ const CLASSROOMS: IClassOption[] = [
     name: 'XII IPA 1',
     academic_year: {
       id: 1,
-      start_date: '2024-07-01',
-      end_date: '2025-06-30',
-      semester: 'Ganjil',
+      odd_start_date: '2024-07-01',
+      even_end_date: '2025-06-30',
     },
   },
 ]

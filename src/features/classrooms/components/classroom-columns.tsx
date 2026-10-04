@@ -113,19 +113,7 @@ export function useClassroomColumns(): ColumnDef<
             return <span className="text-muted-foreground">-</span>
           return (
             <span className="whitespace-nowrap">
-              {formatAcademicLabel({
-                id: academicYear.id,
-                start_date: academicYear.start_date,
-                end_date: academicYear.end_date,
-                semester: academicYear.semester,
-                is_active: false,
-                created_at: '',
-                updated_at: '',
-              })}
-              <span className="text-muted-foreground">
-                {' '}
-                ({academicYear.semester})
-              </span>
+              {formatAcademicLabel(academicYear)}
             </span>
           )
         },

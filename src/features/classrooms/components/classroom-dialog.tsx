@@ -37,7 +37,7 @@ const NO_TEACHER_VALUE = 'none'
 function useAcademicYearOptions() {
   const query = useQuery(academicYearsQueryOptions({ page: 1, per_page: 50 }))
   const options = (query.data?.items ?? []).map((item) => ({
-    label: `${formatAcademicLabel(item)} (${item.semester})`,
+    label: formatAcademicLabel(item),
     value: String(item.id),
   }))
   return { ...query, options }
@@ -254,19 +254,7 @@ function ClassroomDetail({ item }: { item: IClassroom }) {
         <DetailRow label="Classroom Name" value={data.name} />
         <DetailRow
           label="Academic Year"
-          value={
-            academicYear
-              ? `${formatAcademicLabel({
-                  id: academicYear.id,
-                  start_date: academicYear.start_date,
-                  end_date: academicYear.end_date,
-                  semester: academicYear.semester,
-                  is_active: false,
-                  created_at: '',
-                  updated_at: '',
-                })} (${academicYear.semester})`
-              : '-'
-          }
+          value={academicYear ? formatAcademicLabel(academicYear) : '-'}
         />
         <DetailRow label="Homeroom Teacher" value={teacher?.name ?? '-'} />
         <DetailRow

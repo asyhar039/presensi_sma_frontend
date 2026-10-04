@@ -12,9 +12,11 @@ export interface IClassroomUser {
 
 export interface IClassroomAcademicYear {
   id: number
-  start_date: string
-  end_date: string
-  semester: string
+  odd_start_date: string
+  even_end_date: string
+  start_date?: string
+  end_date?: string
+  semester?: string
 }
 
 export interface IClassroomStudentUser {

@@ -1,12 +1,9 @@
-export const ACADEMIC_YEAR_SEMESTERS = ['odd', 'even'] as const
-
-export type AcademicYearSemester = (typeof ACADEMIC_YEAR_SEMESTERS)[number]
-
 export type AcademicYearSortBy =
   | 'id'
-  | 'start_date'
-  | 'end_date'
-  | 'semester'
+  | 'odd_start_date'
+  | 'odd_end_date'
+  | 'even_start_date'
+  | 'even_end_date'
   | 'is_active'
   | 'created_at'
 
@@ -14,9 +11,10 @@ export type AcademicYearOrder = 'asc' | 'desc'
 
 export interface IAcademicYear {
   id: number
-  start_date: string
-  end_date: string
-  semester: string
+  odd_start_date: string
+  odd_end_date: string
+  even_start_date: string
+  even_end_date: string
   is_active: boolean
   created_at: string
   updated_at: string
@@ -25,18 +23,17 @@ export interface IAcademicYear {
 export interface IAcademicYearParams {
   page?: number
   per_page?: number
-  search?: string
-  semester?: string
   year?: number
   sortBy?: string
   order?: string
 }
 
 export interface IAcademicYearPayload {
-  start_date: string
-  end_date: string
-  semester: AcademicYearSemester
-  is_active: boolean
+  odd_start_date?: string
+  odd_end_date?: string
+  even_start_date?: string
+  even_end_date?: string
+  is_active?: boolean
 }
 
 export interface IAcademicYearPaginationMeta {

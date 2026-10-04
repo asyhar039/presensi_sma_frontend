@@ -41,7 +41,7 @@ function AcademicYearActions({ item }: { item: IAcademicYear }) {
     showConfirmation({
       icon: IconTrash,
       title: 'Delete academic year?',
-      description: `This will permanently delete the ${formatSemester(item.semester)} academic year. This action cannot be undone.`,
+      description: `This will permanently delete the ${formatAcademicLabel(item)} academic year. This action cannot be undone.`,
       actionLabel: 'Delete',
       actionVariant: 'destructive',
       onAction: async ({ close, loading }) => {
@@ -91,24 +91,27 @@ function StatusBadge({ isActive }: { isActive: boolean }) {
   return <Badge variant="outline">Inactive</Badge>
 }
 
-function SemesterBadge({ value }: { value: string }) {
-  if (value === 'odd') return <Badge variant="default">Odd</Badge>
-  return <Badge variant="secondary">{formatSemester(value)}</Badge>
-}
-
-export function formatSemester(value: string): string {
-  const normalized = value.toLowerCase()
-  if (normalized === 'odd') return 'Odd'
-  if (normalized === 'even') return 'Even'
-  return value
-}
-
-export function formatAcademicLabel(item: IAcademicYear): string {
-  const startYear = formatDate(item.start_date, 'YYYY', '')
-  const endYear = formatDate(item.end_date, 'YYYY', '')
+export function formatAcademicLabel(
+  item: Pick<IAcademicYear, 'id' | 'odd_start_date' | 'even_end_date'> & {
+    start_date?: string
+    end_date?: string
+  },
+): string {
+  const start = item.odd_start_date ?? item.start_date
+  const end = item.even_end_date ?? item.end_date
+  const startYear = formatDate(start, 'YYYY', '')
+  const endYear = formatDate(end, 'YYYY', '')
   if (!startYear || !endYear) return `#${item.id}`
   if (startYear === endYear) return startYear
   return `${startYear}/${endYear}`
+}
+
+function DateCell({ value }: { value: string }) {
+  return (
+    <span className="whitespace-nowrap">
+      {formatDate(value, DATE_FORMAT.DATE)}
+    </span>
+  )
 }
 
 export function useAcademicYearColumns(): ColumnDef<
@@ -129,27 +132,24 @@ export function useAcademicYearColumns(): ColumnDef<
         ),
       },
       {
-        accessorKey: 'semester',
-        header: dataTableHeader('Semester'),
-        cell: ({ row }) => <SemesterBadge value={row.original.semester} />,
+        accessorKey: 'odd_start_date',
+        header: dataTableHeader('Odd Start'),
+        cell: ({ row }) => <DateCell value={row.original.odd_start_date} />,
       },
       {
-        accessorKey: 'start_date',
-        header: dataTableHeader('Start Date'),
-        cell: ({ row }) => (
-          <span className="whitespace-nowrap">
-            {formatDate(row.original.start_date, DATE_FORMAT.DATE)}
-          </span>
-        ),
+        accessorKey: 'odd_end_date',
+        header: dataTableHeader('Odd End'),
+        cell: ({ row }) => <DateCell value={row.original.odd_end_date} />,
       },
       {
-        accessorKey: 'end_date',
-        header: dataTableHeader('End Date'),
-        cell: ({ row }) => (
-          <span className="whitespace-nowrap">
-            {formatDate(row.original.end_date, DATE_FORMAT.DATE)}
-          </span>
-        ),
+        accessorKey: 'even_start_date',
+        header: dataTableHeader('Even Start'),
+        cell: ({ row }) => <DateCell value={row.original.even_start_date} />,
+      },
+      {
+        accessorKey: 'even_end_date',
+        header: dataTableHeader('Even End'),
+        cell: ({ row }) => <DateCell value={row.original.even_end_date} />,
       },
       {
         accessorKey: 'is_active',

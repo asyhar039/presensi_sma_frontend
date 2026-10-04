@@ -63,8 +63,7 @@ function ClassFilterSelect() {
       <SelectContent>
         {classes.map((cls) => (
           <SelectItem key={cls.id} value={String(cls.id)}>
-            {cls.name}{' '}
-            {cls.academic_year ? `(${cls.academic_year.semester})` : ''}
+            {cls.name}
           </SelectItem>
         ))}
       </SelectContent>

@@ -5,7 +5,7 @@ import { classroomSearch } from '@/features/classrooms/schemas/classroom-search'
 import { ClassroomView } from '@/features/classrooms/views/classroom-view'
 import { mustBeLoggedIn } from '@/utils/router'
 
-export const Route = createFileRoute('/dashboard/classrooms')({
+export const Route = createFileRoute('/dashboard/classrooms/')({
   beforeLoad: async ({ context, location }) => {
     await mustBeLoggedIn(context, location)
   },

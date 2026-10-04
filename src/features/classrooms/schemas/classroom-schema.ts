@@ -15,3 +15,14 @@ export const classroomSchema = v.object({
 })
 
 export type IClassroomSchema = v.InferOutput<typeof classroomSchema>
+
+export const classroomMembersSchema = v.object({
+  student_ids: v.pipe(
+    v.array(v.string()),
+    v.minLength(1, 'Select at least one student.'),
+  ),
+})
+
+export type IClassroomMembersSchema = v.InferOutput<
+  typeof classroomMembersSchema
+>

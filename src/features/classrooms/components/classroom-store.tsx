@@ -2,7 +2,7 @@ import type { IClassroom } from '@/features/classrooms/types/classroom.types'
 
 import zustandContext from '@/components/composite/zustand-context'
 
-export type ClassroomDialogMode = 'create' | 'edit' | 'view'
+export type ClassroomDialogMode = 'create' | 'edit'
 
 interface ClassroomState {
   selected: IClassroom | null
@@ -10,8 +10,8 @@ interface ClassroomState {
   isDialogOpen: boolean
   openCreate: () => void
   openEdit: (item: IClassroom) => void
-  openView: (item: IClassroom) => void
   closeDialog: () => void
+  settleDialog: () => void
 }
 
 export const [ClassroomProvider, useClassroomStore] =
@@ -24,10 +24,8 @@ export const [ClassroomProvider, useClassroomStore] =
         set({ selected: null, mode: 'create', isDialogOpen: true }),
       openEdit: (item) =>
         set({ selected: item, mode: 'edit', isDialogOpen: true }),
-      openView: (item) =>
-        set({ selected: item, mode: 'view', isDialogOpen: true }),
-      closeDialog: () =>
-        set({ selected: null, mode: null, isDialogOpen: false }),
+      closeDialog: () => set({ isDialogOpen: false }),
+      settleDialog: () => set({ selected: null, mode: null }),
     }),
     'useClassroomStore must be used within a ClassroomProvider',
   )

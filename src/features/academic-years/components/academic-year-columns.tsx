@@ -92,15 +92,10 @@ function StatusBadge({ isActive }: { isActive: boolean }) {
 }
 
 export function formatAcademicLabel(
-  item: Pick<IAcademicYear, 'id' | 'odd_start_date' | 'even_end_date'> & {
-    start_date?: string
-    end_date?: string
-  },
+  item: Pick<IAcademicYear, 'id' | 'odd_start_date' | 'even_end_date'>,
 ): string {
-  const start = item.odd_start_date ?? item.start_date
-  const end = item.even_end_date ?? item.end_date
-  const startYear = formatDate(start, 'YYYY', '')
-  const endYear = formatDate(end, 'YYYY', '')
+  const startYear = formatDate(item.odd_start_date, 'YYYY', '')
+  const endYear = formatDate(item.even_end_date, 'YYYY', '')
   if (!startYear || !endYear) return `#${item.id}`
   if (startYear === endYear) return startYear
   return `${startYear}/${endYear}`

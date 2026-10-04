@@ -11,6 +11,8 @@ import { useCallback, useMemo, useRef } from 'react'
 
 import {
   Combobox,
+  ComboboxChip,
+  ComboboxChipRemove,
   ComboboxChips,
   ComboboxClear,
   ComboboxEmpty,
@@ -21,6 +23,7 @@ import {
   ComboboxPopup,
   ComboboxPositioner,
   ComboboxStatus,
+  ComboboxValue,
 } from '@/components/ui/combobox'
 import { Spinner } from '@/components/ui/spinner'
 import { useDebounceRef } from '@/hooks/use-debounce-ref'
@@ -204,6 +207,7 @@ export function ApiCombobox<T extends ApiComboboxOption = ApiComboboxOption>({
   }, [])
 
   const containerRef = useRef<HTMLDivElement>(null)
+  const positionerRef = useRef<HTMLDivElement | null>(null)
 
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>) => {
@@ -262,9 +266,23 @@ export function ApiCombobox<T extends ApiComboboxOption = ApiComboboxOption>({
       }}
     >
       {multiple ? (
-        <ComboboxChips>
-          <ComboboxInput placeholder={placeholder} />
-          <ComboboxClear />
+        <ComboboxChips ref={positionerRef}>
+          <ComboboxValue>
+            {(items: T[]) => (
+              <>
+                {items.map((item) => (
+                  <ComboboxChip key={item.value} aria-label={item.value}>
+                    {item.label}
+                    <ComboboxChipRemove />
+                  </ComboboxChip>
+                ))}
+                <ComboboxInput
+                  placeholder={placeholder}
+                  className="flex-1 h-6 border-0 bg-transparent pl-2 text-base outline-none shadow-none focus-visible:ring-0"
+                />
+              </>
+            )}
+          </ComboboxValue>
         </ComboboxChips>
       ) : (
         <div className="relative flex flex-col gap-2">
@@ -276,7 +294,7 @@ export function ApiCombobox<T extends ApiComboboxOption = ApiComboboxOption>({
         </div>
       )}
 
-      <ComboboxPositioner sideOffset={6}>
+      <ComboboxPositioner sideOffset={6} anchor={positionerRef}>
         <ComboboxPopup>
           <div
             ref={containerRef}

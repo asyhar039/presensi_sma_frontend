@@ -1,41 +1,62 @@
+import type { IAcademicYear } from '@/features/academic-years/types/academic-year.types'
+import type { ITeacher } from '@/features/teachers/types/teacher.types'
+
 export type ClassroomSortBy = 'id' | 'created_at'
 
 export type ClassroomOrder = 'asc' | 'desc'
 
-export interface IClassroomUser {
+export interface IClassroomAcademicYearBrief {
+  label: string
+  value: number
+}
+
+export interface IClassroomHomeroomBrief {
   id: number
-  identity_number: string
   name: string
   email: string
-  phone_number: string | null
-}
-
-export interface IClassroomAcademicYear {
-  id: number
-  odd_start_date: string
-  even_end_date: string
-  start_date?: string
-  end_date?: string
-  semester?: string
-}
-
-export interface IClassroomStudentUser {
-  id: number
-  name: string
-}
-
-export interface IClassroomStudent {
-  id: number
-  user: IClassroomStudentUser
 }
 
 export interface IClassroom {
   id: number
   name: string
-  academic_year: IClassroomAcademicYear | null
-  user: IClassroomUser | null
+  academic_year: IClassroomAcademicYearBrief | null
+  homeroom_teacher: IClassroomHomeroomBrief | null
   students_count: number
-  students?: IClassroomStudent[]
+  created_at: string
+  updated_at: string
+}
+
+export interface IClassroomDetail {
+  id: number
+  name: string
+  academic_year: IAcademicYear | null
+  homeroom_teacher: ITeacher | null
+  students_count: number
+  created_at: string
+  updated_at: string
+}
+
+export interface IClassroomMemberUser {
+  id: number
+  identity_number: string
+  name: string
+  email: string
+  phone_number: string | null
+  email_verified_at: string | null
+  role: string
+}
+
+export interface IClassroomMemberLabel {
+  key: string
+  label: string
+}
+
+export interface IClassroomMember {
+  id: number
+  user: IClassroomMemberUser
+  gender: IClassroomMemberLabel
+  address: string | null
+  status: IClassroomMemberLabel
   created_at: string
   updated_at: string
 }
@@ -52,7 +73,12 @@ export interface IClassroomParams {
 export interface IClassroomPayload {
   name: string
   academic_year_id: number
-  homeroom_teacher_id: number | null
+  homeroom_teacher_id?: number | null
+}
+
+export interface IClassroomMemberParams {
+  page?: number
+  per_page?: number
 }
 
 export interface IClassroomPaginationMeta {
@@ -64,5 +90,10 @@ export interface IClassroomPaginationMeta {
 
 export interface IClassroomListResult {
   items: IClassroom[]
+  meta: IClassroomPaginationMeta
+}
+
+export interface IClassroomMemberListResult {
+  items: IClassroomMember[]
   meta: IClassroomPaginationMeta
 }

@@ -14,7 +14,6 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardAcademicYearsRouteImport } from './routes/dashboard/academic-years'
-import { Route as DashboardClassroomsRouteImport } from './routes/dashboard/classrooms'
 import { Route as DashboardDutyTeacherRouteImport } from './routes/dashboard/duty-teacher'
 import { Route as DashboardPermitsRouteImport } from './routes/dashboard/permits'
 import { Route as DashboardRoomsRouteImport } from './routes/dashboard/rooms'
@@ -24,6 +23,8 @@ import { Route as DashboardSubjectsRouteImport } from './routes/dashboard/subjec
 import { Route as DashboardTeachersRouteImport } from './routes/dashboard/teachers'
 import { Route as DashboardAttendanceRecapIndexRouteImport } from './routes/dashboard/attendance-recap/index'
 import { Route as DashboardAttendanceRecapStudentIdRouteImport } from './routes/dashboard/attendance-recap/$studentId'
+import { Route as DashboardClassroomsIndexRouteImport } from './routes/dashboard/classrooms/index'
+import { Route as DashboardClassroomsClassroomIdRouteImport } from './routes/dashboard/classrooms/$classroomId'
 import { Route as DashboardSettingsIndexRouteImport } from './routes/dashboard/settings.index'
 import { Route as DashboardSettingsPublicHolidaysRouteImport } from './routes/dashboard/settings.public-holidays'
 import { Route as DashboardSettingsSchoolZonesRouteImport } from './routes/dashboard/settings.school-zones'
@@ -53,11 +54,6 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
 const DashboardAcademicYearsRoute = DashboardAcademicYearsRouteImport.update({
   id: '/academic-years',
   path: '/academic-years',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardClassroomsRoute = DashboardClassroomsRouteImport.update({
-  id: '/classrooms',
-  path: '/classrooms',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardDutyTeacherRoute = DashboardDutyTeacherRouteImport.update({
@@ -107,6 +103,18 @@ const DashboardAttendanceRecapStudentIdRoute =
     path: '/attendance-recap/$studentId',
     getParentRoute: () => DashboardRoute,
   } as any)
+const DashboardClassroomsIndexRoute =
+  DashboardClassroomsIndexRouteImport.update({
+    id: '/classrooms/',
+    path: '/classrooms/',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardClassroomsClassroomIdRoute =
+  DashboardClassroomsClassroomIdRouteImport.update({
+    id: '/classrooms/$classroomId',
+    path: '/classrooms/$classroomId',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardSettingsIndexRoute = DashboardSettingsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -142,7 +150,6 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/login': typeof AuthLoginRoute
   '/dashboard/academic-years': typeof DashboardAcademicYearsRoute
-  '/dashboard/classrooms': typeof DashboardClassroomsRoute
   '/dashboard/duty-teacher': typeof DashboardDutyTeacherRoute
   '/dashboard/permits': typeof DashboardPermitsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
@@ -152,18 +159,19 @@ export interface FileRoutesByFullPath {
   '/dashboard/teachers': typeof DashboardTeachersRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/attendance-recap/$studentId': typeof DashboardAttendanceRecapStudentIdRoute
+  '/dashboard/classrooms/$classroomId': typeof DashboardClassroomsClassroomIdRoute
   '/dashboard/settings/public-holidays': typeof DashboardSettingsPublicHolidaysRoute
   '/dashboard/settings/school-zones': typeof DashboardSettingsSchoolZonesRoute
   '/dashboard/student/attendance-history': typeof DashboardStudentAttendanceHistoryRoute
   '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
   '/dashboard/attendance-recap/': typeof DashboardAttendanceRecapIndexRoute
+  '/dashboard/classrooms/': typeof DashboardClassroomsIndexRoute
   '/dashboard/settings/': typeof DashboardSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof AuthLoginRoute
   '/dashboard/academic-years': typeof DashboardAcademicYearsRoute
-  '/dashboard/classrooms': typeof DashboardClassroomsRoute
   '/dashboard/duty-teacher': typeof DashboardDutyTeacherRoute
   '/dashboard/permits': typeof DashboardPermitsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
@@ -172,11 +180,13 @@ export interface FileRoutesByTo {
   '/dashboard/teachers': typeof DashboardTeachersRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/attendance-recap/$studentId': typeof DashboardAttendanceRecapStudentIdRoute
+  '/dashboard/classrooms/$classroomId': typeof DashboardClassroomsClassroomIdRoute
   '/dashboard/settings/public-holidays': typeof DashboardSettingsPublicHolidaysRoute
   '/dashboard/settings/school-zones': typeof DashboardSettingsSchoolZonesRoute
   '/dashboard/student/attendance-history': typeof DashboardStudentAttendanceHistoryRoute
   '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
   '/dashboard/attendance-recap': typeof DashboardAttendanceRecapIndexRoute
+  '/dashboard/classrooms': typeof DashboardClassroomsIndexRoute
   '/dashboard/settings': typeof DashboardSettingsIndexRoute
 }
 export interface FileRoutesById {
@@ -185,7 +195,6 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/dashboard/academic-years': typeof DashboardAcademicYearsRoute
-  '/dashboard/classrooms': typeof DashboardClassroomsRoute
   '/dashboard/duty-teacher': typeof DashboardDutyTeacherRoute
   '/dashboard/permits': typeof DashboardPermitsRoute
   '/dashboard/rooms': typeof DashboardRoomsRoute
@@ -195,11 +204,13 @@ export interface FileRoutesById {
   '/dashboard/teachers': typeof DashboardTeachersRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/attendance-recap/$studentId': typeof DashboardAttendanceRecapStudentIdRoute
+  '/dashboard/classrooms/$classroomId': typeof DashboardClassroomsClassroomIdRoute
   '/dashboard/settings/public-holidays': typeof DashboardSettingsPublicHolidaysRoute
   '/dashboard/settings/school-zones': typeof DashboardSettingsSchoolZonesRoute
   '/dashboard/student/attendance-history': typeof DashboardStudentAttendanceHistoryRoute
   '/dashboard/teacher/students': typeof DashboardTeacherStudentsRoute
   '/dashboard/attendance-recap/': typeof DashboardAttendanceRecapIndexRoute
+  '/dashboard/classrooms/': typeof DashboardClassroomsIndexRoute
   '/dashboard/settings/': typeof DashboardSettingsIndexRoute
 }
 export interface FileRouteTypes {
@@ -209,7 +220,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/dashboard/academic-years'
-    | '/dashboard/classrooms'
     | '/dashboard/duty-teacher'
     | '/dashboard/permits'
     | '/dashboard/rooms'
@@ -219,18 +229,19 @@ export interface FileRouteTypes {
     | '/dashboard/teachers'
     | '/dashboard/'
     | '/dashboard/attendance-recap/$studentId'
+    | '/dashboard/classrooms/$classroomId'
     | '/dashboard/settings/public-holidays'
     | '/dashboard/settings/school-zones'
     | '/dashboard/student/attendance-history'
     | '/dashboard/teacher/students'
     | '/dashboard/attendance-recap/'
+    | '/dashboard/classrooms/'
     | '/dashboard/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/dashboard/academic-years'
-    | '/dashboard/classrooms'
     | '/dashboard/duty-teacher'
     | '/dashboard/permits'
     | '/dashboard/rooms'
@@ -239,11 +250,13 @@ export interface FileRouteTypes {
     | '/dashboard/teachers'
     | '/dashboard'
     | '/dashboard/attendance-recap/$studentId'
+    | '/dashboard/classrooms/$classroomId'
     | '/dashboard/settings/public-holidays'
     | '/dashboard/settings/school-zones'
     | '/dashboard/student/attendance-history'
     | '/dashboard/teacher/students'
     | '/dashboard/attendance-recap'
+    | '/dashboard/classrooms'
     | '/dashboard/settings'
   id:
     | '__root__'
@@ -251,7 +264,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/_auth/login'
     | '/dashboard/academic-years'
-    | '/dashboard/classrooms'
     | '/dashboard/duty-teacher'
     | '/dashboard/permits'
     | '/dashboard/rooms'
@@ -261,11 +273,13 @@ export interface FileRouteTypes {
     | '/dashboard/teachers'
     | '/dashboard/'
     | '/dashboard/attendance-recap/$studentId'
+    | '/dashboard/classrooms/$classroomId'
     | '/dashboard/settings/public-holidays'
     | '/dashboard/settings/school-zones'
     | '/dashboard/student/attendance-history'
     | '/dashboard/teacher/students'
     | '/dashboard/attendance-recap/'
+    | '/dashboard/classrooms/'
     | '/dashboard/settings/'
   fileRoutesById: FileRoutesById
 }
@@ -310,13 +324,6 @@ declare module '@tanstack/react-router' {
       path: '/academic-years'
       fullPath: '/dashboard/academic-years'
       preLoaderRoute: typeof DashboardAcademicYearsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/classrooms': {
-      id: '/dashboard/classrooms'
-      path: '/classrooms'
-      fullPath: '/dashboard/classrooms'
-      preLoaderRoute: typeof DashboardClassroomsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/duty-teacher': {
@@ -382,6 +389,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAttendanceRecapStudentIdRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/classrooms/': {
+      id: '/dashboard/classrooms/'
+      path: '/classrooms'
+      fullPath: '/dashboard/classrooms/'
+      preLoaderRoute: typeof DashboardClassroomsIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/classrooms/$classroomId': {
+      id: '/dashboard/classrooms/$classroomId'
+      path: '/classrooms/$classroomId'
+      fullPath: '/dashboard/classrooms/$classroomId'
+      preLoaderRoute: typeof DashboardClassroomsClassroomIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/settings/': {
       id: '/dashboard/settings/'
       path: '/'
@@ -437,7 +458,6 @@ const DashboardSettingsRouteWithChildren =
 
 interface DashboardRouteChildren {
   DashboardAcademicYearsRoute: typeof DashboardAcademicYearsRoute
-  DashboardClassroomsRoute: typeof DashboardClassroomsRoute
   DashboardDutyTeacherRoute: typeof DashboardDutyTeacherRoute
   DashboardPermitsRoute: typeof DashboardPermitsRoute
   DashboardRoomsRoute: typeof DashboardRoomsRoute
@@ -447,14 +467,15 @@ interface DashboardRouteChildren {
   DashboardTeachersRoute: typeof DashboardTeachersRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardAttendanceRecapStudentIdRoute: typeof DashboardAttendanceRecapStudentIdRoute
+  DashboardClassroomsClassroomIdRoute: typeof DashboardClassroomsClassroomIdRoute
   DashboardStudentAttendanceHistoryRoute: typeof DashboardStudentAttendanceHistoryRoute
   DashboardTeacherStudentsRoute: typeof DashboardTeacherStudentsRoute
   DashboardAttendanceRecapIndexRoute: typeof DashboardAttendanceRecapIndexRoute
+  DashboardClassroomsIndexRoute: typeof DashboardClassroomsIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAcademicYearsRoute: DashboardAcademicYearsRoute,
-  DashboardClassroomsRoute: DashboardClassroomsRoute,
   DashboardDutyTeacherRoute: DashboardDutyTeacherRoute,
   DashboardPermitsRoute: DashboardPermitsRoute,
   DashboardRoomsRoute: DashboardRoomsRoute,
@@ -465,10 +486,12 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardAttendanceRecapStudentIdRoute:
     DashboardAttendanceRecapStudentIdRoute,
+  DashboardClassroomsClassroomIdRoute: DashboardClassroomsClassroomIdRoute,
   DashboardStudentAttendanceHistoryRoute:
     DashboardStudentAttendanceHistoryRoute,
   DashboardTeacherStudentsRoute: DashboardTeacherStudentsRoute,
   DashboardAttendanceRecapIndexRoute: DashboardAttendanceRecapIndexRoute,
+  DashboardClassroomsIndexRoute: DashboardClassroomsIndexRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(

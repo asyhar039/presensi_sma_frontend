@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { ForbiddenInline } from '@/components/composite/forbidden'
+import { HomeroomPermitView } from '@/features/homeroom/views/homeroom-permit-view'
 import { permitSearchSchema } from '@/features/permits/schemas/permit-search'
-import { TeacherPermitView } from '@/features/permits/views/teacher-permit-view'
 import { mustBeLoggedIn } from '@/utils/router'
 
 export const Route = createFileRoute('/dashboard/permits')({
@@ -15,6 +15,6 @@ export const Route = createFileRoute('/dashboard/permits')({
     if (!auth?.role?.isTeacher && !auth?.role?.isAdmin) {
       return <ForbiddenInline />
     }
-    return <TeacherPermitView />
+    return <HomeroomPermitView />
   },
 })

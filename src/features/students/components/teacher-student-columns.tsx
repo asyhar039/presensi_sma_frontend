@@ -1,6 +1,9 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import type { DataTableFeatures } from '@/components/data-table/data-table'
-import type { IStudent } from '@/features/students/types/student.types'
+import type {
+  IStudent,
+  IStudentLabel,
+} from '@/features/students/types/student.types'
 
 import { IconEye } from '@tabler/icons-react'
 import { useMemo } from 'react'
@@ -18,7 +21,11 @@ import { DATE_FORMAT } from '@/constants/app'
 import { useStudentStore } from '@/features/students/components/student-store'
 import { formatDate } from '@/utils/datetime'
 
-function TeacherStudentActions({ item }: { item: IStudent }) {
+interface TeacherStudentActionsProps {
+  item: IStudent
+}
+
+function TeacherStudentActions({ item }: TeacherStudentActionsProps) {
   const openView = useStudentStore((state) => state.openView)
 
   return (
@@ -33,23 +40,26 @@ function TeacherStudentActions({ item }: { item: IStudent }) {
       <DropdownMenuContent align="end" side="bottom" className="w-44">
         <DropdownMenuItem onClick={() => openView(item)}>
           <IconEye />
-          <span>Lihat Detail</span>
+          <span>View Details</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
 }
 
-function GenderBadge({ gender }: { gender: IStudent['gender'] }) {
-  return <Badge variant="secondary">{gender.label || gender.key}</Badge>
+interface LabelBadgeProps {
+  label: IStudentLabel
 }
 
-function StatusBadge({ status }: { status: IStudent['status'] }) {
-  const key = status.key.toLowerCase()
-  if (key === 'active') return <Badge variant="default">{status.label}</Badge>
-  if (key === 'graduated')
-    return <Badge variant="default">{status.label}</Badge>
-  return <Badge variant="outline">{status.label}</Badge>
+function GenderBadge({ label }: LabelBadgeProps) {
+  return <Badge variant="secondary">{label.label || label.key}</Badge>
+}
+
+function StatusBadge({ label }: LabelBadgeProps) {
+  const key = label.key.toLowerCase()
+  if (key === 'active') return <Badge variant="default">{label.label}</Badge>
+  if (key === 'graduated') return <Badge variant="default">{label.label}</Badge>
+  return <Badge variant="outline">{label.label}</Badge>
 }
 
 export function useTeacherStudentColumns(): ColumnDef<
@@ -62,14 +72,14 @@ export function useTeacherStudentColumns(): ColumnDef<
       {
         id: 'name',
         accessorKey: 'name',
-        header: dataTableHeader('Nama'),
+        header: dataTableHeader('Name'),
         cell: ({ row }) => (
           <div className="flex min-w-0 flex-col">
             <span className="font-medium whitespace-nowrap">
               {row.original.user.name}
             </span>
             <span className="text-xs whitespace-nowrap text-muted-foreground">
-              NIS: {row.original.user.identity_number}
+              {row.original.user.identity_number}
             </span>
           </div>
         ),
@@ -86,19 +96,19 @@ export function useTeacherStudentColumns(): ColumnDef<
       },
       {
         id: 'gender',
-        header: dataTableHeader('Jenis Kelamin'),
+        header: dataTableHeader('Gender'),
         enableSorting: false,
-        cell: ({ row }) => <GenderBadge gender={row.original.gender} />,
+        cell: ({ row }) => <GenderBadge label={row.original.gender} />,
       },
       {
         id: 'status',
         header: dataTableHeader('Status'),
         enableSorting: false,
-        cell: ({ row }) => <StatusBadge status={row.original.status} />,
+        cell: ({ row }) => <StatusBadge label={row.original.status} />,
       },
       {
         accessorKey: 'created_at',
-        header: dataTableHeader('Dibuat'),
+        header: dataTableHeader('Created'),
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-muted-foreground">
             {formatDate(row.original.created_at, DATE_FORMAT.DATE)}
@@ -107,7 +117,7 @@ export function useTeacherStudentColumns(): ColumnDef<
       },
       {
         id: 'actions',
-        header: dataTableHeader('Aksi'),
+        header: dataTableHeader('Actions'),
         enableSorting: false,
         cell: ({ row }) => (
           <div className="flex justify-end">

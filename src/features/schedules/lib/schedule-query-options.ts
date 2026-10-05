@@ -1,6 +1,9 @@
 import { queryOptions } from '@tanstack/react-query'
 
-import { getClassSchedules } from '@/features/schedules/services/schedule-api'
+import {
+  getClassSchedules,
+  getMyTeachingSchedules,
+} from '@/features/schedules/services/schedule-api'
 import { daySchedulesQueryOptions } from '@/features/settings/lib/settings-query-options'
 
 export const scheduleKeys = {
@@ -23,3 +26,15 @@ export function classSchedulesQueryOptions(
 }
 
 export { daySchedulesQueryOptions }
+
+export const teacherScheduleKeys = {
+  all: ['my-teaching-schedules'] as const,
+}
+
+export function myTeachingSchedulesQueryOptions() {
+  return queryOptions({
+    queryKey: teacherScheduleKeys.all,
+    queryFn: getMyTeachingSchedules,
+    staleTime: 30_000,
+  })
+}

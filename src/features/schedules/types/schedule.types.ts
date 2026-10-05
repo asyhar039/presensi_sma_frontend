@@ -58,3 +58,19 @@ export interface ISelectedSlot {
   draft: IDraftRange
   entry: IClassSchedule | null
 }
+
+export interface ITeacherScheduleSubject {
+  id: number
+  name: string
+}
+
+export interface ITeacherSchedule {
+  id: number
+  classroom: { id: number; name: string }
+  day: string
+  start_time: string
+  end_time: string
+  subjects: ITeacherScheduleSubject[]
+}
+
+export type ITeacherScheduleWeek = Record<WeekDay, ITeacherSchedule[]>

@@ -1,6 +1,7 @@
 import type {
   IClassSchedule,
   ICreateClassSchedulePayload,
+  ITeacherScheduleWeek,
   IUpdateClassSchedulePayload,
 } from '@/features/schedules/types/schedule.types'
 import type {
@@ -115,4 +116,8 @@ export function getTeacherScheduleDropdownSelected(
   params: DropdownSelectedParams,
 ) {
   return selected('/teachers/dropdown/selected', params)
+}
+
+export function getMyTeachingSchedules() {
+  return api.get<ITeacherScheduleWeek>('/subject/schedules')
 }

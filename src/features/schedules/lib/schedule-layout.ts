@@ -1,27 +1,37 @@
-import type { IClassSchedule } from '@/features/schedules/types/schedule.types'
+import type {
+  IClassSchedule,
+  ITeacherSchedule,
+} from '@/features/schedules/types/schedule.types'
 
 import { toMinutes } from '@/features/schedules/lib/schedule-time'
 
+type Placeable = Pick<
+  IClassSchedule | ITeacherSchedule,
+  'start_time' | 'end_time'
+>
+
 export interface PlacedEvent {
-  event: IClassSchedule
+  event: Placeable
   lane: number
   lanes: number
 }
 
-function overlaps(a: IClassSchedule, b: IClassSchedule): boolean {
+function overlaps(a: Placeable, b: Placeable): boolean {
   return (
     toMinutes(a.start_time) < toMinutes(b.end_time) &&
     toMinutes(b.start_time) < toMinutes(a.end_time)
   )
 }
 
-export function layoutDayEvents(events: IClassSchedule[]): PlacedEvent[] {
+export function layoutDayEvents<T extends Placeable>(
+  events: T[],
+): (PlacedEvent & { event: T })[] {
   const sorted = [...events].sort(
     (a, b) =>
       toMinutes(a.start_time) - toMinutes(b.start_time) ||
       toMinutes(a.end_time) - toMinutes(b.end_time),
   )
-  const placed: (PlacedEvent & { stop: number })[] = []
+  const placed: (PlacedEvent & { stop: number; event: T })[] = []
   for (const event of sorted) {
     const start = toMinutes(event.start_time)
     const cluster = placed.filter(
@@ -39,7 +49,7 @@ export function layoutDayEvents(events: IClassSchedule[]): PlacedEvent[] {
     placed.push({ event, lane, lanes: 1, stop: toMinutes(event.end_time) })
   }
 
-  const groups: (PlacedEvent & { stop: number })[][] = []
+  const groups: (PlacedEvent & { stop: number; event: T })[][] = []
   const byStart = [...placed].sort(
     (a, b) => toMinutes(a.event.start_time) - toMinutes(b.event.start_time),
   )
@@ -58,7 +68,7 @@ export function layoutDayEvents(events: IClassSchedule[]): PlacedEvent[] {
 }
 
 export function eventStyle(
-  event: IClassSchedule,
+  event: Placeable,
   placed: Pick<PlacedEvent, 'lane' | 'lanes'>,
   scaleStart: number,
   scaleTotal: number,

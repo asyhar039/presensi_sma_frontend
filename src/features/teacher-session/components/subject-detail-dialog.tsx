@@ -97,7 +97,7 @@ function DetailBody({ id, onDecided }: { id: number; onDecided: () => void }) {
           {d.status.label}
         </Badge>
         <Badge variant="secondary" className="capitalize">
-          {d.current_step.replaceAll('_', ' ')}
+          {d.current_step?.replaceAll('_', ' ') || 'N/A'}
         </Badge>
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

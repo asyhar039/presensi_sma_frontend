@@ -104,7 +104,8 @@ export function useDutyColumns({
         header: dataTableHeader('Step'),
         cell: ({ row }) => (
           <span className="text-sm text-muted-foreground capitalize">
-            {row.original.leave_request.current_step.replaceAll('_', ' ')}
+            {row.original.leave_request.current_step?.replaceAll('_', ' ') ||
+              'N/A'}
           </span>
         ),
       },

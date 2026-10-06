@@ -118,7 +118,7 @@ function DetailBody({
           {d.status.label}
         </Badge>
         <Badge variant="secondary" className="capitalize">
-          {d.current_step.replaceAll('_', ' ')}
+          {d.current_step?.replaceAll('_', ' ') || 'N/A'}
         </Badge>
       </div>
 

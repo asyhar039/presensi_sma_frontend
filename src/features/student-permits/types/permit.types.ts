@@ -1,26 +1,76 @@
-export type PermitType = 'sick' | 'leave_school' | 'leave_in'
+export type LeaveRequestType = 'sick_leave' | 'early_out' | 'late_arrival'
 
-export type PermitStatus = 'pending' | 'approved' | 'rejected'
-
-export interface IStudentPermit {
+export interface IAcademicYear {
   id: number
-  student_id: number
-  type: PermitType
-  start_date: string
-  end_date: string
-  reason: string
-  document_url?: string | null
-  status: PermitStatus
-  created_at: string
-  updated_at: string
+  odd_start_date: string
+  odd_end_date: string
+  even_start_date: string
+  even_end_date: string
 }
 
-export interface IStudentProfile {
+export interface IHomeroomTeacher {
   id: number
-  identity_number: string
   name: string
   email: string
-  classroom_id: number
-  classroom_name: string
-  homeroom_teacher: string
+}
+
+export interface IStudentClass {
+  id: number
+  name: string
+  homeroom_teacher: IHomeroomTeacher
+}
+
+export interface IStudentInformation {
+  academic_year: IAcademicYear
+  class: IStudentClass
+}
+
+export interface ISchoolTime {
+  start_time: string
+  end_time: string
+}
+
+export type WeekdayKey =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday'
+
+export type WeeklySchedule = Record<WeekdayKey, ISchoolTime | null>
+
+export interface IPublicHoliday {
+  name: string
+  date: string
+}
+
+export interface IPresenceInformation {
+  time: WeeklySchedule
+  public_holidays: IPublicHoliday[]
+  has_early_out: boolean
+  has_late_arrival: boolean
+}
+
+export interface ILeaveRequestResult {
+  id: number
+  key: string
+  type: { key: string; label: string }
+  status: { key: string; label: string }
+  start_date: string | null
+  end_date: string | null
+  range_date: (string | null)[]
+  date: string | null
+  time_out: string | null
+  time_in: string | null
+  exit_reason: string | null
+  destination: string | null
+  contact_person: string | null
+  estimated_arrival_time: string | null
+  late_reason: string | null
+  notes: string | null
+  attachment: string | null
+  current_step: string | null
+  requested_at: string | null
 }

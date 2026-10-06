@@ -1,4 +1,7 @@
+import { IconSchool } from '@tabler/icons-react'
+
 import { DataTable } from '@/components/data-table'
+import { Badge } from '@/components/ui/badge'
 import {
   Card,
   CardContent,
@@ -6,11 +9,18 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { useAuth } from '@/context/auth-context'
 import { StudentProvider } from '@/features/students/components/student-store'
 import { useTeacherStudentColumns } from '@/features/students/components/teacher-student-columns'
+import { TeacherStudentDetailDialog } from '@/features/students/components/teacher-student-detail-dialog'
+import {
+  NoHomeroomWarning,
+  TeacherStudentError,
+  TeacherStudentHeading,
+  TeacherStudentSkeleton,
+} from '@/features/students/components/teacher-student-states'
 import { TeacherStudentToolbar } from '@/features/students/components/teacher-student-toolbar'
-import { studentKeys } from '@/features/students/lib/student-query-options'
+import { useHomeroom } from '@/features/students/hooks/use-homeroom'
+import { homeroomKeys } from '@/features/students/lib/homeroom-query-options'
 import {
   STUDENT_DEFAULT_FILTERS,
   STUDENT_DEFAULT_ORDER,
@@ -19,38 +29,59 @@ import {
   STUDENT_SORT_BY,
   studentFilterSchema,
 } from '@/features/students/lib/student-table'
-import { getStudents } from '@/features/students/services/student-api'
+import { getHomeroomStudents } from '@/features/students/services/homeroom-api'
+import { getErrorMessage } from '@/utils/error'
 
-function TeacherStudentContent() {
-  const { user } = useAuth()
+function HomeroomStudentContent() {
   const columns = useTeacherStudentColumns()
+  const homeroomQuery = useHomeroom()
+
+  if (homeroomQuery.isLoading) {
+    return <TeacherStudentSkeleton />
+  }
+
+  if (homeroomQuery.isError) {
+    return (
+      <TeacherStudentError
+        message={getErrorMessage(
+          homeroomQuery.error,
+          'Failed to load homeroom data.',
+        )}
+        onRetry={() => homeroomQuery.refetch()}
+      />
+    )
+  }
+
+  const homeroom = homeroomQuery.data
+  if (!homeroom?.has_homeroom || !homeroom.class) {
+    return <NoHomeroomWarning />
+  }
 
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold tracking-tight">Data Siswa</h1>
-          <p className="text-sm text-muted-foreground">
-            Kelola dan pantau data siswa dalam kelas yang Anda ampu.
-          </p>
-        </div>
+        <TeacherStudentHeading
+          title="Students"
+          description="Manage and monitor students in your homeroom class."
+        />
+        <Badge variant="secondary" className="w-fit gap-1">
+          <IconSchool className="size-4" />
+          <span>{homeroom.class.name}</span>
+        </Badge>
       </div>
 
       <Card>
         <CardHeader className="sr-only">
           <CardTitle>Students</CardTitle>
-          <CardDescription>List of students in your classes</CardDescription>
+          <CardDescription>
+            List of students in your homeroom class
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <DataTable
             columns={columns}
-            queryKey={studentKeys.lists()}
-            queryFn={(params) =>
-              getStudents({
-                ...params,
-                teacher_id: user?.id,
-              })
-            }
+            queryKey={homeroomKeys.studentLists()}
+            queryFn={getHomeroomStudents}
             allowedSortBy={STUDENT_SORT_BY}
             defaultSortBy={STUDENT_DEFAULT_SORT_BY}
             defaultOrder={STUDENT_DEFAULT_ORDER}
@@ -58,11 +89,16 @@ function TeacherStudentContent() {
             defaultFilters={STUDENT_DEFAULT_FILTERS}
             filterSchema={studentFilterSchema}
             toolbar={<TeacherStudentToolbar />}
-            searchPlaceholder="Cari nama atau NIS..."
+            searchPlaceholder="Search name or identity number..."
+            emptyTitle="No students yet"
+            emptyDescription="There are no students in your homeroom class."
+            errorMessage="Failed to load students."
             syncWithQueryParams
           />
         </CardContent>
       </Card>
+
+      <TeacherStudentDetailDialog />
     </div>
   )
 }
@@ -70,7 +106,7 @@ function TeacherStudentContent() {
 export function TeacherStudentView() {
   return (
     <StudentProvider>
-      <TeacherStudentContent />
+      <HomeroomStudentContent />
     </StudentProvider>
   )
 }

@@ -10,21 +10,12 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { FieldGroup } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DATE_FORMAT } from '@/constants/app'
-import { formatSemester } from '@/features/academic-years/components/academic-year-columns'
 import { useAcademicYearStore } from '@/features/academic-years/components/academic-year-store'
 import { useAcademicYearDetail } from '@/features/academic-years/hooks/use-academic-year-detail'
 import { useCreateAcademicYear } from '@/features/academic-years/hooks/use-create-academic-year'
 import { useUpdateAcademicYear } from '@/features/academic-years/hooks/use-update-academic-year'
-import { ACADEMIC_YEAR_SEMESTER_FORM_OPTIONS } from '@/features/academic-years/lib/academic-year-table'
 import {
   type IAcademicYearSchema,
   academicYearSchema,
@@ -43,6 +34,13 @@ function toISOStringPayload(value: string): string {
   return new Date(`${value}T00:00:00Z`).toISOString()
 }
 
+const DATE_FIELDS = [
+  { name: 'odd_start_date', label: 'Odd Start Date' },
+  { name: 'odd_end_date', label: 'Odd End Date' },
+  { name: 'even_start_date', label: 'Even Start Date' },
+  { name: 'even_end_date', label: 'Even End Date' },
+] as const
+
 function AcademicYearForm({ initial }: { initial: IAcademicYear | null }) {
   const closeDialog = useAcademicYearStore((state) => state.closeDialog)
   const createMutation = useCreateAcademicYear()
@@ -50,20 +48,20 @@ function AcademicYearForm({ initial }: { initial: IAcademicYear | null }) {
 
   const form = useAppForm({
     defaultValues: {
-      start_date: toDateInput(initial?.start_date),
-      end_date: toDateInput(initial?.end_date),
-      semester: (initial?.semester === 'even'
-        ? 'even'
-        : 'odd') as IAcademicYearSchema['semester'],
+      odd_start_date: toDateInput(initial?.odd_start_date),
+      odd_end_date: toDateInput(initial?.odd_end_date),
+      even_start_date: toDateInput(initial?.even_start_date),
+      even_end_date: toDateInput(initial?.even_end_date),
       is_active: initial?.is_active ?? true,
     } as IAcademicYearSchema,
     validators: { onChange: academicYearSchema },
     onSubmit: async ({ value }) => {
       try {
         const payload = {
-          start_date: toISOStringPayload(value.start_date),
-          end_date: toISOStringPayload(value.end_date),
-          semester: value.semester,
+          odd_start_date: toISOStringPayload(value.odd_start_date),
+          odd_end_date: toISOStringPayload(value.odd_end_date),
+          even_start_date: toISOStringPayload(value.even_start_date),
+          even_end_date: toISOStringPayload(value.even_end_date),
           is_active: value.is_active,
         }
         if (initial) {
@@ -89,67 +87,25 @@ function AcademicYearForm({ initial }: { initial: IAcademicYear | null }) {
       <form.AppForm>
         <FieldGroup>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <form.AppField name="start_date">
-              {(field) => (
-                <field.FormField<string>
-                  label="Start Date"
-                  children={({ isInvalid, onChange, onBlur, ...props }) => (
-                    <Input
-                      type="date"
-                      onBlur={onBlur}
-                      onChange={(event) => onChange(event.target.value)}
-                      aria-invalid={isInvalid}
-                      {...props}
-                    />
-                  )}
-                />
-              )}
-            </form.AppField>
-            <form.AppField name="end_date">
-              {(field) => (
-                <field.FormField<string>
-                  label="End Date"
-                  children={({ isInvalid, onChange, onBlur, ...props }) => (
-                    <Input
-                      type="date"
-                      onBlur={onBlur}
-                      onChange={(event) => onChange(event.target.value)}
-                      aria-invalid={isInvalid}
-                      {...props}
-                    />
-                  )}
-                />
-              )}
-            </form.AppField>
-          </div>
-
-          <form.AppField name="semester">
-            {(field) => (
-              <field.FormField<string>
-                label="Semester"
-                children={({ value, onChange }) => (
-                  <Select
-                    items={ACADEMIC_YEAR_SEMESTER_FORM_OPTIONS}
-                    value={value}
-                    onValueChange={(next) =>
-                      onChange(next as IAcademicYearSchema['semester'])
-                    }
-                  >
-                    <SelectTrigger className="w-full" aria-label="Semester">
-                      <SelectValue placeholder="Select semester" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ACADEMIC_YEAR_SEMESTER_FORM_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            {DATE_FIELDS.map((item) => (
+              <form.AppField key={item.name} name={item.name}>
+                {(field) => (
+                  <field.FormField<string>
+                    label={item.label}
+                    children={({ isInvalid, onChange, onBlur, ...props }) => (
+                      <Input
+                        type="date"
+                        onBlur={onBlur}
+                        onChange={(event) => onChange(event.target.value)}
+                        aria-invalid={isInvalid}
+                        {...props}
+                      />
+                    )}
+                  />
                 )}
-              />
-            )}
-          </form.AppField>
+              </form.AppField>
+            ))}
+          </div>
 
           <form.AppField name="is_active">
             {(field) => (
@@ -223,14 +179,21 @@ function AcademicYearDetail({ item }: { item: IAcademicYear }) {
 
   return (
     <div className="divide-y divide-border rounded-md border border-border px-4">
-      <DetailRow label="Semester" value={formatSemester(data.semester)} />
       <DetailRow
-        label="Start Date"
-        value={formatDate(data.start_date, DATE_FORMAT.DATE)}
+        label="Odd Start"
+        value={formatDate(data.odd_start_date, DATE_FORMAT.DATE)}
       />
       <DetailRow
-        label="End Date"
-        value={formatDate(data.end_date, DATE_FORMAT.DATE)}
+        label="Odd End"
+        value={formatDate(data.odd_end_date, DATE_FORMAT.DATE)}
+      />
+      <DetailRow
+        label="Even Start"
+        value={formatDate(data.even_start_date, DATE_FORMAT.DATE)}
+      />
+      <DetailRow
+        label="Even End"
+        value={formatDate(data.even_end_date, DATE_FORMAT.DATE)}
       />
       <DetailRow
         label="Status"
@@ -252,16 +215,15 @@ const DIALOG_COPY = {
   create: {
     title: 'Create academic year',
     description:
-      'Fill in the period, semester, and status for the new academic year.',
+      'Fill in the odd/even periods and status for the new academic year.',
   },
   edit: {
     title: 'Edit academic year',
-    description:
-      'Update the period, semester, or status of this academic year.',
+    description: 'Update the periods or status of this academic year.',
   },
   view: {
     title: 'Academic year detail',
-    description: 'Period, semester, and status of this academic year.',
+    description: 'Periods and status of this academic year.',
   },
 } as const
 

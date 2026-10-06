@@ -7,16 +7,15 @@ import { classroomKeys } from '@/features/classrooms/lib/classroom-query-options
 import { putClassroom } from '@/features/classrooms/services/classroom-api'
 import { getErrorMessage } from '@/utils/error'
 
+type UpdateClassroomArgs = { id: number; payload: Partial<IClassroomPayload> }
+
 export function useUpdateClassroom(id: number | null) {
   const queryClient = useQueryClient()
-
   return useMutation({
-    mutationFn: (payload: IClassroomPayload) =>
-      putClassroom(id as number, payload),
+    mutationFn: ({ id: targetId, payload }: UpdateClassroomArgs) =>
+      putClassroom(targetId, payload),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: classroomKeys.lists(),
-      })
+      await queryClient.invalidateQueries({ queryKey: classroomKeys.lists() })
       if (id) {
         await queryClient.invalidateQueries({
           queryKey: classroomKeys.detail(id),

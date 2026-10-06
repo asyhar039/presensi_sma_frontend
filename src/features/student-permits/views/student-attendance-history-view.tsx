@@ -1,371 +1,389 @@
-import type { ColumnDef } from '@tanstack/react-table'
-import type { DataTableFeatures } from '@/components/data-table/data-table'
-import type {
-  IStudentAttendanceRecord,
-  StudentAttendanceStatus,
-} from '@/features/student-permits/types/attendance-history.types'
+import type { ICalendarDay } from '@/features/student-permits/services/presence-scan-api'
 
-import { IconArrowLeft, IconDownload } from '@tabler/icons-react'
+import {
+  IconArrowLeft,
+  IconCalendarMonth,
+  IconChevronLeft,
+  IconChevronRight,
+} from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
+import dayjs from 'dayjs'
+import { useMemo, useState } from 'react'
 
-import { DataTable } from '@/components/data-table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Typography } from '@/components/ui/typography'
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import {
-  studentAttendanceHistoryQueryOptions,
-  studentAttendanceSummaryQueryOptions,
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  monthlyCalendarQueryOptions,
+  studentInformationQueryOptions,
 } from '@/features/student-permits/lib/attendance-history-query-options'
 import { cn } from '@/lib/class-name'
-import { formatDate } from '@/utils/datetime'
+import { getErrorMessage } from '@/utils/error'
 
-const STATUS_BADGE_VARIANTS: Record<StudentAttendanceStatus, string> = {
+type HistoryViewProps = { month?: string }
+
+const STATUS_TONE: Record<string, string> = {
   present:
     'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  sick: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  leave_school:
+  sick_leave:
     'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  leave_in:
-    'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-  absent: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  permit:
+    'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  alpha: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  holiday: 'bg-muted text-muted-foreground',
+  upcoming: 'bg-muted text-muted-foreground',
 }
 
-const MOCK_STUDENT = {
-  name: 'Andi',
-  identity_number: '3040507012',
-  classroom_name: 'XI IPA 1',
-  homeroom_teacher: 'Dra. Siti Aminah',
+function statusTone(status: string) {
+  return STATUS_TONE[status.toLowerCase()] ?? 'bg-muted text-muted-foreground'
 }
 
-const DAYS_IN_INDONESIAN = [
-  'Minggu',
-  'Senin',
-  'Selasa',
-  'Rabu',
-  'Kamis',
-  'Jumat',
-  'Sabtu',
-]
-
-function getDayName(dateStr: string): string {
-  const date = new Date(dateStr)
-  return DAYS_IN_INDONESIAN[date.getDay()]
-}
-
-export function StudentAttendanceHistoryView() {
-  const { data: summary } = useQuery(studentAttendanceSummaryQueryOptions())
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [monthFilter, setMonthFilter] = useState('')
-  const navigate = useNavigate()
-
-  const handleStatusChange = (value: string | null) => {
-    const val = value ?? 'all'
-    setStatusFilter(val)
-  }
-
-  const handleMonthChange = (value: string | null) => {
-    const val = value ?? ''
-    setMonthFilter(val)
-  }
-
-  const { data: history } = useQuery(
-    studentAttendanceHistoryQueryOptions({
-      status: statusFilter === 'all' ? undefined : statusFilter,
-      month: monthFilter || undefined,
-    }),
-  )
-
-  const handleBackToDashboard = () => {
-    navigate({ to: '/dashboard', replace: true })
-  }
-
-  const renderStatusBadge = (
-    status: StudentAttendanceStatus,
-    label: string,
-  ) => (
-    <Badge className={cn('capitalize', STATUS_BADGE_VARIANTS[status])}>
-      {label}
-    </Badge>
-  )
-
-  const renderAttachment = (url: string | null) => {
-    if (!url) return <span className="text-muted-foreground italic">-</span>
-    return (
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => window.open(url, '_blank')}
+function DayCell({
+  day,
+  selected,
+  onSelect,
+}: {
+  day: ICalendarDay
+  selected: boolean
+  onSelect: () => void
+}) {
+  const d = dayjs(day.date)
+  const primary =
+    day.schedules[0]?.status.toLowerCase() ??
+    (day.is_holiday === 'true' || day.is_holiday === '1'
+      ? 'holiday'
+      : 'upcoming')
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={cn(
+        'flex min-h-16 flex-col items-start gap-1 rounded-lg border p-2 text-left transition-colors hover:bg-muted/60 md:min-h-20',
+        selected && 'border-primary ring-1 ring-primary',
+      )}
+    >
+      <span className="text-xs font-semibold">{d.format('D')}</span>
+      <span
+        className={cn(
+          'rounded px-1.5 py-0.5 text-[10px] font-medium capitalize',
+          statusTone(primary),
+        )}
       >
-        <IconDownload className="h-4 w-4 mr-1" />
-        Lihat
-      </Button>
+        {day.is_holiday === 'true' || day.is_holiday === '1'
+          ? 'Holiday'
+          : primary.replaceAll('_', ' ')}
+      </span>
+      {day.schedules.length > 1 && (
+        <span className="text-[10px] text-muted-foreground">
+          +{day.schedules.length - 1} more
+        </span>
+      )}
+    </button>
+  )
+}
+
+function DayCellSkeleton() {
+  return <Skeleton className="min-h-16 w-full md:min-h-20" />
+}
+
+function DetailPanel({ day }: { day: ICalendarDay | null }) {
+  if (!day) {
+    return (
+      <Empty className="border">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <IconCalendarMonth />
+          </EmptyMedia>
+          <EmptyTitle>Select a date</EmptyTitle>
+          <EmptyDescription>
+            Tap a calendar day to see that day&apos;s schedule and status.
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     )
   }
+  return (
+    <div className="space-y-3">
+      <div>
+        <p className="font-semibold">
+          {dayjs(day.date).format('dddd, DD MMMM YYYY')}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          {day.schedules.length} schedule{day.schedules.length === 1 ? '' : 's'}
+        </p>
+      </div>
+      {day.schedules.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          No schedules on this day.
+        </p>
+      ) : (
+        <ul className="space-y-2">
+          {day.schedules.map((s) => (
+            <li key={s.schedule_id} className="rounded-lg border p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-medium">
+                  {s.start_time}–{s.end_time}
+                </p>
+                <Badge className={cn('capitalize', statusTone(s.status))}>
+                  {s.status.replaceAll('_', ' ')}
+                </Badge>
+              </div>
+              <p className="mt-1 text-sm">{s.teacher}</p>
+              <p className="text-xs capitalize text-muted-foreground">
+                {s.day}
+              </p>
+              {s.permit_types.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {s.permit_types.map((t) => (
+                    <Badge
+                      key={t}
+                      variant="outline"
+                      className="text-[10px] capitalize"
+                    >
+                      {t.replaceAll('_', ' ')}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
 
-  const columns: ColumnDef<
-    DataTableFeatures,
-    IStudentAttendanceRecord,
-    unknown
-  >[] = [
-    {
-      id: 'date',
-      header: 'Tanggal & Hari',
-      accessorKey: 'date',
-      cell: ({ row }) => (
-        <div>
-          <Typography className="font-medium">
-            {formatDate(row.original.date, 'DD MMM YYYY')}
-          </Typography>
-          <Typography variant="muted" className="text-xs">
-            {getDayName(row.original.date)}
-          </Typography>
-        </div>
-      ),
-    },
-    {
-      id: 'time',
-      header: 'Jam Masuk / Pulang',
-      cell: ({ row }) => (
-        <div className="space-y-1 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <span>Masuk:</span>
-            <Typography className="font-medium">
-              {row.original.check_in_time || '-'}
-            </Typography>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <span>Pulang:</span>
-            <Typography className="font-medium">
-              {row.original.check_out_time || '-'}
-            </Typography>
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: 'status',
-      header: 'Status',
-      cell: ({ row }) =>
-        renderStatusBadge(row.original.status, row.original.status_label),
-    },
-    {
-      id: 'remarks',
-      header: 'Keterangan',
-      cell: ({ row }) => (
-        <Typography variant="muted" className="max-w-xs truncate block">
-          {row.original.remarks || '-'}
-        </Typography>
-      ),
-    },
-    {
-      id: 'attachment',
-      header: 'Lampiran',
-      cell: ({ row }) => (
-        <div className="flex justify-center">
-          {renderAttachment(row.original.document_url)}
-        </div>
-      ),
-    },
-  ]
+export function StudentAttendanceHistoryView({
+  month: initialMonth,
+}: HistoryViewProps = {}) {
+  const navigate = useNavigate()
+  const [cursor, setCursor] = useState(
+    () => initialMonth ?? dayjs().format('YYYY-MM'),
+  )
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const monthParam = useMemo(
+    () => dayjs(`${cursor}-01`).format('YYYY-MM'),
+    [cursor],
+  )
+
+  const infoQuery = useQuery(studentInformationQueryOptions())
+  const calendarQuery = useQuery(monthlyCalendarQueryOptions(monthParam))
+  const days = calendarQuery.data?.days ?? []
+  const selected: ICalendarDay | null = useMemo(
+    () =>
+      days.find((d) => d.date === selectedDate) ??
+      days.find((d) => d.date === dayjs().format('YYYY-MM-DD')) ??
+      null,
+    [days, selectedDate],
+  )
+  const leadingBlanks = useMemo(() => {
+    if (days.length === 0) return 0
+    return (dayjs(days[0].date).day() + 6) % 7
+  }, [days])
 
   return (
-    <div className="min-h-screen bg-muted/30 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <Typography as="h1" variant="h2" className="text-foreground">
-              Riwayat Presensi Siswa
-            </Typography>
-            <Typography variant="muted" className="text-sm">
-              Lihat riwayat kehadiran dan izin Anda
-            </Typography>
-          </div>
-          <Button variant="outline" onClick={handleBackToDashboard}>
-            <IconArrowLeft className="h-4 w-4 mr-2" />
-            Kembali
+    <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Attendance History
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Per-day schedule entries with your presence status.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Previous month"
+            onClick={() =>
+              setCursor((c) =>
+                dayjs(`${c}-01`).subtract(1, 'month').format('YYYY-MM'),
+              )
+            }
+          >
+            <IconChevronLeft />
+          </Button>
+          <span className="min-w-32 text-center text-sm font-medium">
+            {dayjs(`${monthParam}-01`).format('MMMM YYYY')}
+          </span>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Next month"
+            onClick={() =>
+              setCursor((c) =>
+                dayjs(`${c}-01`).add(1, 'month').format('YYYY-MM'),
+              )
+            }
+          >
+            <IconChevronRight />
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => navigate({ to: '/dashboard' })}
+          >
+            <IconArrowLeft />
+            Back
           </Button>
         </div>
+      </div>
 
-        {/* Student Profile Card */}
+      {infoQuery.isPending ? (
+        <Skeleton className="h-20 w-full" />
+      ) : infoQuery.data ? (
         <Card>
+          <CardContent className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-4">
+            <div>
+              <p className="text-xs text-muted-foreground">Class</p>
+              <p className="text-sm font-medium">{infoQuery.data.class.name}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Homeroom teacher</p>
+              <p className="text-sm font-medium">
+                {infoQuery.data.class.homeroom_teacher.name}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Academic year</p>
+              <p className="text-sm font-medium">
+                {dayjs(infoQuery.data.academic_year.odd_start_date).format(
+                  'YYYY',
+                )}
+                /
+                {dayjs(infoQuery.data.academic_year.even_end_date).format(
+                  'YYYY',
+                )}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Month</p>
+              <p className="text-sm font-medium">
+                {calendarQuery.data?.month ?? monthParam}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      <div className="grid items-start gap-6 lg:grid-cols-12">
+        <Card className="lg:col-span-8">
           <CardHeader>
-            <CardTitle>Data Siswa</CardTitle>
+            <CardTitle>Monthly calendar</CardTitle>
+            <CardDescription>
+              Present, sick leave, permit, alpha, or holiday per day.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-              <div>
-                <Typography variant="muted" className="text-xs">
-                  Nama
-                </Typography>
-                <Typography className="font-medium">
-                  {MOCK_STUDENT.name}
-                </Typography>
-              </div>
-              <div>
-                <Typography variant="muted" className="text-xs">
-                  NISN
-                </Typography>
-                <Typography className="font-medium">
-                  {MOCK_STUDENT.identity_number}
-                </Typography>
-              </div>
-              <div>
-                <Typography variant="muted" className="text-xs">
-                  Kelas
-                </Typography>
-                <Typography className="font-medium">
-                  {MOCK_STUDENT.classroom_name}
-                </Typography>
-              </div>
-              <div>
-                <Typography variant="muted" className="text-xs">
-                  Wali Kelas
-                </Typography>
-                <Typography className="font-medium">
-                  {MOCK_STUDENT.homeroom_teacher}
-                </Typography>
-              </div>
+            <div className="mb-2 grid grid-cols-7 gap-1.5 text-center text-[11px] font-medium text-muted-foreground md:gap-2">
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
+                <span key={d}>{d}</span>
+              ))}
             </div>
-
-            {summary && (
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3 pt-4 border-t">
-                <div className="text-center p-3 rounded-lg bg-green-50 dark:bg-green-950/20">
-                  <Typography className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    {summary.total_present}
-                  </Typography>
-                  <Typography variant="muted" className="text-xs">
-                    Hadir
-                  </Typography>
-                </div>
-                <div className="text-center p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20">
-                  <Typography className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {summary.total_sick}
-                  </Typography>
-                  <Typography variant="muted" className="text-xs">
-                    Sakit
-                  </Typography>
-                </div>
-                <div className="text-center p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20">
-                  <Typography className="text-2xl font-bold text-amber-600 dark:text-amber-400">
-                    {summary.total_leave_in}
-                  </Typography>
-                  <Typography variant="muted" className="text-xs">
-                    Terlambat
-                  </Typography>
-                </div>
-                <div className="text-center p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20">
-                  <Typography className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                    {summary.total_leave_school}
-                  </Typography>
-                  <Typography variant="muted" className="text-xs">
-                    Izin Keluar
-                  </Typography>
-                </div>
-                <div className="text-center p-3 rounded-lg bg-red-50 dark:bg-red-950/20">
-                  <Typography className="text-2xl font-bold text-red-600 dark:text-red-400">
-                    {summary.total_absent}
-                  </Typography>
-                  <Typography variant="muted" className="text-xs">
-                    Alpa
-                  </Typography>
-                </div>
+            {calendarQuery.isPending ? (
+              <div className="grid grid-cols-7 gap-1.5 md:gap-2">
+                {Array.from({ length: 35 }).map((_, i) => (
+                  <DayCellSkeleton key={i} />
+                ))}
+              </div>
+            ) : calendarQuery.isError ? (
+              <Empty className="border">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <IconCalendarMonth />
+                  </EmptyMedia>
+                  <EmptyTitle>Failed to load history</EmptyTitle>
+                  <EmptyDescription>
+                    {getErrorMessage(calendarQuery.error)}
+                  </EmptyDescription>
+                </EmptyHeader>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => calendarQuery.refetch()}
+                >
+                  Try again
+                </Button>
+              </Empty>
+            ) : days.length === 0 ? (
+              <Empty className="border">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <IconCalendarMonth />
+                  </EmptyMedia>
+                  <EmptyTitle>No data this month</EmptyTitle>
+                  <EmptyDescription>
+                    There are no schedule entries for{' '}
+                    {dayjs(`${monthParam}-01`).format('MMMM YYYY')}.
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            ) : (
+              <div className="grid grid-cols-7 gap-1.5 md:gap-2">
+                {Array.from({ length: leadingBlanks }).map((_, i) => (
+                  <span key={`blank-${i}`} />
+                ))}
+                {days.map((day) => (
+                  <DayCell
+                    key={day.date}
+                    day={day}
+                    selected={selected?.date === day.date}
+                    onSelect={() => setSelectedDate(day.date)}
+                  />
+                ))}
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Filter Controls */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1 sm:w-48">
-                <Typography variant="muted" className="text-xs mb-1">
-                  Filter Bulan
-                </Typography>
-                <Select value={monthFilter} onValueChange={handleMonthChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Semua Bulan" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Semua Bulan</SelectItem>
-                    <SelectItem value="2026-09">September 2026</SelectItem>
-                    <SelectItem value="2026-08">Agustus 2026</SelectItem>
-                    <SelectItem value="2026-07">Juli 2026</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex-1 sm:w-48">
-                <Typography variant="muted" className="text-xs mb-1">
-                  Filter Status
-                </Typography>
-                <Select value={statusFilter} onValueChange={handleStatusChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Semua Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Semua</SelectItem>
-                    <SelectItem value="present">Hadir</SelectItem>
-                    <SelectItem value="sick">Sakit</SelectItem>
-                    <SelectItem value="leave_school">Izin Keluar</SelectItem>
-                    <SelectItem value="leave_in">Izin Terlambat</SelectItem>
-                    <SelectItem value="absent">Alpa</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {[
+                'present',
+                'sick_leave',
+                'permit',
+                'alpha',
+                'holiday',
+                'upcoming',
+              ].map((s) => (
+                <Badge key={s} className={cn('capitalize', statusTone(s))}>
+                  {s.replaceAll('_', ' ')}
+                </Badge>
+              ))}
             </div>
           </CardContent>
         </Card>
-
-        {/* Attendance History Table - Using DataTable with pagination */}
-        <Card>
+        <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              Riwayat Presensi
-              <span className="text-sm text-muted-foreground">
-                {history?.items.length ?? 0} data
-              </span>
-            </CardTitle>
+            <CardTitle>Day detail</CardTitle>
+            <CardDescription>
+              {selected
+                ? dayjs(selected.date).format('DD MMMM YYYY')
+                : 'Nothing selected'}
+            </CardDescription>
           </CardHeader>
-          <CardContent className="p-0">
-            <DataTable
-              columns={columns}
-              queryKey={[
-                'student-attendance',
-                'history',
-                statusFilter,
-                monthFilter,
-              ]}
-              queryFn={async () => {
-                const response = await history
-                return {
-                  items: response?.items ?? [],
-                  meta: {
-                    page: 1,
-                    per_page: 10,
-                    total: response?.items.length ?? 0,
-                    total_pages: 1,
-                  },
-                }
-              }}
-              defaultPerPage={10}
-              perPageOptions={[10, 20, 50]}
-              enableSearch={false}
-              syncWithQueryParams={false}
-              emptyTitle="Tidak ada data"
-              emptyDescription="Riwayat presensi tidak ditemukan untuk filter ini."
-              errorMessage="Gagal memuat data riwayat presensi"
-            />
+          <CardContent>
+            {calendarQuery.isPending ? (
+              <div className="space-y-2">
+                <Skeleton className="h-6 w-2/3" />
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+              </div>
+            ) : (
+              <DetailPanel day={selected} />
+            )}
           </CardContent>
         </Card>
       </div>

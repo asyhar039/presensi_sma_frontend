@@ -8,6 +8,7 @@ import {
   IconPencil,
   IconTrash,
 } from '@tabler/icons-react'
+import { Link } from '@tanstack/react-router'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 
@@ -25,15 +26,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { DATE_FORMAT } from '@/constants/app'
-import { formatAcademicLabel } from '@/features/academic-years/components/academic-year-columns'
 import { useClassroomStore } from '@/features/classrooms/components/classroom-store'
 import { useDeleteClassroom } from '@/features/classrooms/hooks/use-delete-classroom'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { formatDate } from '@/utils/datetime'
 import { getErrorMessage } from '@/utils/error'
 
-function ClassroomActions({ item }: { item: IClassroom }) {
-  const openView = useClassroomStore((state) => state.openView)
+type ClassroomActionsProps = { item: IClassroom }
+
+function ClassroomActions({ item }: ClassroomActionsProps) {
   const openEdit = useClassroomStore((state) => state.openEdit)
   const showConfirmation = useConfirmationStore((state) => state.show)
   const deleteMutation = useDeleteClassroom()
@@ -49,11 +50,11 @@ function ClassroomActions({ item }: { item: IClassroom }) {
         loading(true)
         try {
           await deleteMutation.mutateAsync(item.id)
-          close()
         } catch (error) {
           toast.error(getErrorMessage(error, 'Failed to delete classroom.'))
         } finally {
           loading(false)
+          close()
         }
       },
     })
@@ -69,10 +70,18 @@ function ClassroomActions({ item }: { item: IClassroom }) {
         }
       />
       <DropdownMenuContent align="end" side="bottom">
-        <DropdownMenuItem onClick={() => openView(item)}>
-          <IconEye />
-          <span>View detail</span>
-        </DropdownMenuItem>
+        <DropdownMenuItem
+          render={
+            <Link
+              to="/dashboard/classrooms/$classroomId"
+              params={{ classroomId: String(item.id) }}
+              className="flex items-center gap-2"
+            >
+              <IconEye />
+              <span>View detail</span>
+            </Link>
+          }
+        />
         <DropdownMenuItem onClick={() => openEdit(item)}>
           <IconPencil />
           <span>Edit</span>
@@ -98,47 +107,40 @@ export function useClassroomColumns(): ColumnDef<
         accessorKey: 'name',
         header: dataTableHeader('Classroom'),
         cell: ({ row }) => (
-          <span className="font-medium whitespace-nowrap">
+          <Link
+            to="/dashboard/classrooms/$classroomId"
+            params={{ classroomId: String(row.original.id) }}
+            className="font-medium whitespace-nowrap hover:underline"
+          >
             {row.original.name}
-          </span>
+          </Link>
         ),
       },
       {
         id: 'academic_year',
         header: dataTableHeader('Academic Year'),
         enableSorting: false,
-        cell: ({ row }) => {
-          const academicYear = row.original.academic_year
-          if (!academicYear)
-            return <span className="text-muted-foreground">-</span>
-          return (
+        cell: ({ row }) =>
+          row.original.academic_year ? (
             <span className="whitespace-nowrap">
-              {formatAcademicLabel({
-                id: academicYear.id,
-                start_date: academicYear.start_date,
-                end_date: academicYear.end_date,
-                semester: academicYear.semester,
-                is_active: false,
-                created_at: '',
-                updated_at: '',
-              })}
-              <span className="text-muted-foreground">
-                {' '}
-                ({academicYear.semester})
-              </span>
+              {row.original.academic_year.label}
             </span>
-          )
-        },
+          ) : (
+            <span className="text-muted-foreground">-</span>
+          ),
       },
       {
         id: 'homeroom_teacher',
         header: dataTableHeader('Homeroom Teacher'),
         enableSorting: false,
-        cell: ({ row }) => {
-          const teacher = row.original.user
-          if (!teacher) return <span className="text-muted-foreground">-</span>
-          return <span className="whitespace-nowrap">{teacher.name}</span>
-        },
+        cell: ({ row }) =>
+          row.original.homeroom_teacher ? (
+            <span className="whitespace-nowrap">
+              {row.original.homeroom_teacher.name}
+            </span>
+          ) : (
+            <span className="text-muted-foreground">-</span>
+          ),
       },
       {
         accessorKey: 'students_count',

@@ -10,6 +10,7 @@ import { useFieldContext } from '@/hooks/use-form'
 export type FormControlProps = {
   label: string
   description?: string
+  required?: boolean
 }
 
 type FormFieldProps<T> = FormControlProps & {
@@ -29,6 +30,7 @@ function FormField<T>({
   children,
   label,
   description,
+  required,
   horizontal,
   className,
 }: FormFieldProps<T>) {
@@ -42,7 +44,10 @@ function FormField<T>({
       className={className}
     >
       <FieldContent className="flex-none">
-        <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
+        <FieldLabel htmlFor={field.name}>
+          {label}
+          {required && <span className="text-destructive"> *</span>}
+        </FieldLabel>
         {description && <FieldDescription>{description}</FieldDescription>}
       </FieldContent>
       {children({

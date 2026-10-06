@@ -36,6 +36,8 @@
     "cn": "^0.4.0",
     "dayjs": "^1.11.23",
     "jsqr": "^1.4.0",
+    "qrcode.react": "^4.2.0",
+    "react-dropzone": "^20.1.2",
     "lucide-react": "^1.49.0",
     "maplibre-gl": "^6.11.2",
     "react": "^19.3.0",

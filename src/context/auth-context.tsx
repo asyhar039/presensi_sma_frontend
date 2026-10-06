@@ -39,8 +39,8 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
       logout: async () => {
         try {
           await logout.mutateAsync()
+          queryClient.clear()
         } finally {
-          queryClient.setQueryData(authKeys.me, null)
           clearAccessToken()
           setHasToken(false)
         }

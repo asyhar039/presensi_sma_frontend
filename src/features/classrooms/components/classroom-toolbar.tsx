@@ -18,7 +18,7 @@ function AcademicYearFilterSelect() {
   const options = [
     { label: 'All academic years', value: 'all' },
     ...(academicYearsQuery.data?.items ?? []).map((item) => ({
-      label: `${formatAcademicLabel(item)} (${item.semester})`,
+      label: formatAcademicLabel(item),
       value: String(item.id),
     })),
   ]

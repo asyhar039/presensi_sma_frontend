@@ -7,13 +7,10 @@ import { getErrorMessage } from '@/utils/error'
 
 export function useDeleteClassroom() {
   const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: deleteClassroom,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: classroomKeys.lists(),
-      })
+      await queryClient.invalidateQueries({ queryKey: classroomKeys.lists() })
       toast.success('Classroom deleted successfully.')
     },
     onError: (error) => {

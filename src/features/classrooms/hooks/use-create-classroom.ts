@@ -7,13 +7,10 @@ import { getErrorMessage } from '@/utils/error'
 
 export function useCreateClassroom() {
   const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: postClassroom,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: classroomKeys.lists(),
-      })
+      await queryClient.invalidateQueries({ queryKey: classroomKeys.lists() })
       toast.success('Classroom created successfully.')
     },
     onError: (error) => {

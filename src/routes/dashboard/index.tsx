@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ForbiddenInline } from '@/components/composite/forbidden'
 import { AdminDashboardView } from '@/features/admin/views/admin-dashboard-view'
 import { StudentDashboardView } from '@/features/student-permits/views/student-dashboard-view'
+import { TeacherDashboardView } from '@/features/teacher-session/views/teacher-dashboard-view'
 import { mustBeLoggedIn } from '@/utils/router'
 
 export const Route = createFileRoute('/dashboard/')({
@@ -21,7 +22,7 @@ export const Route = createFileRoute('/dashboard/')({
     }
 
     if (auth?.role?.isTeacher) {
-      return <AdminDashboardView />
+      return <TeacherDashboardView />
     }
 
     return <ForbiddenInline />

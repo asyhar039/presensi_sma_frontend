@@ -4,10 +4,12 @@ import {
   IconLocation,
   IconQrcode,
 } from '@tabler/icons-react'
+import { useMutation } from '@tanstack/react-query'
 import jsQR from 'jsqr'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { ButtonLoading } from '@/components/composite/button-loading'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -39,6 +41,8 @@ import {
   type IGeoPosition,
   useGeolocation,
 } from '@/features/student-permits/hooks/use-geolocation'
+import { scanPresence } from '@/features/student-permits/services/presence-scan-api'
+import { getErrorMessage } from '@/utils/error'
 
 type AttendanceScanDialogProps = {
   open: boolean
@@ -139,14 +143,26 @@ function ScanTabs({
 
 function ManualPanel({ position }: { position: IGeoPosition }) {
   const [code, setCode] = useState('')
-
+  const scan = useMutation({
+    mutationFn: () =>
+      scanPresence({
+        key: code.trim(),
+        latitude: position.latitude,
+        longitude: position.longitude,
+      }),
+    onSuccess: (res) => {
+      toast.success(
+        res.inside_zone
+          ? 'Presence recorded successfully.'
+          : 'Presence recorded outside the school zone.',
+      )
+      setCode('')
+    },
+    onError: (e) => toast.error(getErrorMessage(e)),
+  })
   const submit = () => {
-    const value = code.trim()
-    if (!value) return
-    toast.success(
-      `Code "${value}" recorded at ${position.latitude.toFixed(5)}, ${position.longitude.toFixed(5)}.`,
-    )
-    setCode('')
+    if (!code.trim() || scan.isPending) return
+    scan.mutate()
   }
 
   return (
@@ -165,14 +181,15 @@ function ManualPanel({ position }: { position: IGeoPosition }) {
           }}
         />
       </div>
-      <Button
+      <ButtonLoading
         type="button"
         className="w-full"
+        loading={scan.isPending}
         disabled={!code.trim()}
         onClick={submit}
       >
         Submit Attendance
-      </Button>
+      </ButtonLoading>
       <p className="text-xs text-muted-foreground">
         Location locked: {position.latitude.toFixed(5)},{' '}
         {position.longitude.toFixed(5)} (±{Math.round(position.accuracy)} m).
@@ -218,7 +235,7 @@ function CameraPanel({
   useEffect(() => {
     if (!scanning) return
     let frame = 0
-    const tick = () => {
+    const tick = async () => {
       const video = videoRef.current
       const canvas = canvasRef.current
       if (video && canvas && video.readyState === video.HAVE_ENOUGH_DATA) {
@@ -232,9 +249,20 @@ function CameraPanel({
           if (found?.data) {
             setDetected(found.data)
             setScanning(false)
-            toast.success(
-              `QR "${found.data}" detected at ${position.latitude.toFixed(5)}, ${position.longitude.toFixed(5)}.`,
-            )
+            try {
+              const res = await scanPresence({
+                key: found.data.trim(),
+                latitude: position.latitude,
+                longitude: position.longitude,
+              })
+              toast.success(
+                res.inside_zone
+                  ? 'Presence recorded successfully.'
+                  : 'Presence recorded outside the school zone.',
+              )
+            } catch (e) {
+              toast.error(getErrorMessage(e))
+            }
             return
           }
         }

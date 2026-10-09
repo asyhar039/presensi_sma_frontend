@@ -25,6 +25,7 @@ import {
   getClassOptions,
   getMonthOptions,
   getSemesterOptions,
+  getTeacherClassOptions,
 } from '@/features/attendance/services/attendance-api'
 
 function getSearchParam(param: string): string {
@@ -33,7 +34,13 @@ function getSearchParam(param: string): string {
   return params.get(param) || ''
 }
 
-function ClassFilterSelect() {
+interface ClassFilterSelectProps {
+  getClassesFn?: () => Promise<IClassOption[]>
+}
+
+function ClassFilterSelect({
+  getClassesFn = getClassOptions,
+}: ClassFilterSelectProps) {
   const { value, setValue } = useDataTableFilter<string>('classroom_id', {
     defaultValue: '',
   })
@@ -41,11 +48,11 @@ function ClassFilterSelect() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getClassOptions().then((data) => {
+    getClassesFn().then((data) => {
       setClasses(data)
       setLoading(false)
     })
-  }, [])
+  }, [getClassesFn])
 
   return (
     <Select
@@ -164,7 +171,13 @@ function StatusFilterSelect() {
   )
 }
 
-export function AttendanceToolbar() {
+export interface AttendanceToolbarProps {
+  isTeacher?: boolean
+}
+
+export function AttendanceToolbar({
+  isTeacher = false,
+}: AttendanceToolbarProps) {
   return (
     <DataTableToolbar
       searchPlaceholder="Cari NIS atau nama siswa..."
@@ -172,7 +185,9 @@ export function AttendanceToolbar() {
       className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
     >
       <div className="flex flex-wrap items-center gap-2 flex-1">
-        <ClassFilterSelect />
+        <ClassFilterSelect
+          getClassesFn={isTeacher ? getTeacherClassOptions : getClassOptions}
+        />
         <MonthFilterSelect />
         <SemesterFilterSelect />
         <StatusFilterSelect />

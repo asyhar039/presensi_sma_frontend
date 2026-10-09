@@ -16,6 +16,6 @@ export const Route = createFileRoute('/dashboard/attendance-recap/')({
       return <ForbiddenInline />
     }
 
-    return <AttendanceRecapView />
+    return <AttendanceRecapView isTeacher={auth?.role?.isTeacher} />
   },
 })

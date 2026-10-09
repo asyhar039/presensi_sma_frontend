@@ -41,13 +41,12 @@ export const useConfirmationStore = create<ConfirmationState>((set, get) => ({
   isCancelLoading: false,
   show: (data) => set({ data, isOpen: true }),
   close: () => {
-    const { isActionLoading, isCancelLoading, data } = get()
-    if (isActionLoading || isCancelLoading) return
     set({ isOpen: false })
+    const { data } = get()
     const timeout = setTimeout(() => {
       const newData = get().data
       if (deepEqual(data, newData)) {
-        set({ data: null })
+        set({ data: null, isActionLoading: false, isCancelLoading: false })
       }
       clearTimeout(timeout)
     }, 500)

@@ -170,20 +170,20 @@ function EventBlock({
         {...listeners}
         onClick={() => onOpen(entry)}
         className={cn(
-          'absolute inset-x-1 top-0 bottom-0 cursor-grab overflow-hidden rounded-md border border-primary/30 bg-primary/10 p-1.5 text-left active:cursor-grabbing',
+          'absolute inset-x-1 top-0 bottom-0 cursor-grab overflow-hidden rounded-md border border-primary/30 bg-primary/10 p-1.5 text-center active:cursor-grabbing',
           lanes > 1 && 'inset-x-0.5',
           isDragging && 'z-20 opacity-80 shadow-lg',
         )}
       >
-        <span className="block truncate text-xs font-semibold">
+        <span className="block truncate text-md font-semibold">
           {entry.teacher?.name ?? 'No teacher'}
         </span>
         {entry.teacher?.subjects?.[0] && (
-          <span className="block truncate text-[11px] text-muted-foreground">
+          <span className="block truncate text-sm text-muted-foreground">
             {entry.teacher.subjects[0].name}
           </span>
         )}
-        <span className="block text-[11px] tabular-nums text-muted-foreground">
+        <span className="block text-xs tabular-nums dark:text-muted-foreground">
           {entry.start_time} – {entry.end_time}
         </span>
       </button>

@@ -83,16 +83,6 @@ export const DASHBOARD_NAVIGATION: Record<UserRole, DashboardNavGroup[]> = {
       ],
     },
     {
-      title: 'Monitoring',
-      items: [
-        {
-          title: 'Class Attendance Recap',
-          href: '/dashboard/attendance-recap',
-          icon: IconClipboardCheck,
-        },
-      ],
-    },
-    {
       title: 'Others',
       items: [
         {

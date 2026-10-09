@@ -42,6 +42,7 @@ import {
   useGeolocation,
 } from '@/features/student-permits/hooks/use-geolocation'
 import { scanPresence } from '@/features/student-permits/services/presence-scan-api'
+import { cn } from '@/lib/class-name'
 import { getErrorMessage } from '@/utils/error'
 
 type AttendanceScanDialogProps = {
@@ -121,12 +122,28 @@ function ScanTabs({
   const [tab, setTab] = useState('manual')
   return (
     <Tabs value={tab} onValueChange={(value) => setTab(value as string)}>
-      <TabsList className="grid grid-cols-2">
-        <TabsTab value="manual">
+      <TabsList className="grid h-auto grid-cols-2 gap-1 rounded-lg bg-muted/80 p-1">
+        <TabsTab
+          value="manual"
+          className={cn(
+            'flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer flex items-center justify-center gap-2',
+            'text-slate-500 hover:text-slate-900 hover:bg-slate-200/60',
+            tab === 'manual' &&
+              'bg-white text-slate-900 font-semibold shadow-sm border border-slate-200/80 hover:bg-white',
+          )}
+        >
           <IconKeyboard className="size-4" />
           Manual
         </TabsTab>
-        <TabsTab value="camera">
+        <TabsTab
+          value="camera"
+          className={cn(
+            'flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer flex items-center justify-center gap-2',
+            'text-slate-500 hover:text-slate-900 hover:bg-slate-200/60',
+            tab === 'camera' &&
+              'bg-white text-slate-900 font-semibold shadow-sm border border-slate-200/80 hover:bg-white',
+          )}
+        >
           <IconCamera className="size-4" />
           Camera
         </TabsTab>

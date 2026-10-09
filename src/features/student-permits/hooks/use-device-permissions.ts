@@ -104,22 +104,63 @@ export function useCameraDevices(active: boolean) {
       }
       try {
         setError(null)
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: selectedId
-            ? { deviceId: { exact: selectedId } }
-            : { facingMode: 'environment' },
-        })
         stop()
+
+        let stream: MediaStream | null = null
+
+        if (selectedId) {
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: { deviceId: { exact: selectedId } },
+            })
+          } catch {
+            // Fallback if specific deviceId fails
+            stream = null
+          }
+        }
+
+        if (!stream) {
+          // 1. Try environment (rear) camera
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: { ideal: 'environment' } },
+            })
+          } catch {
+            // 2. Try user (front) camera fallback
+            try {
+              stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user' },
+              })
+            } catch {
+              // 3. Fallback to basic any video input
+              stream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+              })
+            }
+          }
+        }
+
         streamRef.current = stream
         setStatus('granted')
         await listDevices()
+
+        // Sync deviceId with actual track if available
+        const videoTrack = stream.getVideoTracks()[0]
+        if (videoTrack) {
+          const settings = videoTrack.getSettings()
+          if (settings.deviceId) {
+            setDeviceId(settings.deviceId)
+          }
+        }
+
         return stream
       } catch (requestError) {
+        stop()
         setStatus('denied')
         setError(
           requestError instanceof Error
             ? requestError.message
-            : 'Camera access was denied.',
+            : 'Camera access denied or device not found.',
         )
         return null
       }
@@ -136,5 +177,14 @@ export function useCameraDevices(active: boolean) {
     return stop
   }, [active, request, stop])
 
-  return { devices, deviceId, setDeviceId, status, error, request, stop }
+  return {
+    devices,
+    deviceId,
+    setDeviceId,
+    status,
+    error,
+    request,
+    stop,
+    stream: streamRef.current,
+  }
 }

@@ -211,22 +211,35 @@ function CameraPanel({
   const [scanning, setScanning] = useState(false)
   const [detected, setDetected] = useState<string | null>(null)
 
+  // Attach stream to video element when stream is available or video mounts
   useEffect(() => {
-    if (active && camera.deviceId && camera.status === 'idle') {
-      void camera.request(camera.deviceId).then((stream) => {
-        if (stream && videoRef.current) videoRef.current.srcObject = stream
-      })
+    if (!active) {
+      setScanning(false)
+      if (videoRef.current) {
+        videoRef.current.srcObject = null
+      }
+      return
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, camera.deviceId])
 
-  useEffect(() => () => camera.stop(), [camera.stop])
+    if (camera.status === 'granted' && camera.stream && videoRef.current) {
+      if (videoRef.current.srcObject !== camera.stream) {
+        videoRef.current.srcObject = camera.stream
+        void videoRef.current.play().catch(() => {
+          // Autoplay policy or video not ready
+        })
+      }
+      setScanning(true)
+    }
+  }, [active, camera.status, camera.stream])
 
   const switchCamera = useCallback(
     async (nextId: string) => {
       camera.setDeviceId(nextId)
       const stream = await camera.request(nextId)
-      if (stream && videoRef.current) videoRef.current.srcObject = stream
+      if (stream && videoRef.current) {
+        videoRef.current.srcObject = stream
+        void videoRef.current.play().catch(() => {})
+      }
       setScanning(true)
     },
     [camera],
@@ -339,6 +352,11 @@ function CameraPanel({
           className="h-56 w-full object-cover"
         />
         <canvas ref={canvasRef} className="hidden" />
+        {camera.error && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/80 p-4 text-center">
+            <p className="text-sm text-white">{camera.error}</p>
+          </div>
+        )}
       </div>
 
       <Button

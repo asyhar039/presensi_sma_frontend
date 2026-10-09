@@ -50,11 +50,11 @@ function StudentActions({ item }: { item: IStudent }) {
         loading(true)
         try {
           await deleteMutation.mutateAsync(item.id)
+          loading(false)
           close()
         } catch (error) {
-          toast.error(getErrorMessage(error, 'Failed to delete student.'))
-        } finally {
           loading(false)
+          toast.error(getErrorMessage(error, 'Failed to delete student.'))
         }
       },
     })

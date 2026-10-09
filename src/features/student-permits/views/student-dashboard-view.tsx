@@ -181,7 +181,7 @@ export function StudentDashboardView() {
                 value={tab}
                 onValueChange={(value) => setTab(value as LeaveRequestType)}
               >
-                <LeaveTypeTabs />
+                <LeaveTypeTabs activeTab={tab} />
                 <TabsPanel value="sick_leave">
                   <SickLeaveForm
                     presence={presence}

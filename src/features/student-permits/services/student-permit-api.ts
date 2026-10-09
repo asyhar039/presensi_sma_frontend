@@ -34,6 +34,10 @@ export function postEarlyOut(formData: FormData) {
   )
 }
 
+export function getStudentLeaveRequests() {
+  return api.get<ILeaveRequestResult[]>('/student/leave-requests')
+}
+
 export function postLateArrival(formData: FormData) {
   return api.post<ILeaveRequestResult>(
     '/student/leave-requests/late-arrival',

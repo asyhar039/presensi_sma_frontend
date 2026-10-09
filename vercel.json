@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://presensismabackend-production.up.railway.app/api/:path*"
+    },
+    {
+      "source": "/presensi_sma_backend/:path*",
+      "destination": "https://presensismabackend-production.up.railway.app/presensi_sma_backend/:path*"
+    },
+    {
+      "source": "/((?!api|presensi_sma_backend|assets|.*\\..*).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

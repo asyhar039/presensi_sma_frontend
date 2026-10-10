@@ -11,7 +11,7 @@ export function Login() {
           Welcome back!
         </Typography>
         <Typography variant="body" as="p" className="text-muted-foreground">
-          Sign in to your Attendance Apps account to continue.
+          Sign in to your SIP Apps account to continue.
         </Typography>
       </div>
       <LoginForm />

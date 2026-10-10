@@ -18,7 +18,7 @@ function RouteComponent() {
         <ThemeSwitcher />
       </div>
       <Typography as="h1" variant="h1">
-        Welcome to the Attendance Apps
+        Welcome to the SIP Apps
       </Typography>
       <Typography as="p" variant="lead" className="text-center">
         This is a simple attendance application that allows you to manage your

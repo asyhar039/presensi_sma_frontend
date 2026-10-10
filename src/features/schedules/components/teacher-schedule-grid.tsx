@@ -42,7 +42,7 @@ export function TeacherScheduleGrid({
           <div
             key={`${slot.start}-${i}`}
             style={{ height: rowHeight(slot) }}
-            className="flex flex-col justify-center border-b pr-2 text-right last:border-b-0"
+            className="flex flex-col justify-center border-b pr-2 text-center last:border-b-0"
           >
             {slot.is_break ? (
               <span className="text-[11px] font-medium text-amber-700 dark:text-amber-400">

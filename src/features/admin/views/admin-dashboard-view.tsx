@@ -1,6 +1,12 @@
+import type { ColumnDef } from '@tanstack/react-table'
+import type { DataTableFeatures } from '@/components/data-table/data-table'
+import type { IAttendanceRecord } from '@/features/attendance/types/attendance.types'
+
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 
+import { DataTable, dataTableHeader } from '@/components/data-table'
+import { Badge } from '@/components/ui/badge'
 import {
   Card,
   CardContent,
@@ -11,11 +17,82 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/context/auth-context'
 import { useAdminStats } from '@/features/admin/hooks/use-admin-stats'
+import {
+  ATTENDANCE_STATUS_BADGE_VARIANTS,
+  ATTENDANCE_STATUS_LABELS,
+} from '@/features/attendance/types/attendance.types'
+
+function useLiveAttendanceColumns(): ColumnDef<
+  DataTableFeatures,
+  IAttendanceRecord,
+  unknown
+>[] {
+  return useMemo<ColumnDef<DataTableFeatures, IAttendanceRecord, unknown>[]>(
+    () => [
+      {
+        id: 'nis',
+        accessorKey: 'student_id',
+        header: dataTableHeader('NIS'),
+        cell: ({ row }) => (
+          <span className="font-medium text-muted-foreground">
+            {row.original.student?.user?.identity_number}
+          </span>
+        ),
+      },
+      {
+        id: 'student_name',
+        accessorKey: 'student_id',
+        header: dataTableHeader('Nama Siswa'),
+        cell: ({ row }) => (
+          <span className="font-medium">
+            {row.original.student?.user?.name}
+          </span>
+        ),
+      },
+      {
+        id: 'classroom',
+        accessorKey: 'classroom_name',
+        header: dataTableHeader('Kelas'),
+      },
+      {
+        id: 'subject',
+        accessorKey: 'subject_name',
+        header: dataTableHeader('Mata Pelajaran'),
+      },
+      {
+        id: 'status',
+        accessorKey: 'status',
+        header: dataTableHeader('Status'),
+        cell: ({ row }) => {
+          const status = row.original.status
+          const variant = ATTENDANCE_STATUS_BADGE_VARIANTS[status]
+          const label = ATTENDANCE_STATUS_LABELS[status]
+          return <Badge variant={variant}>{label}</Badge>
+        },
+      },
+      {
+        id: 'date',
+        accessorKey: 'date',
+        header: dataTableHeader('Tanggal'),
+        cell: ({ row }) => dayjs(row.original.date).format('DD/MM/YYYY'),
+      },
+      {
+        id: 'time',
+        accessorKey: 'time_start',
+        header: dataTableHeader('Waktu'),
+        cell: ({ row }) =>
+          `${row.original.time_start}–${row.original.time_end}`,
+      },
+    ],
+    [],
+  )
+}
 
 export function AdminDashboardView() {
   const { user } = useAuth()
   const { totalStudents, totalTeachers, attendancePercentage, isLoading } =
     useAdminStats()
+  const liveAttendanceColumns = useLiveAttendanceColumns()
 
   const currentDate = useMemo(() => dayjs().format('dddd, D MMMM YYYY'), [])
 
@@ -89,44 +166,34 @@ export function AdminDashboardView() {
       </div>
 
       {/* Charts Section */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* Live Attendance */}
+      <div className="space-y-4">
+        {/* Live Attendance Table */}
         <Card>
           <CardHeader>
             <CardTitle>Kehadiran Langsung</CardTitle>
             <CardDescription>Status kehadiran siswa saat ini</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
-                  <span className="text-sm">Hadir</span>
-                </div>
-                <span className="font-semibold">245</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <span className="text-sm">Izin</span>
-                </div>
-                <span className="font-semibold">12</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-orange-500" />
-                  <span className="text-sm">Sakit</span>
-                </div>
-                <span className="font-semibold">8</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500" />
-                  <span className="text-sm">Alpa</span>
-                </div>
-                <span className="font-semibold">5</span>
-              </div>
-            </div>
+            <DataTable
+              columns={liveAttendanceColumns}
+              queryKey={['live-attendance']}
+              queryFn={async (params) => {
+                const { getAttendanceRecords } = await import(
+                  '@/features/attendance/services/attendance-api'
+                )
+                return getAttendanceRecords({
+                  page: params.page ? Number(params.page) : 1,
+                  per_page: params.per_page ? Number(params.per_page) : 10,
+                  search: params.search ? String(params.search) : undefined,
+                })
+              }}
+              defaultOrder="desc"
+              perPageOptions={[10, 20, 50]}
+              searchPlaceholder="Cari NIS atau nama siswa..."
+              emptyTitle="Tidak ada data kehadiran"
+              emptyDescription="Tidak ada siswa yang hadir saat ini."
+              syncWithQueryParams={false}
+            />
           </CardContent>
         </Card>
 

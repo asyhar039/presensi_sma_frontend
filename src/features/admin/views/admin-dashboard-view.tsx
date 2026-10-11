@@ -1,6 +1,12 @@
+import type {
+  AttendanceStatus,
+  IAttendanceParams,
+} from '@/features/attendance/types/attendance.types'
+
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 
+import { DataTable } from '@/components/data-table'
 import {
   Card,
   CardContent,
@@ -11,11 +17,23 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/context/auth-context'
 import { useAdminStats } from '@/features/admin/hooks/use-admin-stats'
+import { useAttendanceColumns } from '@/features/attendance/components/attendance-columns'
+import { attendanceKeys } from '@/features/attendance/lib/attendance-query-options'
+import {
+  ATTENDANCE_DEFAULT_FILTERS,
+  ATTENDANCE_DEFAULT_ORDER,
+  ATTENDANCE_DEFAULT_SORT_BY,
+  ATTENDANCE_PER_PAGE_OPTIONS,
+  ATTENDANCE_SORT_BY,
+  attendanceFilterSchema,
+} from '@/features/attendance/lib/attendance-table'
+import { getAttendanceRecords } from '@/features/attendance/services/attendance-api'
 
 export function AdminDashboardView() {
   const { user } = useAuth()
   const { totalStudents, totalTeachers, attendancePercentage, isLoading } =
     useAdminStats()
+  const columns = useAttendanceColumns()
 
   const currentDate = useMemo(() => dayjs().format('dddd, D MMMM YYYY'), [])
 
@@ -51,8 +69,7 @@ export function AdminDashboardView() {
   ]
 
   return (
-    <div className="space-y-8">
-      {/* Header Section */}
+    <div className="flex w-full flex-col gap-6">
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight">
@@ -65,7 +82,6 @@ export function AdminDashboardView() {
         </div>
       </div>
 
-      {/* Stats Cards Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <Card key={stat.title}>
@@ -88,107 +104,125 @@ export function AdminDashboardView() {
         ))}
       </div>
 
-      {/* Charts Section */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* Live Attendance */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Kehadiran Langsung</CardTitle>
-            <CardDescription>Status kehadiran siswa saat ini</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
-                  <span className="text-sm">Hadir</span>
-                </div>
-                <span className="font-semibold">245</span>
+      <div className="grid items-start gap-6 lg:grid-cols-12">
+        <div className="space-y-6 lg:col-span-8">
+          <Card>
+            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="space-y-1">
+                <CardTitle className="flex items-center gap-2">
+                  <span className="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live Presensi Siswa Masuk
+                </CardTitle>
+                <CardDescription>
+                  Aktivitas scan presensi siswa real-time dan log data
+                  kehadiran.
+                </CardDescription>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <span className="text-sm">Izin</span>
-                </div>
-                <span className="font-semibold">12</span>
+              <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+                <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                Pembaruan Realtime
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-orange-500" />
-                  <span className="text-sm">Sakit</span>
-                </div>
-                <span className="font-semibold">8</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500" />
-                  <span className="text-sm">Alpa</span>
-                </div>
-                <span className="font-semibold">5</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent>
+              <DataTable
+                columns={columns}
+                queryKey={attendanceKeys.lists()}
+                queryFn={async (params) => {
+                  const apiParams: IAttendanceParams = {}
+                  if (params.classroom_id)
+                    apiParams.classroom_id = Number(params.classroom_id)
+                  if (params.month) apiParams.month = Number(params.month)
+                  if (params.semester)
+                    apiParams.semester = String(params.semester)
+                  if (params.status && params.status !== 'all')
+                    apiParams.status = params.status as AttendanceStatus
+                  if (params.search) apiParams.search = String(params.search)
+                  if (params.page) apiParams.page = Number(params.page)
+                  if (params.per_page)
+                    apiParams.per_page = Number(params.per_page)
+                  if (params.sortBy) apiParams.sortBy = String(params.sortBy)
+                  if (params.order) apiParams.order = String(params.order)
 
-        {/* Attendance Composition */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Komposisi Kehadiran</CardTitle>
-            <CardDescription>Persentase status kehadiran</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span>Hadir</span>
-                  <span className="font-semibold">91.0%</span>
+                  return getAttendanceRecords(apiParams)
+                }}
+                allowedSortBy={ATTENDANCE_SORT_BY}
+                defaultSortBy={ATTENDANCE_DEFAULT_SORT_BY}
+                defaultOrder={ATTENDANCE_DEFAULT_ORDER}
+                perPageOptions={ATTENDANCE_PER_PAGE_OPTIONS}
+                defaultFilters={ATTENDANCE_DEFAULT_FILTERS}
+                filterSchema={attendanceFilterSchema}
+                enableSearch={false}
+                toolbar={null}
+                footer={null}
+                emptyTitle="Tidak ada data presensi"
+                emptyDescription="Belum ada aktivitas presensi siswa."
+                errorMessage="Gagal memuat data presensi."
+                syncWithQueryParams
+              />
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="space-y-6 lg:col-span-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Komposisi Kehadiran</CardTitle>
+              <CardDescription>Persentase status kehadiran</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Hadir</span>
+                    <span className="font-semibold">91.0%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                    <div
+                      className="bg-green-500 h-2 rounded-full"
+                      style={{ width: '91%' }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                  <div
-                    className="bg-green-500 h-2 rounded-full"
-                    style={{ width: '91%' }}
-                  />
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Izin</span>
+                    <span className="font-semibold">4.5%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                    <div
+                      className="bg-yellow-500 h-2 rounded-full"
+                      style={{ width: '4.5%' }}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Sakit</span>
+                    <span className="font-semibold">3.0%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                    <div
+                      className="bg-orange-500 h-2 rounded-full"
+                      style={{ width: '3%' }}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Alpa</span>
+                    <span className="font-semibold">1.5%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                    <div
+                      className="bg-red-500 h-2 rounded-full"
+                      style={{ width: '1.5%' }}
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span>Izin</span>
-                  <span className="font-semibold">4.5%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                  <div
-                    className="bg-yellow-500 h-2 rounded-full"
-                    style={{ width: '4.5%' }}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span>Sakit</span>
-                  <span className="font-semibold">3.0%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                  <div
-                    className="bg-orange-500 h-2 rounded-full"
-                    style={{ width: '3%' }}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span>Alpa</span>
-                  <span className="font-semibold">1.5%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                  <div
-                    className="bg-red-500 h-2 rounded-full"
-                    style={{ width: '1.5%' }}
-                  />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   )

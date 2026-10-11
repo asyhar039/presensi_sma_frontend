@@ -231,15 +231,19 @@ export function ReportView() {
         <CardHeader className="pb-3">
           <CardTitle className="text-base font-medium flex items-center gap-2">
             <IconFilter className="size-4" />
-            <span>Filter Laporan Presensi</span>
+            <span>Filter Laporan Kehadiran</span>
           </CardTitle>
           <CardDescription>
-            Tentukan kriteria pencarian untuk menyaring rekapitulasi data
-            kehadiran siswa.
+            Atur filter untuk menyaring rekapitulasi data kehadiran siswa.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-6">
+          <div
+            className={cn(
+              'grid gap-4 items-end',
+              'grid-cols-2 sm:grid-cols-3 md:grid-cols-6',
+            )}
+          >
             <div className="space-y-1.5">
               <label
                 htmlFor="report-filter-month"
@@ -251,14 +255,22 @@ export function ReportView() {
                 value={selectedMonth}
                 onValueChange={(val) => val && setSelectedMonth(val)}
               >
-                <SelectTrigger id="report-filter-month">
+                <SelectTrigger id="report-filter-month" className="h-10 w-full">
                   <SelectValue placeholder="Pilih Bulan" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="10">Oktober</SelectItem>
-                  <SelectItem value="9">September</SelectItem>
-                  <SelectItem value="8">Agustus</SelectItem>
+                  <SelectItem value="1">Januari</SelectItem>
+                  <SelectItem value="2">Februari</SelectItem>
+                  <SelectItem value="3">Maret</SelectItem>
+                  <SelectItem value="4">April</SelectItem>
+                  <SelectItem value="5">Mei</SelectItem>
+                  <SelectItem value="6">Juni</SelectItem>
                   <SelectItem value="7">Juli</SelectItem>
+                  <SelectItem value="8">Agustus</SelectItem>
+                  <SelectItem value="9">September</SelectItem>
+                  <SelectItem value="10">Oktober</SelectItem>
+                  <SelectItem value="11">November</SelectItem>
+                  <SelectItem value="12">Desember</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -274,7 +286,7 @@ export function ReportView() {
                 value={selectedYear}
                 onValueChange={(val) => val && setSelectedYear(val)}
               >
-                <SelectTrigger id="report-filter-year">
+                <SelectTrigger id="report-filter-year" className="h-10 w-full">
                   <SelectValue placeholder="Pilih Tahun" />
                 </SelectTrigger>
                 <SelectContent>
@@ -295,7 +307,7 @@ export function ReportView() {
                 value={selectedClass}
                 onValueChange={(val) => val && setSelectedClass(val)}
               >
-                <SelectTrigger id="report-filter-class">
+                <SelectTrigger id="report-filter-class" className="h-10 w-full">
                   <SelectValue placeholder="Semua Kelas" />
                 </SelectTrigger>
                 <SelectContent>
@@ -319,7 +331,10 @@ export function ReportView() {
                 value={selectedSubject}
                 onValueChange={(val) => val && setSelectedSubject(val)}
               >
-                <SelectTrigger id="report-filter-subject">
+                <SelectTrigger
+                  id="report-filter-subject"
+                  className="h-10 w-full"
+                >
                   <SelectValue placeholder="Semua Mapel" />
                 </SelectTrigger>
                 <SelectContent>
@@ -343,7 +358,10 @@ export function ReportView() {
                 value={selectedStatus}
                 onValueChange={(val) => val && setSelectedStatus(val)}
               >
-                <SelectTrigger id="report-filter-status">
+                <SelectTrigger
+                  id="report-filter-status"
+                  className="h-10 w-full"
+                >
                   <SelectValue placeholder="Semua Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -356,10 +374,10 @@ export function ReportView() {
               </Select>
             </div>
 
-            <div className="space-y-1.5 flex items-end gap-2">
+            <div className="space-y-1.5 flex items-end">
               <Button
                 variant="outline"
-                className="w-full"
+                className="h-10 w-full"
                 onClick={handleResetFilters}
               >
                 <IconRefresh className="size-4 mr-1.5" />

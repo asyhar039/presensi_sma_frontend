@@ -1,7 +1,9 @@
+import { IconQrcode } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
 import { DataTable } from '@/components/data-table'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -11,6 +13,7 @@ import {
 } from '@/components/ui/card'
 import { useDutyColumns } from '@/features/duty-teacher/components/duty-columns'
 import { DutyDetailDialog } from '@/features/duty-teacher/components/duty-detail-dialog'
+import { DutyScanDialog } from '@/features/duty-teacher/components/duty-scan-dialog'
 import {
   DutyError,
   DutyHeading,
@@ -37,6 +40,7 @@ import { getErrorMessage } from '@/utils/error'
 function DutyTeacherContent() {
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
+  const [scanOpen, setScanOpen] = useState(false)
 
   const statusQuery = useQuery(dutyStatusQueryOptions())
   const columns = useDutyColumns({
@@ -90,11 +94,17 @@ function DutyTeacherContent() {
 
   return (
     <div className="flex w-full flex-col gap-6">
-      <DutyHeading
-        title="Duty Teacher"
-        description="Review today's early-out and late-arrival requests."
-        badge={badge}
-      />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <DutyHeading
+          title="Duty Teacher"
+          description="Review today's early-out and late-arrival requests."
+          badge={badge}
+        />
+        <Button onClick={() => setScanOpen(true)} className="w-full sm:w-auto">
+          <IconQrcode />
+          <span>Scan Request</span>
+        </Button>
+      </div>
 
       <Card>
         <CardHeader className="sr-only">
@@ -123,6 +133,8 @@ function DutyTeacherContent() {
           />
         </CardContent>
       </Card>
+
+      <DutyScanDialog open={scanOpen} onOpenChange={setScanOpen} />
 
       <DutyDetailDialog
         leaveRequestId={selectedId}

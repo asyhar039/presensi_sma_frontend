@@ -48,3 +48,13 @@ export async function decideDutyLeaveRequest(
     payload,
   )
 }
+
+export async function decideDutyLeaveRequestByKey(
+  leaveRequestKey: string,
+  payload: IDecideLeavePayload,
+): Promise<IDutyLeaveDetail> {
+  return api.post<IDutyLeaveDetail>(
+    `/duty/leave-requests/key/${encodeURIComponent(leaveRequestKey)}/early-out/decision`,
+    payload,
+  )
+}

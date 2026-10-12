@@ -80,6 +80,11 @@ export const DASHBOARD_NAVIGATION: Record<UserRole, DashboardNavGroup[]> = {
           href: '/dashboard/classrooms',
           icon: IconChalkboardTeacher,
         },
+        {
+          title: 'Duty Teacher',
+          href: '/dashboard/duty-teacher',
+          icon: IconQrcodeOff,
+        },
       ],
     },
     {

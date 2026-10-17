@@ -1,5 +1,4 @@
-import { IconQrcode } from '@tabler/icons-react'
-
+import iconSIP from '@/assets/icon_SIP.png'
 import { cn } from '@/lib/class-name'
 
 type LogoProps = {
@@ -22,16 +21,17 @@ function Logo({
         className,
       )}
     >
-      <IconQrcode
-        className={cn('size-6', iconClassName)}
-        stroke={2}
+      <img
+        src={iconSIP}
+        alt="SIP Apps Logo"
+        className={cn('size-8 object-contain', iconClassName)}
         aria-hidden="true"
       />
       {showText && (
         <span
           className={cn('text-lg font-semibold tracking-tight', textClassName)}
         >
-          Attendance Apps
+          SIP Apps
         </span>
       )}
     </div>

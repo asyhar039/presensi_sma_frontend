@@ -1,12 +1,12 @@
-import type { ColumnDef } from '@tanstack/react-table'
-import type { DataTableFeatures } from '@/components/data-table/data-table'
-import type { IAttendanceRecord } from '@/features/attendance/types/attendance.types'
+import type {
+  AttendanceStatus,
+  IAttendanceParams,
+} from '@/features/attendance/types/attendance.types'
 
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 
-import { DataTable, dataTableHeader } from '@/components/data-table'
-import { Badge } from '@/components/ui/badge'
+import { DataTable } from '@/components/data-table'
 import {
   Card,
   CardContent,
@@ -17,82 +17,25 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/context/auth-context'
 import { useAdminStats } from '@/features/admin/hooks/use-admin-stats'
+import { useAttendanceColumns } from '@/features/attendance/components/attendance-columns'
+import { attendanceKeys } from '@/features/attendance/lib/attendance-query-options'
 import {
-  ATTENDANCE_STATUS_BADGE_VARIANTS,
-  ATTENDANCE_STATUS_LABELS,
-} from '@/features/attendance/types/attendance.types'
-
-function useLiveAttendanceColumns(): ColumnDef<
-  DataTableFeatures,
-  IAttendanceRecord,
-  unknown
->[] {
-  return useMemo<ColumnDef<DataTableFeatures, IAttendanceRecord, unknown>[]>(
-    () => [
-      {
-        id: 'nis',
-        accessorKey: 'student_id',
-        header: dataTableHeader('NIS'),
-        cell: ({ row }) => (
-          <span className="font-medium text-muted-foreground">
-            {row.original.student?.user?.identity_number}
-          </span>
-        ),
-      },
-      {
-        id: 'student_name',
-        accessorKey: 'student_id',
-        header: dataTableHeader('Nama Siswa'),
-        cell: ({ row }) => (
-          <span className="font-medium">
-            {row.original.student?.user?.name}
-          </span>
-        ),
-      },
-      {
-        id: 'classroom',
-        accessorKey: 'classroom_name',
-        header: dataTableHeader('Kelas'),
-      },
-      {
-        id: 'subject',
-        accessorKey: 'subject_name',
-        header: dataTableHeader('Mata Pelajaran'),
-      },
-      {
-        id: 'status',
-        accessorKey: 'status',
-        header: dataTableHeader('Status'),
-        cell: ({ row }) => {
-          const status = row.original.status
-          const variant = ATTENDANCE_STATUS_BADGE_VARIANTS[status]
-          const label = ATTENDANCE_STATUS_LABELS[status]
-          return <Badge variant={variant}>{label}</Badge>
-        },
-      },
-      {
-        id: 'date',
-        accessorKey: 'date',
-        header: dataTableHeader('Tanggal'),
-        cell: ({ row }) => dayjs(row.original.date).format('DD/MM/YYYY'),
-      },
-      {
-        id: 'time',
-        accessorKey: 'time_start',
-        header: dataTableHeader('Waktu'),
-        cell: ({ row }) =>
-          `${row.original.time_start}–${row.original.time_end}`,
-      },
-    ],
-    [],
-  )
-}
+  ATTENDANCE_DEFAULT_FILTERS,
+  ATTENDANCE_DEFAULT_ORDER,
+  ATTENDANCE_DEFAULT_SORT_BY,
+  ATTENDANCE_PER_PAGE_OPTIONS,
+  ATTENDANCE_SORT_BY,
+  attendanceFilterSchema,
+} from '@/features/attendance/lib/attendance-table'
+import { getAttendanceRecords } from '@/features/attendance/services/attendance-api'
 
 export function AdminDashboardView() {
   const { user } = useAuth()
+
   const { totalStudents, totalTeachers, attendancePercentage, isLoading } =
     useAdminStats()
-  const liveAttendanceColumns = useLiveAttendanceColumns()
+
+  const columns = useAttendanceColumns()
 
   const currentDate = useMemo(() => dayjs().format('dddd, D MMMM YYYY'), [])
 
@@ -128,21 +71,22 @@ export function AdminDashboardView() {
   ]
 
   return (
-    <div className="space-y-8">
-      {/* Header Section */}
+    <div className="flex w-full flex-col gap-6">
+      {/* Header Dashboard */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight">
-            Selamat Datang {user?.name ? `, ${user.name}` : ''}
+            Selamat Datang{user?.name ? `, ${user.name}` : ''}
           </h1>
         </div>
+
         <div className="flex flex-col gap-1">
           <p className="text-sm text-muted-foreground">{user?.name}</p>
           <p className="text-sm text-muted-foreground">{currentDate}</p>
         </div>
       </div>
 
-      {/* Stats Cards Grid */}
+      {/* Statistik Dashboard */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <Card key={stat.title}>
@@ -151,12 +95,14 @@ export function AdminDashboardView() {
                 {stat.title}
               </CardTitle>
             </CardHeader>
+
             <CardContent>
               <div className={`rounded-lg ${stat.bgColor} p-4`}>
                 <div className={`text-3xl font-bold ${stat.color}`}>
                   {isLoading ? <Skeleton className="h-10 w-24" /> : stat.value}
                 </div>
-                <p className="text-xs text-muted-foreground pt-2">
+
+                <p className="pt-2 text-xs text-muted-foreground">
                   {stat.description}
                 </p>
               </div>
@@ -165,97 +111,166 @@ export function AdminDashboardView() {
         ))}
       </div>
 
-      {/* Charts Section */}
-      <div className="space-y-4">
-        {/* Live Attendance Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Kehadiran Langsung</CardTitle>
-            <CardDescription>Status kehadiran siswa saat ini</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DataTable
-              columns={liveAttendanceColumns}
-              queryKey={['live-attendance']}
-              queryFn={async (params) => {
-                const { getAttendanceRecords } = await import(
-                  '@/features/attendance/services/attendance-api'
-                )
-                return getAttendanceRecords({
-                  page: params.page ? Number(params.page) : 1,
-                  per_page: params.per_page ? Number(params.per_page) : 10,
-                  search: params.search ? String(params.search) : undefined,
-                })
-              }}
-              defaultOrder="desc"
-              perPageOptions={[10, 20, 50]}
-              searchPlaceholder="Cari NIS atau nama siswa..."
-              emptyTitle="Tidak ada data kehadiran"
-              emptyDescription="Tidak ada siswa yang hadir saat ini."
-              syncWithQueryParams={false}
-            />
-          </CardContent>
-        </Card>
+      {/* Tabel Presensi dan Komposisi Kehadiran */}
+      <div className="grid items-start gap-6 lg:grid-cols-12">
+        {/* Live Presensi Siswa */}
+        <div className="space-y-6 lg:col-span-8">
+          <Card>
+            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="space-y-1">
+                <CardTitle className="flex items-center gap-2">
+                  <span className="size-2.5 animate-pulse rounded-full bg-emerald-500" />
+                  Live Presensi Siswa Masuk
+                </CardTitle>
 
-        {/* Attendance Composition */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Komposisi Kehadiran</CardTitle>
-            <CardDescription>Persentase status kehadiran</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span>Hadir</span>
-                  <span className="font-semibold">91.0%</span>
+                <CardDescription>
+                  Aktivitas scan presensi siswa real-time dan log data
+                  kehadiran.
+                </CardDescription>
+              </div>
+
+              <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+                <span className="size-2 animate-pulse rounded-full bg-emerald-500" />
+                Pembaruan Realtime
+              </div>
+            </CardHeader>
+
+            <CardContent>
+              <DataTable
+                columns={columns}
+                queryKey={attendanceKeys.lists()}
+                queryFn={async (params) => {
+                  const apiParams: IAttendanceParams = {}
+
+                  if (params.classroom_id) {
+                    apiParams.classroom_id = Number(params.classroom_id)
+                  }
+
+                  if (params.month) {
+                    apiParams.month = Number(params.month)
+                  }
+
+                  if (params.semester) {
+                    apiParams.semester = String(params.semester)
+                  }
+
+                  if (params.status && params.status !== 'all') {
+                    apiParams.status = params.status as AttendanceStatus
+                  }
+
+                  if (params.search) {
+                    apiParams.search = String(params.search)
+                  }
+
+                  if (params.page) {
+                    apiParams.page = Number(params.page)
+                  }
+
+                  if (params.per_page) {
+                    apiParams.per_page = Number(params.per_page)
+                  }
+
+                  if (params.sortBy) {
+                    apiParams.sortBy = String(params.sortBy)
+                  }
+
+                  if (params.order) {
+                    apiParams.order = String(params.order)
+                  }
+
+                  return getAttendanceRecords(apiParams)
+                }}
+                allowedSortBy={ATTENDANCE_SORT_BY}
+                defaultSortBy={ATTENDANCE_DEFAULT_SORT_BY}
+                defaultOrder={ATTENDANCE_DEFAULT_ORDER}
+                perPageOptions={ATTENDANCE_PER_PAGE_OPTIONS}
+                defaultFilters={ATTENDANCE_DEFAULT_FILTERS}
+                filterSchema={attendanceFilterSchema}
+                enableSearch={false}
+                toolbar={null}
+                footer={null}
+                emptyTitle="Tidak ada data presensi"
+                emptyDescription="Belum ada aktivitas presensi siswa."
+                errorMessage="Gagal memuat data presensi."
+                syncWithQueryParams
+              />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Komposisi Kehadiran */}
+        <div className="space-y-6 lg:col-span-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Komposisi Kehadiran</CardTitle>
+              <CardDescription>Persentase status kehadiran</CardDescription>
+            </CardHeader>
+
+            <CardContent>
+              <div className="space-y-4">
+                {/* Hadir */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Hadir</span>
+                    <span className="font-semibold">91.0%</span>
+                  </div>
+
+                  <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+                    <div
+                      className="h-2 rounded-full bg-green-500"
+                      style={{ width: '91%' }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                  <div
-                    className="bg-green-500 h-2 rounded-full"
-                    style={{ width: '91%' }}
-                  />
+
+                {/* Izin */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Izin</span>
+                    <span className="font-semibold">4.5%</span>
+                  </div>
+
+                  <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+                    <div
+                      className="h-2 rounded-full bg-yellow-500"
+                      style={{ width: '4.5%' }}
+                    />
+                  </div>
+                </div>
+
+                {/* Sakit */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Sakit</span>
+                    <span className="font-semibold">3.0%</span>
+                  </div>
+
+                  <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+                    <div
+                      className="h-2 rounded-full bg-orange-500"
+                      style={{ width: '3%' }}
+                    />
+                  </div>
+                </div>
+
+                {/* Alpa */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>Alpa</span>
+                    <span className="font-semibold">1.5%</span>
+                  </div>
+
+                  <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+                    <div
+                      className="h-2 rounded-full bg-red-500"
+                      style={{ width: '1.5%' }}
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span>Izin</span>
-                  <span className="font-semibold">4.5%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                  <div
-                    className="bg-yellow-500 h-2 rounded-full"
-                    style={{ width: '4.5%' }}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span>Sakit</span>
-                  <span className="font-semibold">3.0%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                  <div
-                    className="bg-orange-500 h-2 rounded-full"
-                    style={{ width: '3%' }}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span>Alpa</span>
-                  <span className="font-semibold">1.5%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                  <div
-                    className="bg-red-500 h-2 rounded-full"
-                    style={{ width: '1.5%' }}
-                  />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   )

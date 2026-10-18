@@ -1,0 +1,10 @@
+{
+  "welcome": "Selamat datang",
+  "dashboard": "Dasbor",
+  "startSession": "Mulai Sesi",
+  "stopSession": "Hentikan Sesi",
+  "refreshQR": "Segarkan QR",
+  "noSchedule": "Tidak ada jadwal",
+  "outsideSlot": "Di luar waktu jadwal",
+  "errorLoading": "Gagal memuat status kehadiran"
+}

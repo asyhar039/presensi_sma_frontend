@@ -5,6 +5,7 @@ import type {
 
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { DataTable } from '@/components/data-table'
 import {
@@ -30,6 +31,7 @@ import {
 import { getAttendanceRecords } from '@/features/attendance/services/attendance-api'
 
 export function AdminDashboardView() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const { totalStudents, totalTeachers, attendancePercentage, isLoading } =
     useAdminStats()
@@ -39,30 +41,30 @@ export function AdminDashboardView() {
 
   const stats = [
     {
-      title: 'Jumlah Siswa',
+      title: t('adminDashboard.totalStudents'),
       value: totalStudents,
-      description: 'Total siswa terdaftar',
+      description: t('adminDashboard.totalStudentsDesc'),
       color: 'text-blue-600',
       bgColor: 'bg-blue-50 dark:bg-blue-950',
     },
     {
-      title: 'Jumlah Guru',
+      title: t('adminDashboard.totalTeachers'),
       value: totalTeachers,
-      description: 'Total guru terdaftar',
+      description: t('adminDashboard.totalTeachersDesc'),
       color: 'text-green-600',
       bgColor: 'bg-green-50 dark:bg-green-950',
     },
     {
-      title: 'Persentase Kehadiran Hari Ini',
+      title: t('adminDashboard.attendancePercentage'),
       value: `${attendancePercentage.toFixed(1)}%`,
-      description: 'Tingkat kehadiran siswa',
+      description: t('adminDashboard.attendancePercentageDesc'),
       color: 'text-purple-600',
       bgColor: 'bg-purple-50 dark:bg-purple-950',
     },
     {
-      title: 'Mata Pelajaran Aktif',
+      title: t('adminDashboard.activeSubjects'),
       value: 10,
-      description: 'Sesi pelajaran aktif hari ini',
+      description: t('adminDashboard.activeSubjectsDesc'),
       color: 'text-orange-600',
       bgColor: 'bg-orange-50 dark:bg-orange-950',
     },
@@ -73,7 +75,7 @@ export function AdminDashboardView() {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight">
-            Selamat Datang {user?.name ? `, ${user.name}` : ''}
+            {t('adminDashboard.welcome')} {user?.name ? `, ${user.name}` : ''}
           </h1>
         </div>
         <div className="flex flex-col gap-1">
@@ -111,16 +113,15 @@ export function AdminDashboardView() {
               <div className="space-y-1">
                 <CardTitle className="flex items-center gap-2">
                   <span className="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live Presensi Siswa Masuk
+                  {t('adminDashboard.liveAttendance')}
                 </CardTitle>
                 <CardDescription>
-                  Aktivitas scan presensi siswa real-time dan log data
-                  kehadiran.
+                  {t('adminDashboard.liveAttendanceDesc')}
                 </CardDescription>
               </div>
               <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
                 <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                Pembaruan Realtime
+                {t('adminDashboard.realtimeUpdate')}
               </div>
             </CardHeader>
             <CardContent>
@@ -154,9 +155,9 @@ export function AdminDashboardView() {
                 enableSearch={false}
                 toolbar={null}
                 footer={null}
-                emptyTitle="Tidak ada data presensi"
-                emptyDescription="Belum ada aktivitas presensi siswa."
-                errorMessage="Gagal memuat data presensi."
+                emptyTitle={t('adminDashboard.noAttendanceData')}
+                emptyDescription={t('adminDashboard.noAttendanceActivity')}
+                errorMessage={t('adminDashboard.failedLoadAttendance')}
                 syncWithQueryParams
               />
             </CardContent>
@@ -166,14 +167,16 @@ export function AdminDashboardView() {
         <div className="space-y-6 lg:col-span-4">
           <Card>
             <CardHeader>
-              <CardTitle>Komposisi Kehadiran</CardTitle>
-              <CardDescription>Persentase status kehadiran</CardDescription>
+              <CardTitle>{t('adminDashboard.attendanceComposition')}</CardTitle>
+              <CardDescription>
+                {t('adminDashboard.attendanceCompositionDesc')}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span>Hadir</span>
+                    <span>{t('adminDashboard.present')}</span>
                     <span className="font-semibold">91.0%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
@@ -185,7 +188,7 @@ export function AdminDashboardView() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span>Izin</span>
+                    <span>{t('adminDashboard.permission')}</span>
                     <span className="font-semibold">4.5%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
@@ -197,7 +200,7 @@ export function AdminDashboardView() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span>Sakit</span>
+                    <span>{t('adminDashboard.sick')}</span>
                     <span className="font-semibold">3.0%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
@@ -209,7 +212,7 @@ export function AdminDashboardView() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span>Alpa</span>
+                    <span>{t('adminDashboard.absent')}</span>
                     <span className="font-semibold">1.5%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">

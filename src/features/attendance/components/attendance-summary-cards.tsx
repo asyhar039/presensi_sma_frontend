@@ -3,6 +3,8 @@ import type {
   IStudentAttendanceSummary,
 } from '@/features/attendance/types/attendance.types'
 
+import { useTranslation } from 'react-i18next'
+
 import { Card, CardContent } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
 
@@ -71,6 +73,7 @@ export function AttendanceSummaryCards({
 }: {
   summary: IAttendanceSummary
 }) {
+  const { t } = useTranslation()
   const attendanceRate = summary.average_attendance.toFixed(1)
   const totalRecords =
     summary.total_present +
@@ -81,27 +84,30 @@ export function AttendanceSummaryCards({
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <SummaryCard
-        title="Total Siswa"
+        title={t('attendance.totalStudents')}
         value={summary.total_students}
-        description="Siswa di kelas ini"
+        description={t('attendance.studentsInClass')}
         variant="default"
       />
       <SummaryCard
-        title="Rata-rata Kehadiran"
+        title={t('attendance.averageAttendance')}
         value={`${attendanceRate}%`}
-        description={`Dari ${totalRecords} total pertemuan`}
+        description={t('attendance.fromTotalMeetings', { total: totalRecords })}
         variant="success"
       />
       <SummaryCard
-        title="Total Izin & Sakit"
+        title={t('attendance.totalPermitSick')}
         value={summary.total_permission + summary.total_sick}
-        description={`Izin: ${summary.total_permission} | Sakit: ${summary.total_sick}`}
+        description={t('attendance.permitSickDesc', {
+          permit: summary.total_permission,
+          sick: summary.total_sick,
+        })}
         variant="warning"
       />
       <SummaryCard
-        title="Total Alpa"
+        title={t('attendance.totalAbsent')}
         value={summary.total_absent}
-        description="Tanpa keterangan"
+        description={t('attendance.unexcused')}
         variant="danger"
       />
     </div>
@@ -113,28 +119,29 @@ export function StudentAttendanceSummaryCards({
 }: {
   summary: IStudentAttendanceSummary
 }) {
+  const { t } = useTranslation()
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <SummaryCard
-        title="HADIR"
+        title={t('adminDashboard.present').toUpperCase()}
         value={summary.present}
         variant="success"
         className="bg-green-500/10 border-none"
       />
       <SummaryCard
-        title="IZIN"
+        title={t('adminDashboard.permission').toUpperCase()}
         value={summary.permission}
         variant="default"
         className="bg-blue-500/10 border-none"
       />
       <SummaryCard
-        title="SAKIT"
+        title={t('adminDashboard.sick').toUpperCase()}
         value={summary.sick}
         variant="warning"
         className="bg-yellow-500/10 border-none"
       />
       <SummaryCard
-        title="ALFA"
+        title={t('adminDashboard.absent').toUpperCase()}
         value={summary.absent}
         variant="danger"
         className="bg-red-500/10 border-none"

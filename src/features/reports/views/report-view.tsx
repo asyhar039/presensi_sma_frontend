@@ -8,6 +8,7 @@ import {
   IconUserExclamation,
 } from '@tabler/icons-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 import { Badge } from '@/components/ui/badge'
@@ -44,6 +45,7 @@ import { Tabs, TabsList, TabsTab } from '@/components/ui/tabs'
 import { cn } from '@/lib/class-name'
 
 export function ReportView() {
+  const { t } = useTranslation()
   const [dateRangeTab, setDateRangeTab] = useState('1-10')
   const [selectedMonth, setSelectedMonth] = useState('10')
   const [selectedYear, setSelectedYear] = useState('2026')
@@ -52,7 +54,7 @@ export function ReportView() {
   const [selectedStatus, setSelectedStatus] = useState('all')
 
   const handleExport = (type: string) => {
-    toast.success(`Exporting attendance report as ${type.toUpperCase()}...`)
+    toast.success(t('reports.exportingMessage', { type: type.toUpperCase() }))
   }
 
   const handleResetFilters = () => {
@@ -61,7 +63,7 @@ export function ReportView() {
     setSelectedClass('all')
     setSelectedSubject('all')
     setSelectedStatus('all')
-    toast.info('Filter laporan berhasil direset.')
+    toast.info(t('reports.resetFilterSuccess'))
   }
 
   const mockStudents = [
@@ -133,11 +135,10 @@ export function ReportView() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold tracking-tight">
-            Laporan Presensi
+            {t('reports.title')}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Laporan rekapitulasi data kehadiran siswa, persentase kedisiplinan,
-            dan matriks harian sekolah.
+            {t('adminDashboard.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -146,19 +147,19 @@ export function ReportView() {
               render={
                 <Button variant="outline" className="gap-2">
                   <IconDownload className="size-4" />
-                  <span>Export Data</span>
+                  <span>{t('common.export')}</span>
                 </Button>
               }
             />
             <DropdownMenuContent align="end" className="w-44">
               <DropdownMenuItem onClick={() => handleExport('excel')}>
-                Export Excel (.xlsx)
+                {t('reports.exportExcel')} (.xlsx)
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleExport('pdf')}>
-                Export PDF (.pdf)
+                {t('reports.exportPdf')} (.pdf)
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleExport('csv')}>
-                Export CSV (.csv)
+                {t('reports.exportCsv')} (.csv)
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -169,13 +170,15 @@ export function ReportView() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Hari Efektif</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t('reports.effectiveDays')}
+            </CardTitle>
             <IconCalendar className="size-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">22 Hari</div>
+            <div className="text-2xl font-bold">22 {t('schedules.day')}</div>
             <p className="text-xs text-muted-foreground pt-1">
-              Periode Bulan Berjalan
+              {t('attendance.selectMonthYear')}
             </p>
           </CardContent>
         </Card>
@@ -183,14 +186,14 @@ export function ReportView() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Rata-rata Kehadiran
+              {t('reports.averageAttendance')}
             </CardTitle>
             <IconChartBar className="size-4 text-emerald-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-emerald-600">93.8%</div>
             <p className="text-xs text-muted-foreground pt-1">
-              Tingkat kehadiran siswa seluruh kelas
+              {t('attendance.attendancePercentage')}
             </p>
           </CardContent>
         </Card>
@@ -198,14 +201,16 @@ export function ReportView() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Alpa Kronis (&gt;3 Hari)
+              {t('adminDashboard.absent')} (&gt;3 {t('schedules.day')})
             </CardTitle>
             <IconUserExclamation className="size-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">3 Siswa</div>
+            <div className="text-2xl font-bold text-red-600">
+              3 {t('students.title')}
+            </div>
             <p className="text-xs text-muted-foreground pt-1">
-              Perlu tindak lanjut pembinaan BK
+              {t('dutyTeacher.studentStatus')}
             </p>
           </CardContent>
         </Card>
@@ -213,14 +218,14 @@ export function ReportView() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Kelas Terdisiplin
+              {t('classrooms.title')}
             </CardTitle>
             <IconSchool className="size-4 text-purple-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">X MIPA 1</div>
             <p className="text-xs text-muted-foreground pt-1">
-              Tingkat kehadiran tertinggi (98.2%)
+              {t('attendance.attendancePercentage')} (98.2%)
             </p>
           </CardContent>
         </Card>
@@ -231,11 +236,9 @@ export function ReportView() {
         <CardHeader className="pb-3">
           <CardTitle className="text-base font-medium flex items-center gap-2">
             <IconFilter className="size-4" />
-            <span>Filter Laporan Kehadiran</span>
+            <span>{t('reports.filterTitle')}</span>
           </CardTitle>
-          <CardDescription>
-            Atur filter untuk menyaring rekapitulasi data kehadiran siswa.
-          </CardDescription>
+          <CardDescription>{t('reports.filterDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div
@@ -249,28 +252,28 @@ export function ReportView() {
                 htmlFor="report-filter-month"
                 className="text-xs font-medium text-muted-foreground"
               >
-                Bulan
+                {t('common.month')}
               </label>
               <Select
                 value={selectedMonth}
                 onValueChange={(val) => val && setSelectedMonth(val)}
               >
                 <SelectTrigger id="report-filter-month" className="h-10 w-full">
-                  <SelectValue placeholder="Pilih Bulan" />
+                  <SelectValue placeholder={t('reports.selectMonth')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">Januari</SelectItem>
-                  <SelectItem value="2">Februari</SelectItem>
-                  <SelectItem value="3">Maret</SelectItem>
-                  <SelectItem value="4">April</SelectItem>
-                  <SelectItem value="5">Mei</SelectItem>
-                  <SelectItem value="6">Juni</SelectItem>
-                  <SelectItem value="7">Juli</SelectItem>
-                  <SelectItem value="8">Agustus</SelectItem>
-                  <SelectItem value="9">September</SelectItem>
-                  <SelectItem value="10">Oktober</SelectItem>
-                  <SelectItem value="11">November</SelectItem>
-                  <SelectItem value="12">Desember</SelectItem>
+                  <SelectItem value="1">{t('months.january')}</SelectItem>
+                  <SelectItem value="2">{t('months.february')}</SelectItem>
+                  <SelectItem value="3">{t('months.march')}</SelectItem>
+                  <SelectItem value="4">{t('months.april')}</SelectItem>
+                  <SelectItem value="5">{t('months.may')}</SelectItem>
+                  <SelectItem value="6">{t('months.june')}</SelectItem>
+                  <SelectItem value="7">{t('months.july')}</SelectItem>
+                  <SelectItem value="8">{t('months.august')}</SelectItem>
+                  <SelectItem value="9">{t('months.september')}</SelectItem>
+                  <SelectItem value="10">{t('months.october')}</SelectItem>
+                  <SelectItem value="11">{t('months.november')}</SelectItem>
+                  <SelectItem value="12">{t('months.december')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -280,14 +283,14 @@ export function ReportView() {
                 htmlFor="report-filter-year"
                 className="text-xs font-medium text-muted-foreground"
               >
-                Tahun
+                {t('common.year')}
               </label>
               <Select
                 value={selectedYear}
                 onValueChange={(val) => val && setSelectedYear(val)}
               >
                 <SelectTrigger id="report-filter-year" className="h-10 w-full">
-                  <SelectValue placeholder="Pilih Tahun" />
+                  <SelectValue placeholder={t('reports.selectYear')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="2026">2026</SelectItem>
@@ -301,17 +304,17 @@ export function ReportView() {
                 htmlFor="report-filter-class"
                 className="text-xs font-medium text-muted-foreground"
               >
-                Kelas
+                {t('common.class')}
               </label>
               <Select
                 value={selectedClass}
                 onValueChange={(val) => val && setSelectedClass(val)}
               >
                 <SelectTrigger id="report-filter-class" className="h-10 w-full">
-                  <SelectValue placeholder="Semua Kelas" />
+                  <SelectValue placeholder={t('reports.allClasses')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Semua Kelas</SelectItem>
+                  <SelectItem value="all">{t('reports.allClasses')}</SelectItem>
                   <SelectItem value="1">X MIPA 1</SelectItem>
                   <SelectItem value="2">X MIPA 2</SelectItem>
                   <SelectItem value="3">XI MIPA 1</SelectItem>
@@ -325,7 +328,7 @@ export function ReportView() {
                 htmlFor="report-filter-subject"
                 className="text-xs font-medium text-muted-foreground"
               >
-                Mata Pelajaran
+                {t('navigation.subject')}
               </label>
               <Select
                 value={selectedSubject}
@@ -335,10 +338,12 @@ export function ReportView() {
                   id="report-filter-subject"
                   className="h-10 w-full"
                 >
-                  <SelectValue placeholder="Semua Mapel" />
+                  <SelectValue placeholder={t('reports.allSubjects')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Semua Mapel</SelectItem>
+                  <SelectItem value="all">
+                    {t('reports.allSubjects')}
+                  </SelectItem>
                   <SelectItem value="math">Matematika</SelectItem>
                   <SelectItem value="phys">Fisika</SelectItem>
                   <SelectItem value="chem">Kimia</SelectItem>
@@ -352,7 +357,7 @@ export function ReportView() {
                 htmlFor="report-filter-status"
                 className="text-xs font-medium text-muted-foreground"
               >
-                Status
+                {t('common.status')}
               </label>
               <Select
                 value={selectedStatus}
@@ -362,14 +367,22 @@ export function ReportView() {
                   id="report-filter-status"
                   className="h-10 w-full"
                 >
-                  <SelectValue placeholder="Semua Status" />
+                  <SelectValue placeholder={t('reports.allStatuses')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Semua Status</SelectItem>
-                  <SelectItem value="h">Hadir (H)</SelectItem>
-                  <SelectItem value="i">Izin (I)</SelectItem>
-                  <SelectItem value="s">Sakit (S)</SelectItem>
-                  <SelectItem value="a">Alpa (A)</SelectItem>
+                  <SelectItem value="all">
+                    {t('reports.allStatuses')}
+                  </SelectItem>
+                  <SelectItem value="h">
+                    {t('reports.presentDesc')} (H)
+                  </SelectItem>
+                  <SelectItem value="i">
+                    {t('reports.permitDesc')} (I)
+                  </SelectItem>
+                  <SelectItem value="s">{t('reports.sickDesc')} (S)</SelectItem>
+                  <SelectItem value="a">
+                    {t('reports.absentDesc')} (A)
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -381,7 +394,7 @@ export function ReportView() {
                 onClick={handleResetFilters}
               >
                 <IconRefresh className="size-4 mr-1.5" />
-                Reset
+                {t('common.reset')}
               </Button>
             </div>
           </div>
@@ -392,11 +405,8 @@ export function ReportView() {
       <Card>
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-4">
           <div>
-            <CardTitle>Matriks Presensi Harian</CardTitle>
-            <CardDescription>
-              Tabel rekapitulasi presensi harian per siswa berdasarkan tanggal
-              terpilih.
-            </CardDescription>
+            <CardTitle>{t('reports.dailyMatrix')}</CardTitle>
+            <CardDescription>{t('reports.dailyMatrixDesc')}</CardDescription>
           </div>
           <Tabs
             value={dateRangeTab}
@@ -411,7 +421,7 @@ export function ReportView() {
                     'bg-white text-slate-900 font-semibold shadow-sm border border-slate-200/80',
                 )}
               >
-                Tanggal 1–10
+                {t('reports.dateRange1_10')}
               </TabsTab>
               <TabsTab
                 value="11-20"
@@ -421,7 +431,7 @@ export function ReportView() {
                     'bg-white text-slate-900 font-semibold shadow-sm border border-slate-200/80',
                 )}
               >
-                Tanggal 11–20
+                {t('reports.dateRange11_20')}
               </TabsTab>
               <TabsTab
                 value="21-31"
@@ -431,7 +441,7 @@ export function ReportView() {
                     'bg-white text-slate-900 font-semibold shadow-sm border border-slate-200/80',
                 )}
               >
-                Tanggal 21–31
+                {t('reports.dateRange21_31')}
               </TabsTab>
             </TabsList>
           </Tabs>
@@ -440,31 +450,31 @@ export function ReportView() {
           {/* Status Legend Indicators */}
           <div className="flex flex-wrap items-center gap-4 text-xs bg-muted/40 p-3 rounded-lg border">
             <span className="font-semibold text-muted-foreground">
-              Keterangan Status:
+              {t('reports.statusLegend')}
             </span>
             <div className="flex items-center gap-1.5">
               <span className="size-5 rounded bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-[10px]">
                 H
               </span>
-              <span>Hadir</span>
+              <span>{t('reports.presentDesc')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="size-5 rounded bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-[10px]">
                 I
               </span>
-              <span>Izin</span>
+              <span>{t('reports.permitDesc')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="size-5 rounded bg-amber-100 text-amber-700 font-bold flex items-center justify-center text-[10px]">
                 S
               </span>
-              <span>Sakit</span>
+              <span>{t('reports.sickDesc')}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="size-5 rounded bg-red-100 text-red-700 font-bold flex items-center justify-center text-[10px]">
                 A
               </span>
-              <span>Alpa (Tanpa Keterangan)</span>
+              <span>{t('reports.absentDesc')}</span>
             </div>
           </div>
 
@@ -472,20 +482,28 @@ export function ReportView() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-12 text-center">No</TableHead>
-                  <TableHead className="min-w-[180px]">
-                    Nama Siswa / NIS
+                  <TableHead className="w-12 text-center">
+                    {t('reports.no')}
                   </TableHead>
-                  <TableHead className="min-w-[100px]">Kelas</TableHead>
+                  <TableHead className="min-w-[180px]">
+                    {t('reports.studentNameNis')}
+                  </TableHead>
+                  <TableHead className="min-w-[100px]">
+                    {t('common.class')}
+                  </TableHead>
                   <TableHead className="text-center">
-                    Matriks Tanggal (1–10)
+                    {dateRangeTab === '1-10'
+                      ? t('reports.dateRange1_10')
+                      : dateRangeTab === '11-20'
+                        ? t('reports.dateRange11_20')
+                        : t('reports.dateRange21_31')}
                   </TableHead>
                   <TableHead className="text-center">H</TableHead>
                   <TableHead className="text-center">I</TableHead>
                   <TableHead className="text-center">S</TableHead>
                   <TableHead className="text-center">A</TableHead>
                   <TableHead className="text-right">
-                    Tingkat Kehadiran
+                    {t('reports.attendanceRate')}
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -562,13 +580,15 @@ export function ReportView() {
           </div>
 
           <div className="flex items-center justify-between pt-2 text-xs text-muted-foreground">
-            <span>Menampilkan 1–5 dari 36 siswa</span>
+            <span>
+              {t('reports.showingStudents', { from: 1, to: 5, total: 36 })}
+            </span>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" disabled>
-                Sebelumnya
+                {t('reports.previous')}
               </Button>
               <Button variant="outline" size="sm">
-                Selanjutnya
+                {t('reports.next')}
               </Button>
             </div>
           </div>

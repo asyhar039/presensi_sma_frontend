@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { Route } from '@/routes/_auth/login'
 
+import { LanguageSwitcher } from '@/components/composite/language-switcher'
 import { ThemeSwitcher } from '@/components/composite/theme-switcher'
 import { BackButton } from '@/features/auth/components/back-button'
 import { Login } from '@/features/auth/components/login'
@@ -35,7 +36,10 @@ export function LoginView() {
       <div className="relative flex h-screen flex-1 items-center justify-center">
         <div className="absolute top-0 p-6 flex items-center justify-between gap-4 w-full">
           <BackButton />
-          <ThemeSwitcher />
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <ThemeSwitcher />
+          </div>
         </div>
         <Login />
       </div>

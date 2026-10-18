@@ -1,4 +1,5 @@
 import { useNavigate, useRouterState } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
 import { FieldGroup } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -10,6 +11,7 @@ import { formErrorHandler } from '@/utils/error'
 import { delay } from '@/utils/time'
 
 export function LoginForm() {
+  const { t } = useTranslation()
   const { login } = useAuth()
   const submit = useLogin()
   const navigate = useNavigate()
@@ -51,11 +53,11 @@ export function LoginForm() {
           <form.AppField name="email">
             {(field) => (
               <field.FormField<string>
-                label="Email"
+                label={t('auth.emailOrUsername')}
                 children={({ isInvalid, onChange, ...props }) => (
                   <Input
                     type="email"
-                    placeholder="Your email"
+                    placeholder={t('auth.emailOrUsername')}
                     autoComplete="off"
                     onChange={(event) => onChange(event.target.value)}
                     aria-invalid={isInvalid}
@@ -68,11 +70,11 @@ export function LoginForm() {
           <form.AppField name="password">
             {(field) => (
               <field.FormField<string>
-                label="Password"
+                label={t('auth.password')}
                 children={({ isInvalid, onChange, ...props }) => (
                   <Input
                     type="password"
-                    placeholder="Your password"
+                    placeholder={t('auth.password')}
                     autoComplete="off"
                     onChange={(event) => onChange(event.target.value)}
                     aria-invalid={isInvalid}
@@ -82,7 +84,7 @@ export function LoginForm() {
               />
             )}
           </form.AppField>
-          <form.ButtonSubmit label="Login" />
+          <form.ButtonSubmit label={t('auth.signIn')} />
         </FieldGroup>
       </form.AppForm>
     </form>

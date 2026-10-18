@@ -2,6 +2,7 @@ import type { IPermitRecord } from '@/features/permits/types/permit.types'
 
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { DataTable } from '@/components/data-table'
 import { Badge } from '@/components/ui/badge'
@@ -26,6 +27,7 @@ import {
 import { getPermits } from '@/features/permits/services/permit-api'
 
 function TeacherPermitContent() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [selectedPermit, setSelectedPermit] = useState<IPermitRecord | null>(
     null,
@@ -47,14 +49,14 @@ function TeacherPermitContent() {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-2xl font-bold tracking-tight">
-              Daftar Izin Siswa
+              {t('permits.list')}
             </h1>
             <Badge variant="secondary" className="font-medium">
               Wali Kelas • {user?.name || 'Guru'}
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground">
-            Kelola dan pantau perizinan siswa untuk kelas bimbingan Anda.
+            {t('homeroom.permitApprovalDesc')}
           </p>
         </div>
       </div>

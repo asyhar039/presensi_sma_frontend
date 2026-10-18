@@ -1,5 +1,6 @@
 import { IconMenu2 } from '@tabler/icons-react'
 
+import { LanguageSwitcher } from '@/components/composite/language-switcher'
 import { Logo } from '@/components/composite/logo'
 import { ThemeSwitcher } from '@/components/composite/theme-switcher'
 import { Button } from '@/components/ui/button'
@@ -24,6 +25,7 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
         <Logo />
       </div>
       <div className="flex items-center gap-2">
+        <LanguageSwitcher className="size-8" />
         <ThemeSwitcher className="size-8" />
       </div>
     </header>

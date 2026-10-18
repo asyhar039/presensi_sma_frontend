@@ -1,3 +1,4 @@
+import '@/lib/i18n'
 import '@/styles/globals.css'
 import { createRoot } from 'react-dom/client'
 

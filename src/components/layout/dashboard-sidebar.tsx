@@ -4,6 +4,7 @@ import type {
 } from '@/constants/navigation'
 
 import { Link, useLocation } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
 import { Logo } from '@/components/composite/logo'
 import { Typography } from '@/components/ui/typography'
@@ -19,6 +20,30 @@ type DashboardSidebarProps = {
   className?: string
 }
 
+const TITLE_TO_KEY: Record<string, string> = {
+  'Main Menu': 'navigation.mainMenu',
+  Management: 'navigation.management',
+  Others: 'navigation.others',
+  Teaching: 'navigation.teaching',
+  Monitoring: 'navigation.monitoring',
+  Dashboard: 'navigation.dashboard',
+  Student: 'navigation.student',
+  Teacher: 'navigation.teacher',
+  Subject: 'navigation.subject',
+  'Academic Year': 'navigation.academicYear',
+  Schedule: 'navigation.schedule',
+  Room: 'navigation.room',
+  ClassRoom: 'navigation.classroom',
+  Report: 'navigation.report',
+  Settings: 'navigation.settings',
+  Attendance: 'navigation.attendance',
+  'Student Data': 'navigation.studentData',
+  'Teaching Schedule': 'navigation.teachingSchedule',
+  'Class Attendance Recap': 'navigation.classAttendanceRecap',
+  Permits: 'navigation.permits',
+  'Duty Teacher': 'navigation.dutyTeacher',
+}
+
 export function DashboardSidebar({
   groups,
   userName,
@@ -27,6 +52,7 @@ export function DashboardSidebar({
   className,
 }: DashboardSidebarProps) {
   const { pathname } = useLocation()
+  const { t } = useTranslation()
 
   return (
     <div
@@ -55,7 +81,9 @@ export function DashboardSidebar({
               variant="muted"
               className="px-3 pb-2 text-xs font-medium tracking-wider uppercase"
             >
-              {group.title}
+              {TITLE_TO_KEY[group.title]
+                ? t(TITLE_TO_KEY[group.title])
+                : group.title}
             </Typography>
             <ul className="space-y-1">
               {group.items.map((item) => (
@@ -90,6 +118,7 @@ function DashboardSidebarNavItem({
   onNavigate,
 }: DashboardSidebarNavItemProps) {
   const Icon = item.icon
+  const { t } = useTranslation()
 
   return (
     <li>
@@ -110,7 +139,7 @@ function DashboardSidebarNavItem({
           variant="small"
           className="flex-1 truncate font-medium text-inherit"
         >
-          {item.title}
+          {TITLE_TO_KEY[item.title] ? t(TITLE_TO_KEY[item.title]) : item.title}
         </Typography>
       </Link>
     </li>

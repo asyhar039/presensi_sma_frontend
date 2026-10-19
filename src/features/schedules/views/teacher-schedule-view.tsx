@@ -6,6 +6,7 @@ import {
   IconRotateClockwise,
 } from '@tabler/icons-react'
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -28,6 +29,7 @@ import {
 import { cn } from '@/lib/class-name'
 
 export function TeacherScheduleView() {
+  const { t } = useTranslation()
   const [day, setDay] = useState<WeekDay>('monday')
   const dayQuery = useDaySchedules()
   const weekQuery = useMyTeachingSchedules()
@@ -47,16 +49,16 @@ export function TeacherScheduleView() {
     <div className="flex w-full flex-col gap-4">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold tracking-tight">
-          My Teaching Schedule
+          {t('teacherSchedule.title')}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Your classes for {WEEK_DAY_LABELS[day]} on the school time grid.
+          {t('teacherSchedule.subtitle', { day: t(`weekdays.${day}`) })}
         </p>
       </div>
       <div className="grid items-start gap-4 lg:grid-cols-[240px_1fr]">
         <div
           role="tablist"
-          aria-label="Days of week"
+          aria-label={t('teacherSchedule.daysOfWeek')}
           className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-1"
         >
           {WEEK_DAYS.map((d) => {
@@ -76,7 +78,7 @@ export function TeacherScheduleView() {
                     : 'border-border bg-card text-muted-foreground hover:bg-muted/60 hover:text-foreground',
                 )}
               >
-                <span>{WEEK_DAY_LABELS[d]}</span>
+                <span>{t(`weekdays.${d}`)}</span>
                 {weekQuery.isPending ? (
                   <Skeleton className="h-5 w-8" />
                 ) : (
@@ -97,7 +99,7 @@ export function TeacherScheduleView() {
               <GridSkeleton />
             ) : dayQuery.isError ? (
               <GridError
-                title="Failed to load time range"
+                title={t('teacherSchedule.failedLoadTimeRange')}
                 onRetry={() => dayQuery.refetch()}
               />
             ) : slots.length === 0 ? (
@@ -106,7 +108,7 @@ export function TeacherScheduleView() {
                   <EmptyMedia variant="icon">
                     <IconCalendarOff />
                   </EmptyMedia>
-                  <EmptyTitle>Holiday</EmptyTitle>
+                  <EmptyTitle>{t('common.holiday')}</EmptyTitle>
                   <EmptyDescription>
                     No time slots configured for {WEEK_DAY_LABELS[day]}.
                   </EmptyDescription>

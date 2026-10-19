@@ -1,4 +1,5 @@
 import { IconPlus } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
@@ -28,6 +29,7 @@ import {
 import { getClassrooms } from '@/features/classrooms/services/classroom-api'
 
 function ClassroomContent() {
+  const { t } = useTranslation()
   const openCreate = useClassroomStore((state) => state.openCreate)
   const columns = useClassroomColumns()
 
@@ -35,21 +37,23 @@ function ClassroomContent() {
     <div className="flex w-full flex-col gap-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold tracking-tight">Classrooms</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {t('classrooms.title')}
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Manage classrooms, academic years, and homeroom teachers.
+            {t('classrooms.subtitle')}
           </p>
         </div>
         <Button onClick={openCreate} className="w-full sm:w-auto">
           <IconPlus />
-          <span>New classroom</span>
+          <span>{t('classrooms.add')}</span>
         </Button>
       </div>
 
       <Card>
         <CardHeader className="sr-only">
-          <CardTitle>Classrooms</CardTitle>
-          <CardDescription>List of classrooms</CardDescription>
+          <CardTitle>{t('classrooms.title')}</CardTitle>
+          <CardDescription>{t('classrooms.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <DataTable
@@ -63,7 +67,7 @@ function ClassroomContent() {
             defaultFilters={CLASSROOM_DEFAULT_FILTERS}
             filterSchema={classroomFilterSchema}
             toolbar={<ClassroomToolbar />}
-            searchPlaceholder="Search classrooms..."
+            searchPlaceholder={t('common.search')}
             syncWithQueryParams
           />
         </CardContent>

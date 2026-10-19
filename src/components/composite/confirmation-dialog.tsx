@@ -1,4 +1,5 @@
 import { IconX } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 import { useShallow } from 'zustand/shallow'
 
 import { ButtonLoading } from '@/components/composite/button-loading'
@@ -17,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 
 export function ConfirmationDialog() {
+  const { t } = useTranslation()
   const [
     data,
     isOpen,
@@ -71,7 +73,7 @@ export function ConfirmationDialog() {
                   className="absolute top-4 right-4"
                 >
                   <IconX />
-                  <span className="sr-only">Close</span>
+                  <span className="sr-only">{t('common.close')}</span>
                 </Button>
               }
             />
@@ -97,7 +99,7 @@ export function ConfirmationDialog() {
                   variant={data.cancelVariant ?? 'outline'}
                   onClick={handleCancel}
                 >
-                  {data.cancelLabel ?? 'Cancel'}
+                  {data.cancelLabel ?? t('common.cancel')}
                 </ButtonLoading>
               }
             />
@@ -112,7 +114,7 @@ export function ConfirmationDialog() {
                   variant={data.actionVariant ?? 'default'}
                   onClick={handleAction}
                 >
-                  {data.actionLabel ?? 'Continue'}
+                  {data.actionLabel ?? t('common.confirm')}
                 </ButtonLoading>
               }
             />

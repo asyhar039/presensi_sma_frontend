@@ -6,6 +6,7 @@ import type {
 
 import { IconDownload } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   DataTableFilterSelect,
@@ -41,6 +42,7 @@ interface ClassFilterSelectProps {
 function ClassFilterSelect({
   getClassesFn = getClassOptions,
 }: ClassFilterSelectProps) {
+  const { t } = useTranslation()
   const { value, setValue } = useDataTableFilter<string>('classroom_id', {
     defaultValue: '',
   })
@@ -62,10 +64,10 @@ function ClassFilterSelect({
     >
       <SelectTrigger
         size="default"
-        aria-label="Kelas"
+        aria-label={t('common.class')}
         className="w-full sm:w-48"
       >
-        <SelectValue placeholder="Pilih Kelas" />
+        <SelectValue placeholder={t('attendance.selectClass')} />
       </SelectTrigger>
       <SelectContent>
         {classes.map((cls) => (
@@ -79,6 +81,7 @@ function ClassFilterSelect({
 }
 
 function MonthFilterSelect() {
+  const { t } = useTranslation()
   const { value, setValue } = useDataTableFilter<string>('month', {
     defaultValue: '',
   })
@@ -100,10 +103,10 @@ function MonthFilterSelect() {
     >
       <SelectTrigger
         size="default"
-        aria-label="Bulan"
+        aria-label={t('common.month')}
         className="w-full sm:w-40"
       >
-        <SelectValue placeholder="Bulan" />
+        <SelectValue placeholder={t('common.month')} />
       </SelectTrigger>
       <SelectContent>
         {months.map((month) => (
@@ -117,6 +120,7 @@ function MonthFilterSelect() {
 }
 
 function SemesterFilterSelect() {
+  const { t } = useTranslation()
   const { value, setValue } = useDataTableFilter<string>('semester', {
     defaultValue: '',
   })
@@ -138,10 +142,10 @@ function SemesterFilterSelect() {
     >
       <SelectTrigger
         size="default"
-        aria-label="Semester"
+        aria-label={t('common.semester')}
         className="w-full sm:w-48"
       >
-        <SelectValue placeholder="Semester" />
+        <SelectValue placeholder={t('common.semester')} />
       </SelectTrigger>
       <SelectContent>
         {semesters.map((sem) => (
@@ -155,14 +159,15 @@ function SemesterFilterSelect() {
 }
 
 function StatusFilterSelect() {
+  const { t } = useTranslation()
   const { value, setValue } = useDataTableFilter<string>('status', {
     defaultValue: 'all',
   })
 
   return (
     <DataTableFilterSelect
-      label="Status"
-      placeholder="Semua Status"
+      label={t('common.status')}
+      placeholder={t('attendance.allStatuses')}
       value={value}
       onChange={setValue}
       options={ATTENDANCE_STATUS_OPTIONS}
@@ -178,9 +183,10 @@ export interface AttendanceToolbarProps {
 export function AttendanceToolbar({
   isTeacher = false,
 }: AttendanceToolbarProps) {
+  const { t } = useTranslation()
   return (
     <DataTableToolbar
-      searchPlaceholder="Cari NIS atau nama siswa..."
+      searchPlaceholder={t('attendance.searchStudent')}
       showReset
       className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
     >
@@ -207,7 +213,7 @@ export function AttendanceToolbar({
           }}
         >
           <IconDownload className="size-4" />
-          <span>Ekspor Data</span>
+          <span>{t('attendance.exportData')}</span>
         </Button>
       </div>
     </DataTableToolbar>

@@ -1,4 +1,5 @@
 import { IconPlus } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
@@ -28,6 +29,7 @@ import {
 import { getAcademicYears } from '@/features/academic-years/services/academic-year-api'
 
 function AcademicYearContent() {
+  const { t } = useTranslation()
   const openCreate = useAcademicYearStore((state) => state.openCreate)
   const columns = useAcademicYearColumns()
 
@@ -35,21 +37,23 @@ function AcademicYearContent() {
     <div className="flex w-full flex-col gap-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold tracking-tight">Academic Years</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {t('academicYears.title')}
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Manage academic year periods, semesters, and statuses.
+            {t('academicYears.subtitle')}
           </p>
         </div>
         <Button onClick={openCreate} className="w-full sm:w-auto">
           <IconPlus />
-          <span>New academic year</span>
+          <span>{t('academicYears.add')}</span>
         </Button>
       </div>
 
       <Card>
         <CardHeader className="sr-only">
-          <CardTitle>Academic years</CardTitle>
-          <CardDescription>List of academic years</CardDescription>
+          <CardTitle>{t('academicYears.title')}</CardTitle>
+          <CardDescription>{t('academicYears.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <DataTable
@@ -63,6 +67,7 @@ function AcademicYearContent() {
             defaultFilters={ACADEMIC_YEAR_DEFAULT_FILTERS}
             filterSchema={academicYearFilterSchema}
             toolbar={<AcademicYearToolbar />}
+            searchPlaceholder={t('common.search')}
             syncWithQueryParams
           />
         </CardContent>

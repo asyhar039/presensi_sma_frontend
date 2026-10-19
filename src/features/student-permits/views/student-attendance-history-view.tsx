@@ -15,8 +15,11 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 import dayjs from 'dayjs'
 import { QRCodeSVG } from 'qrcode.react'
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
+import { LanguageSwitcher } from '@/components/composite/language-switcher'
 import { ResponsiveDialog } from '@/components/composite/responsive-dialog'
+import { ThemeSwitcher } from '@/components/composite/theme-switcher'
 import { DataTable, dataTableHeader } from '@/components/data-table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -111,6 +114,7 @@ function DayCellSkeleton() {
 }
 
 function DetailPanel({ day }: { day: ICalendarDay | null }) {
+  const { t } = useTranslation()
   if (!day) {
     return (
       <Empty className="border">
@@ -118,9 +122,9 @@ function DetailPanel({ day }: { day: ICalendarDay | null }) {
           <EmptyMedia variant="icon">
             <IconCalendarMonth />
           </EmptyMedia>
-          <EmptyTitle>Select a date</EmptyTitle>
+          <EmptyTitle>{t('studentDashboard.selectDate')}</EmptyTitle>
           <EmptyDescription>
-            Tap a calendar day to see that day&apos;s schedule and status.
+            {t('studentDashboard.selectDateDesc')}
           </EmptyDescription>
         </EmptyHeader>
       </Empty>
@@ -133,12 +137,14 @@ function DetailPanel({ day }: { day: ICalendarDay | null }) {
           {dayjs(day.date).format('dddd, DD MMMM YYYY')}
         </p>
         <p className="text-xs text-muted-foreground">
-          {day.schedules.length} schedule{day.schedules.length === 1 ? '' : 's'}
+          {t('studentDashboard.schedulesCount', {
+            count: day.schedules.length,
+          })}
         </p>
       </div>
       {day.schedules.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          No schedules on this day.
+          {t('studentDashboard.noScheduleToday')}
         </p>
       ) : (
         <ul className="space-y-2">
@@ -180,6 +186,7 @@ function DetailPanel({ day }: { day: ICalendarDay | null }) {
 export function StudentAttendanceHistoryView({
   month: initialMonth,
 }: HistoryViewProps = {}) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const searchParams = useSearch({ strict: false }) as {
     requestId?: string | number
@@ -237,7 +244,7 @@ export function StudentAttendanceHistoryView({
       () => [
         {
           id: 'type',
-          header: dataTableHeader('Request Type'),
+          header: dataTableHeader(t('studentDashboard.requestType')),
           cell: ({ row }) => (
             <Badge variant="outline" className="font-medium">
               {row.original.type?.label ?? row.original.type?.key ?? 'Leave'}
@@ -246,7 +253,7 @@ export function StudentAttendanceHistoryView({
         },
         {
           id: 'requested_at',
-          header: dataTableHeader('Submission Date & Time'),
+          header: dataTableHeader(t('studentDashboard.submissionDateTime')),
           cell: ({ row }) => (
             <span className="text-muted-foreground">
               {row.original.requested_at
@@ -257,7 +264,7 @@ export function StudentAttendanceHistoryView({
         },
         {
           id: 'reason',
-          header: dataTableHeader('Reason / Destination'),
+          header: dataTableHeader(t('studentDashboard.reasonDestination')),
           cell: ({ row }) => (
             <span className="max-w-xs truncate">
               {row.original.exit_reason ||
@@ -270,7 +277,7 @@ export function StudentAttendanceHistoryView({
         },
         {
           id: 'status',
-          header: dataTableHeader('Status'),
+          header: dataTableHeader(t('common.status')),
           cell: ({ row }) => {
             const statusKey = (row.original.status?.key ?? '').toLowerCase()
             const statusVariant =
@@ -290,7 +297,7 @@ export function StudentAttendanceHistoryView({
         },
         {
           id: 'actions',
-          header: dataTableHeader('Action'),
+          header: dataTableHeader(t('common.actions')),
           cell: ({ row }) => (
             <div className="flex justify-end">
               <Button
@@ -299,13 +306,13 @@ export function StudentAttendanceHistoryView({
                 onClick={() => setActiveQrRequest(row.original)}
               >
                 <IconQrcode className="size-4" />
-                View Pass / QR Code
+                {t('studentDashboard.viewPass')}
               </Button>
             </div>
           ),
         },
       ],
-      [],
+      [t],
     )
 
   const days = calendarQuery.data?.days ?? []
@@ -341,10 +348,10 @@ export function StudentAttendanceHistoryView({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
-            Attendance History
+            {t('studentDashboard.historyTitle')}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Per-day schedule entries with your presence status.
+            {t('studentDashboard.historySubtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -375,12 +382,14 @@ export function StudentAttendanceHistoryView({
           >
             <IconChevronRight />
           </Button>
+          <LanguageSwitcher className="size-9" />
+          <ThemeSwitcher className="size-9" />
           <Button
             variant="ghost"
             onClick={() => navigate({ to: '/dashboard' })}
           >
             <IconArrowLeft />
-            Back
+            {t('common.back')}
           </Button>
         </div>
       </div>
@@ -391,17 +400,23 @@ export function StudentAttendanceHistoryView({
         <Card>
           <CardContent className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-4">
             <div>
-              <p className="text-xs text-muted-foreground">Class</p>
+              <p className="text-xs text-muted-foreground">
+                {t('classrooms.title')}
+              </p>
               <p className="text-sm font-medium">{infoQuery.data.class.name}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Homeroom teacher</p>
+              <p className="text-xs text-muted-foreground">
+                {t('studentDashboard.homeroomTeacher')}
+              </p>
               <p className="text-sm font-medium">
                 {infoQuery.data.class.homeroom_teacher.name}
               </p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Academic year</p>
+              <p className="text-xs text-muted-foreground">
+                {t('studentDashboard.academicYear')}
+              </p>
               <p className="text-sm font-medium">
                 {dayjs(infoQuery.data.academic_year.odd_start_date).format(
                   'YYYY',
@@ -413,7 +428,9 @@ export function StudentAttendanceHistoryView({
               </p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Month</p>
+              <p className="text-xs text-muted-foreground">
+                {t('common.month')}
+              </p>
               <p className="text-sm font-medium">
                 {calendarQuery.data?.month ?? monthParam}
               </p>
@@ -425,9 +442,9 @@ export function StudentAttendanceHistoryView({
       <div className="grid items-start gap-6 lg:grid-cols-12">
         <Card className="lg:col-span-8">
           <CardHeader>
-            <CardTitle>Monthly calendar</CardTitle>
+            <CardTitle>{t('studentDashboard.monthlyCalendar')}</CardTitle>
             <CardDescription>
-              Present, sick leave, permit, alpha, or holiday per day.
+              {t('studentDashboard.monthlyCalendarDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -448,7 +465,9 @@ export function StudentAttendanceHistoryView({
                   <EmptyMedia variant="icon">
                     <IconCalendarMonth />
                   </EmptyMedia>
-                  <EmptyTitle>Failed to load history</EmptyTitle>
+                  <EmptyTitle>
+                    {t('studentDashboard.failedLoadCalendar')}
+                  </EmptyTitle>
                   <EmptyDescription>
                     {getErrorMessage(calendarQuery.error)}
                   </EmptyDescription>
@@ -458,7 +477,7 @@ export function StudentAttendanceHistoryView({
                   size="sm"
                   onClick={() => calendarQuery.refetch()}
                 >
-                  Try again
+                  {t('common.tryAgain')}
                 </Button>
               </Empty>
             ) : days.length === 0 ? (
@@ -467,10 +486,13 @@ export function StudentAttendanceHistoryView({
                   <EmptyMedia variant="icon">
                     <IconCalendarMonth />
                   </EmptyMedia>
-                  <EmptyTitle>No data this month</EmptyTitle>
+                  <EmptyTitle>
+                    {t('studentDashboard.noDataThisMonth')}
+                  </EmptyTitle>
                   <EmptyDescription>
-                    There are no schedule entries for{' '}
-                    {dayjs(`${monthParam}-01`).format('MMMM YYYY')}.
+                    {t('studentDashboard.noDataThisMonthDesc', {
+                      month: dayjs(`${monthParam}-01`).format('MMMM YYYY'),
+                    })}
                   </EmptyDescription>
                 </EmptyHeader>
               </Empty>
@@ -507,7 +529,7 @@ export function StudentAttendanceHistoryView({
         </Card>
         <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle>Day detail</CardTitle>
+            <CardTitle>{t('studentDashboard.dayDetail')}</CardTitle>
             <CardDescription>
               {selected
                 ? dayjs(selected.date).format('DD MMMM YYYY')
@@ -530,10 +552,9 @@ export function StudentAttendanceHistoryView({
 
       <Card>
         <CardHeader>
-          <CardTitle>Leave Request History</CardTitle>
+          <CardTitle>{t('studentDashboard.leaveRequestHistory')}</CardTitle>
           <CardDescription>
-            Logs and status of your sick leave, early leave, and late arrival
-            requests.
+            {t('studentDashboard.leaveRequestHistoryDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -541,16 +562,16 @@ export function StudentAttendanceHistoryView({
             columns={columns}
             queryKey={leaveRequestsQueryOpts.queryKey}
             queryFn={wrappedQueryFn}
-            emptyTitle="No leave requests found"
-            emptyDescription="You haven't submitted any leave requests yet."
-            errorMessage="Failed to load leave requests."
+            emptyTitle={t('studentDashboard.noLeaveRequests')}
+            emptyDescription={t('studentDashboard.noLeaveRequestsDesc')}
+            errorMessage={t('studentDashboard.failedLoadLeave')}
           />
         </CardContent>
       </Card>
 
       <ResponsiveDialog
-        title="Leave Ticket / QR Pass"
-        description="Present this QR code to the teacher or duty staff."
+        title={t('studentDashboard.leaveTicketQr')}
+        description={t('studentDashboard.leaveTicketDesc')}
         isOpen={activeQrRequest !== null}
         onIsOpenChange={(isOpen) => {
           if (!isOpen) setActiveQrRequest(null)
@@ -623,7 +644,7 @@ export function StudentAttendanceHistoryView({
             </dl>
             <div className="flex justify-end">
               <Button type="button" onClick={() => setActiveQrRequest(null)}>
-                Close
+                {t('common.close')}
               </Button>
             </div>
           </div>

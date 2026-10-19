@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 import { DataTable } from '@/components/data-table'
@@ -45,6 +46,7 @@ import {
 import { getErrorMessage } from '@/utils/error'
 
 export function TeacherDashboardView() {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
@@ -61,7 +63,7 @@ export function TeacherDashboardView() {
   const start = useMutation({
     mutationFn: startPresenceSession,
     onSuccess: () => {
-      toast.success('Presence session started.')
+      toast.success(t('teacherSession.sessionStarted'))
       invalidate()
     },
     onError: (e) => toast.error(getErrorMessage(e)),
@@ -69,7 +71,7 @@ export function TeacherDashboardView() {
   const stop = useMutation({
     mutationFn: stopPresenceSession,
     onSuccess: () => {
-      toast.success('Presence session stopped.')
+      toast.success(t('teacherSession.sessionStopped'))
       invalidate()
     },
     onError: (e) => toast.error(getErrorMessage(e)),
@@ -77,7 +79,7 @@ export function TeacherDashboardView() {
   const refresh = useMutation({
     mutationFn: refreshPresenceQR,
     onSuccess: () => {
-      toast.success('QR code refreshed.')
+      toast.success(t('teacherSession.qrRefreshed'))
       invalidate()
     },
     onError: (e) => toast.error(getErrorMessage(e)),
@@ -92,7 +94,7 @@ export function TeacherDashboardView() {
       <SessionError
         message={getErrorMessage(
           sessionQuery.error,
-          'Failed to load presence state.',
+          t('teacherSession.failedLoadSession'),
         )}
         onRetry={() => sessionQuery.refetch()}
       />
@@ -140,10 +142,9 @@ export function TeacherDashboardView() {
           )}
           <Card>
             <CardHeader>
-              <CardTitle>Early-out requests</CardTitle>
+              <CardTitle>{t('teacherSession.earlyOutRequests')}</CardTitle>
               <CardDescription>
-                Today&apos;s requests in classes you teach. Approve first, then
-                the duty teacher decides.
+                {t('teacherSession.earlyOutDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -158,10 +159,10 @@ export function TeacherDashboardView() {
                 defaultFilters={SUBJECT_DEFAULT_FILTERS}
                 filterSchema={subjectFilterSchema}
                 toolbar={<SubjectToolbar />}
-                searchPlaceholder="Search student name or ID number..."
-                emptyTitle="No leave requests"
-                emptyDescription="No early-out requests for your classes today."
-                errorMessage="Failed to load leave requests."
+                searchPlaceholder={t('teacherSession.searchStudent')}
+                emptyTitle={t('teacherSession.noLeaveRequests')}
+                emptyDescription={t('teacherSession.noLeaveRequestsDesc')}
+                errorMessage={t('teacherSession.failedLoadLeave')}
                 syncWithQueryParams
               />
             </CardContent>

@@ -1,4 +1,5 @@
 import { IconPlus } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
@@ -28,6 +29,7 @@ import {
 import { getStudents } from '@/features/students/services/student-api'
 
 function StudentContent() {
+  const { t } = useTranslation()
   const openCreate = useStudentStore((state) => state.openCreate)
   const columns = useStudentColumns()
 
@@ -35,21 +37,23 @@ function StudentContent() {
     <div className="flex w-full flex-col gap-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold tracking-tight">Students</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {t('students.title')}
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Manage student accounts, profiles, and statuses.
+            {t('students.subtitle')}
           </p>
         </div>
         <Button onClick={openCreate} className="w-full sm:w-auto">
           <IconPlus />
-          <span>New student</span>
+          <span>{t('students.add')}</span>
         </Button>
       </div>
 
       <Card>
         <CardHeader className="sr-only">
-          <CardTitle>Students</CardTitle>
-          <CardDescription>List of students</CardDescription>
+          <CardTitle>{t('students.title')}</CardTitle>
+          <CardDescription>{t('students.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <DataTable
@@ -63,7 +67,7 @@ function StudentContent() {
             defaultFilters={STUDENT_DEFAULT_FILTERS}
             filterSchema={studentFilterSchema}
             toolbar={<StudentToolbar />}
-            searchPlaceholder="Search students..."
+            searchPlaceholder={t('common.search')}
             syncWithQueryParams
           />
         </CardContent>

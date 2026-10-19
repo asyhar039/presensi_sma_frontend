@@ -1,5 +1,6 @@
 import { IconPlus } from '@tabler/icons-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
@@ -20,6 +21,7 @@ type ClassroomStudentsSectionProps = { classroomId: number }
 function ClassroomStudentsTable({
   classroomId,
 }: ClassroomStudentsSectionProps) {
+  const { t } = useTranslation()
   const columns = useClassroomMemberColumns(classroomId)
   return (
     <DataTable
@@ -32,10 +34,10 @@ function ClassroomStudentsTable({
         })
       }
       enableSearch={false}
-      searchPlaceholder="Search students..."
+      searchPlaceholder={t('common.search')}
       syncWithQueryParams={false}
-      emptyTitle="No students yet"
-      emptyDescription="Assign students to fill this classroom."
+      emptyTitle={t('classrooms.noStudentsYet')}
+      emptyDescription={t('classrooms.assignStudentsToFill')}
     />
   )
 }
@@ -43,23 +45,22 @@ function ClassroomStudentsTable({
 export function ClassroomStudentsSection({
   classroomId,
 }: ClassroomStudentsSectionProps) {
+  const { t } = useTranslation()
   const [isAssignOpen, setIsAssignOpen] = useState(false)
 
   return (
     <Card>
       <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
-          <CardTitle>Students</CardTitle>
-          <CardDescription>
-            Students assigned to this classroom.
-          </CardDescription>
+          <CardTitle>{t('students.title')}</CardTitle>
+          <CardDescription>{t('classrooms.studentsAssigned')}</CardDescription>
         </div>
         <Button
           onClick={() => setIsAssignOpen(true)}
           className="w-full sm:w-auto"
         >
           <IconPlus />
-          <span>Assign students</span>
+          <span>{t('classrooms.assignStudents')}</span>
         </Button>
       </CardHeader>
       <CardContent>

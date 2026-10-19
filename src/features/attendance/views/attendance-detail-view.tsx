@@ -7,6 +7,7 @@ import type {
 import { IconArrowLeft, IconCalendar, IconUser } from '@tabler/icons-react'
 import { useNavigate, useParams, useSearch } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
@@ -33,6 +34,7 @@ function getSearchParam(param: string): string {
 }
 
 function StudentAttendanceDetailContent() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { studentId } = useParams({
     from: '/dashboard/attendance-recap/$studentId',
@@ -114,9 +116,11 @@ function StudentAttendanceDetailContent() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-bold tracking-tight">
-              Detail Presensi Siswa
+              {t('attendance.studentDetail')}
             </h1>
-            <p className="text-sm text-muted-foreground">Memuat data...</p>
+            <p className="text-sm text-muted-foreground">
+              {t('common.loading')}
+            </p>
           </div>
         </div>
         <Card>
@@ -143,10 +147,10 @@ function StudentAttendanceDetailContent() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-bold tracking-tight">
-              Detail Presensi Siswa
+              {t('attendance.studentDetail')}
             </h1>
             <p className="text-sm text-muted-foreground">
-              Data tidak ditemukan
+              {t('attendance.dataNotFound')}
             </p>
           </div>
         </div>
@@ -154,7 +158,7 @@ function StudentAttendanceDetailContent() {
           <CardContent className="pt-6">
             <div className="text-center py-12">
               <Typography variant="muted" className="text-muted-foreground">
-                Tidak dapat memuat data presensi siswa ini.
+                {t('attendance.cannotLoadAttendance')}
               </Typography>
             </div>
           </CardContent>
@@ -181,14 +185,16 @@ function StudentAttendanceDetailContent() {
             className="w-fit"
           >
             <IconArrowLeft className="size-4" />
-            <span>Kembali</span>
+            <span>{t('common.back')}</span>
           </Button>
           <h1 className="text-2xl font-bold tracking-tight">
-            Detail Presensi Siswa
+            {t('attendance.studentDetail')}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Riwayat kehadiran {student.user.name} (
-            {student.user.identity_number})
+            {t('attendance.attendanceHistoryOf', {
+              name: student.user.name,
+              nis: student.user.identity_number,
+            })}
           </p>
         </div>
       </div>
@@ -197,14 +203,14 @@ function StudentAttendanceDetailContent() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <IconUser className="size-5" />
-            Informasi Siswa
+            {t('attendance.studentInfo')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <Typography variant="small" className="text-muted-foreground">
-                Nama
+                {t('common.name')}
               </Typography>
               <Typography variant="body" className="font-medium">
                 {student.user.name}
@@ -212,7 +218,7 @@ function StudentAttendanceDetailContent() {
             </div>
             <div>
               <Typography variant="small" className="text-muted-foreground">
-                NIS
+                {t('attendance.nis')}
               </Typography>
               <Typography variant="body" className="font-medium">
                 {student.user.identity_number}
@@ -228,7 +234,7 @@ function StudentAttendanceDetailContent() {
             </div>
             <div>
               <Typography variant="small" className="text-muted-foreground">
-                Jenis Kelamin
+                {t('attendance.gender')}
               </Typography>
               <Typography variant="body" className="font-medium capitalize">
                 {student.gender.label}
@@ -246,14 +252,14 @@ function StudentAttendanceDetailContent() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <IconCalendar className="size-5" />
-            Riwayat Kehadiran Harian
+            {t('attendance.dailyAttendanceHistory')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {records.length === 0 ? (
             <div className="text-center py-12">
               <Typography variant="muted" className="text-muted-foreground">
-                Belum ada data presensi untuk periode ini.
+                {t('attendance.noAttendanceForPeriod')}
               </Typography>
             </div>
           ) : (
@@ -267,11 +273,11 @@ function StudentAttendanceDetailContent() {
               perPageOptions={ATTENDANCE_PER_PAGE_OPTIONS}
               defaultFilters={ATTENDANCE_DEFAULT_FILTERS}
               filterSchema={attendanceFilterSchema}
-              searchPlaceholder="Cari mata pelajaran..."
+              searchPlaceholder={t('common.search')}
               syncWithQueryParams
               enableSearch={false}
-              emptyTitle="Tidak ada data presensi"
-              emptyDescription="Siswa ini belum memiliki catatan presensi pada periode terpilih."
+              emptyTitle={t('attendance.noAttendanceData')}
+              emptyDescription={t('attendance.noAttendanceDataDesc')}
             />
           )}
         </CardContent>

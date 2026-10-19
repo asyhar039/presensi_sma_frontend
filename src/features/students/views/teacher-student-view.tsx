@@ -1,4 +1,5 @@
 import { IconSchool } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 
 import { DataTable } from '@/components/data-table'
 import { Badge } from '@/components/ui/badge'
@@ -33,6 +34,7 @@ import { getHomeroomStudents } from '@/features/students/services/homeroom-api'
 import { getErrorMessage } from '@/utils/error'
 
 function HomeroomStudentContent() {
+  const { t } = useTranslation()
   const columns = useTeacherStudentColumns()
   const homeroomQuery = useHomeroom()
 
@@ -58,11 +60,11 @@ function HomeroomStudentContent() {
   }
 
   return (
-    <div className="flex w-full flex-col gap-6">
+    <div className="flex w-col flex-col gap-6 w-full">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <TeacherStudentHeading
-          title="Students"
-          description="Manage and monitor students in your homeroom class."
+          title={t('homeroomStudents.title')}
+          description={t('homeroomStudents.description')}
         />
         <Badge variant="secondary" className="w-fit gap-1">
           <IconSchool className="size-4" />
@@ -72,10 +74,8 @@ function HomeroomStudentContent() {
 
       <Card>
         <CardHeader className="sr-only">
-          <CardTitle>Students</CardTitle>
-          <CardDescription>
-            List of students in your homeroom class
-          </CardDescription>
+          <CardTitle>{t('homeroomStudents.title')}</CardTitle>
+          <CardDescription>{t('homeroomStudents.description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <DataTable
@@ -89,10 +89,10 @@ function HomeroomStudentContent() {
             defaultFilters={STUDENT_DEFAULT_FILTERS}
             filterSchema={studentFilterSchema}
             toolbar={<TeacherStudentToolbar />}
-            searchPlaceholder="Search name or identity number..."
-            emptyTitle="No students yet"
-            emptyDescription="There are no students in your homeroom class."
-            errorMessage="Failed to load students."
+            searchPlaceholder={t('teacherSession.searchStudent')}
+            emptyTitle={t('classrooms.noStudentsYet')}
+            emptyDescription={t('homeroomStudents.noStudentsInClass')}
+            errorMessage={t('errors.loadError')}
             syncWithQueryParams
           />
         </CardContent>

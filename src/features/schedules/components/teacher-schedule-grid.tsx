@@ -3,6 +3,7 @@ import type { IScheduleSlot } from '@/features/settings/types/schedule-clock.typ
 
 import { IconCoffee } from '@tabler/icons-react'
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   eventStyle,
@@ -25,6 +26,7 @@ export function TeacherScheduleGrid({
   slots,
   events,
 }: TeacherScheduleGridProps) {
+  const { t } = useTranslation()
   const scale = useMemo(() => scaleOf(slots), [slots])
   const placed = useMemo(() => layoutDayEvents(events), [events])
   const periods = useMemo(() => {
@@ -46,7 +48,7 @@ export function TeacherScheduleGrid({
           >
             {slot.is_break ? (
               <span className="text-[11px] font-medium text-amber-700 dark:text-amber-400">
-                Break
+                {t('schedules.break')}
               </span>
             ) : (
               <span className="text-xs font-semibold tabular-nums">
@@ -61,7 +63,7 @@ export function TeacherScheduleGrid({
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex h-8 items-center border-b px-3 text-[11px] font-medium text-muted-foreground">
-          Schedule
+          {t('schedules.schedule')}
         </div>
         <div style={{ height: scale.total * PX_PER_MIN }} className="relative">
           {slots.map((slot, i) =>
@@ -73,7 +75,7 @@ export function TeacherScheduleGrid({
               >
                 <IconCoffee className="size-3.5 shrink-0 text-amber-600" />
                 <span className="truncate text-xs font-medium text-amber-700 dark:text-amber-400">
-                  Break · {slot.start} – {slot.end}
+                  {t('schedules.break')} · {slot.start} – {slot.end}
                 </span>
               </div>
             ) : (

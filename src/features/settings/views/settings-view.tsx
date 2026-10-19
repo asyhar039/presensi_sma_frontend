@@ -6,11 +6,12 @@ import {
   IconMapPin,
 } from '@tabler/icons-react'
 import { Link, Outlet, useRouterState } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/lib/class-name'
 
 type SettingsTab = {
-  title: string
+  key: string
   href: string
   icon: TablerIcon
   exact?: boolean
@@ -18,24 +19,25 @@ type SettingsTab = {
 
 const SETTINGS_TABS: SettingsTab[] = [
   {
-    title: 'Schedule Clock',
+    key: 'settings.scheduleClock',
     href: '/dashboard/settings',
     icon: IconCalendar,
     exact: true,
   },
   {
-    title: 'Public Holidays',
+    key: 'settings.publicHolidays',
     href: '/dashboard/settings/public-holidays',
     icon: IconCalendarHeart,
   },
   {
-    title: 'School Zones',
+    key: 'settings.schoolZones',
     href: '/dashboard/settings/school-zones',
     icon: IconMapPin,
   },
 ]
 
 export function SettingsView() {
+  const { t } = useTranslation()
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   })
@@ -43,9 +45,11 @@ export function SettingsView() {
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          {t('settings.title')}
+        </h1>
         <p className="text-sm text-muted-foreground">
-          Configure schedule clocks, public holidays, and school zones.
+          {t('settings.subtitle')}
         </p>
       </div>
 
@@ -70,7 +74,7 @@ export function SettingsView() {
               )}
             >
               <Icon className="size-4" />
-              {tab.title}
+              {t(tab.key)}
             </Link>
           )
         })}

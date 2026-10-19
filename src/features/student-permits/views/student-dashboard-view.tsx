@@ -12,8 +12,11 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
+import { LanguageSwitcher } from '@/components/composite/language-switcher'
+import { ThemeSwitcher } from '@/components/composite/theme-switcher'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -46,6 +49,7 @@ type ResultState = {
 }
 
 export function StudentDashboardView() {
+  const { t } = useTranslation()
   const [tab, setTab] = useState<LeaveRequestType>('sick_leave')
   const [scanOpen, setScanOpen] = useState(false)
   const [resultState, setResultState] = useState<ResultState | null>(null)
@@ -59,16 +63,16 @@ export function StudentDashboardView() {
   const handleLogout = () => {
     confirm({
       icon: IconLogout,
-      title: 'Confirm Logout',
-      description: 'Are you sure you want to log out?',
-      actionLabel: 'Log out',
+      title: t('auth.confirmLogout'),
+      description: t('auth.logoutConfirmation'),
+      actionLabel: t('auth.logOut'),
       actionVariant: 'destructive',
-      cancelLabel: 'Cancel',
+      cancelLabel: t('common.cancel'),
       onAction: async (props) => {
         props.close()
         await logout()
         await delay(100)
-        toast.success('Logged out successfully.')
+        toast.success(t('auth.loggedOutSuccess'))
         await navigate({ to: '/login', replace: true })
       },
     })
@@ -92,25 +96,31 @@ export function StudentDashboardView() {
     <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Leave Requests</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {t('studentDashboard.title')}
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Submit sick leave, early leave, or late arrival requests.
+            {t('studentDashboard.todayStatus')}
           </p>
         </div>
-        <Button
-          onClick={() => setScanOpen(true)}
-          disabled={presenceQuery.isPending}
-          className="w-full sm:w-auto"
-        >
-          {presenceQuery.isPending ? (
-            <Skeleton className="h-4 w-20 bg-primary-foreground/30" />
-          ) : (
-            <>
-              <IconQrcode className="size-4" />
-              Scan QR
-            </>
-          )}
-        </Button>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Button
+            onClick={() => setScanOpen(true)}
+            disabled={presenceQuery.isPending}
+            className="flex-1 sm:flex-initial"
+          >
+            {presenceQuery.isPending ? (
+              <Skeleton className="h-4 w-20 bg-primary-foreground/30" />
+            ) : (
+              <>
+                <IconQrcode className="size-4" />
+                {t('studentDashboard.scanQr')}
+              </>
+            )}
+          </Button>
+          <LanguageSwitcher className="size-9" />
+          <ThemeSwitcher className="size-9" />
+        </div>
       </div>
 
       <div className="grid items-start gap-6 lg:grid-cols-12">
@@ -132,7 +142,7 @@ export function StudentDashboardView() {
                 }
               >
                 <IconHistory className="size-4" />
-                View My History
+                {t('studentDashboard.attendanceHistory')}
               </Button>
               <Button
                 type="button"
@@ -141,7 +151,7 @@ export function StudentDashboardView() {
                 className="w-full text-destructive hover:bg-destructive/10 hover:text-destructive"
               >
                 <IconLogout className="size-4" />
-                Log Out
+                {t('auth.logOut')}
               </Button>
             </CardContent>
           </Card>
@@ -149,14 +159,16 @@ export function StudentDashboardView() {
 
         <Card className="lg:col-span-8">
           <CardHeader>
-            <CardTitle>New Request</CardTitle>
+            <CardTitle>{t('studentDashboard.newRequest')}</CardTitle>
             <CardDescription>
               {presence && presence.public_holidays.length > 0
-                ? `Upcoming holidays: ${presence.public_holidays
-                    .slice(0, 2)
-                    .map((holiday) => holiday.name)
-                    .join(', ')}.`
-                : 'Choose a request type below.'}
+                ? t('studentDashboard.upcomingHolidays', {
+                    holidays: presence.public_holidays
+                      .slice(0, 2)
+                      .map((holiday) => holiday.name)
+                      .join(', '),
+                  })
+                : t('studentDashboard.chooseRequestType')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -170,9 +182,9 @@ export function StudentDashboardView() {
               </div>
             ) : presenceQuery.isError || !presence ? (
               <PermitError
-                message="We could not load request settings. Please check your connection and try again."
+                message={t('errors.loadError')}
                 action={{
-                  label: 'Retry',
+                  label: t('common.retry'),
                   onClick: () => void presenceQuery.refetch(),
                 }}
               />
@@ -229,6 +241,7 @@ export function StudentDashboardView() {
 }
 
 function AlreadySubmitted({ kind }: { kind: string }) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   return (
     <div className="relative overflow-hidden rounded-lg border p-8 text-center">
@@ -241,11 +254,10 @@ function AlreadySubmitted({ kind }: { kind: string }) {
           <IconInfoCircle className="size-5" />
         </span>
         <p className="font-semibold">
-          You already submitted an {kind} request today.
+          {t('studentDashboard.alreadySubmittedTitle', { kind })}
         </p>
         <p className="text-sm text-muted-foreground">
-          Only one {kind} request is allowed per day. Check history for more
-          details.
+          {t('studentDashboard.alreadySubmittedDesc', { kind })}
         </p>
         <Button
           type="button"
@@ -255,7 +267,7 @@ function AlreadySubmitted({ kind }: { kind: string }) {
           }
         >
           <IconHistory className="size-4" />
-          Check History
+          {t('studentDashboard.checkHistory')}
         </Button>
       </div>
     </div>

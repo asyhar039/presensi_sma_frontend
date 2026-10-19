@@ -1,11 +1,13 @@
 import {
   IconChevronUp,
+  IconLanguage,
   IconLayoutDashboard,
   IconLogout,
   IconMoon,
   IconSun,
 } from '@tabler/icons-react'
 import { useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useShallow } from 'zustand/shallow'
 
@@ -40,6 +42,7 @@ export function DashboardUserMenu({
 }: DashboardUserMenuProps) {
   const { logout } = useAuth()
   const navigate = useNavigate()
+  const { t, i18n } = useTranslation()
 
   const confirm = useConfirmationStore((state) => state.show)
   const [theme, toggleTheme] = useThemeStore(
@@ -48,20 +51,33 @@ export function DashboardUserMenu({
 
   const isDark = theme === THEME.DARK
   const ThemeIcon = isDark ? IconSun : IconMoon
+  const isId = !(i18n.resolvedLanguage || i18n.language || '')
+    .toLowerCase()
+    .startsWith('en')
+
+  const toggleLanguage = () => {
+    const nextLang = isId ? 'en' : 'id'
+    void i18n.changeLanguage(nextLang)
+    try {
+      localStorage.setItem('app_language', nextLang)
+    } catch {
+      // ignore
+    }
+  }
 
   const handleLogout = async () => {
     confirm({
       icon: IconLogout,
-      title: 'Confirm Logout',
-      description: 'Are you sure you want to log out?',
-      actionLabel: 'Log out',
+      title: t('auth.confirmLogout'),
+      description: t('auth.logoutConfirmation'),
+      actionLabel: t('auth.logOut'),
       actionVariant: 'destructive',
-      cancelLabel: 'Cancel',
+      cancelLabel: t('common.cancel'),
       onAction: async (props) => {
         props.close()
         await logout()
         await delay(100)
-        toast.success('Logged out successfully')
+        toast.success(t('auth.loggedOutSuccess'))
         await navigate({ to: '/login', replace: true })
       },
     })
@@ -114,11 +130,15 @@ export function DashboardUserMenu({
             className="cursor-pointer"
           >
             <IconLayoutDashboard />
-            Dashboard
+            {t('userMenu.dashboard')}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={toggleTheme} className="cursor-pointer">
             <ThemeIcon />
-            {isDark ? 'Change to Light mode' : 'Change to Dark mode'}
+            {isDark ? t('userMenu.changeToLight') : t('userMenu.changeToDark')}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={toggleLanguage} className="cursor-pointer">
+            <IconLanguage />
+            {isId ? '🇬🇧 English' : '🇮🇩 Indonesia'}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -127,7 +147,7 @@ export function DashboardUserMenu({
             onClick={() => void handleLogout()}
           >
             <IconLogout />
-            Log out
+            {t('auth.logOut')}
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

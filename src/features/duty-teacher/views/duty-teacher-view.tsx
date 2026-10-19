@@ -1,6 +1,7 @@
 import { IconQrcode } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
@@ -38,6 +39,7 @@ import { getDutyLeaveRequests } from '@/features/duty-teacher/services/duty-teac
 import { getErrorMessage } from '@/utils/error'
 
 function DutyTeacherContent() {
+  const { t } = useTranslation()
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
   const [scanOpen, setScanOpen] = useState(false)
@@ -96,22 +98,20 @@ function DutyTeacherContent() {
     <div className="flex w-full flex-col gap-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <DutyHeading
-          title="Duty Teacher"
-          description="Review today's early-out and late-arrival requests."
+          title={t('dutyTeacher.title')}
+          description={t('dutyTeacher.todayMonitoring')}
           badge={badge}
         />
         <Button onClick={() => setScanOpen(true)} className="w-full sm:w-auto">
           <IconQrcode />
-          <span>Scan Request</span>
+          <span>{t('dutyTeacher.scanRequest')}</span>
         </Button>
       </div>
 
       <Card>
         <CardHeader className="sr-only">
-          <CardTitle>Duty leave requests</CardTitle>
-          <CardDescription>
-            Today&apos;s early-out and late-arrival requests
-          </CardDescription>
+          <CardTitle>{t('dutyTeacher.title')}</CardTitle>
+          <CardDescription>{t('dutyTeacher.todayMonitoring')}</CardDescription>
         </CardHeader>
         <CardContent>
           <DataTable
@@ -125,10 +125,10 @@ function DutyTeacherContent() {
             defaultFilters={DUTY_DEFAULT_FILTERS}
             filterSchema={dutyFilterSchema}
             toolbar={<DutyToolbar />}
-            searchPlaceholder="Search student name or ID number..."
-            emptyTitle="No leave requests"
-            emptyDescription="No early-out or late-arrival requests for today."
-            errorMessage="Failed to load leave requests."
+            searchPlaceholder={t('common.search')}
+            emptyTitle={t('teacherSession.noLeaveRequests')}
+            emptyDescription={t('teacherSession.noLeaveRequestsDesc')}
+            errorMessage={t('teacherSession.failedLoadLeave')}
             syncWithQueryParams
           />
         </CardContent>

@@ -1,4 +1,5 @@
 import { IconPlus } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
@@ -28,6 +29,7 @@ import {
 import { getTeachers } from '@/features/teachers/services/teacher-api'
 
 function TeacherContent() {
+  const { t } = useTranslation()
   const openCreate = useTeacherStore((state) => state.openCreate)
   const columns = useTeacherColumns()
 
@@ -35,21 +37,23 @@ function TeacherContent() {
     <div className="flex w-full flex-col gap-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold tracking-tight">Teachers</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {t('teachers.title')}
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Manage teacher accounts, profiles, and employment statuses.
+            {t('teachers.subtitle')}
           </p>
         </div>
         <Button onClick={openCreate} className="w-full sm:w-auto">
           <IconPlus />
-          <span>New teacher</span>
+          <span>{t('teachers.add')}</span>
         </Button>
       </div>
 
       <Card>
         <CardHeader className="sr-only">
-          <CardTitle>Teachers</CardTitle>
-          <CardDescription>List of teachers</CardDescription>
+          <CardTitle>{t('teachers.title')}</CardTitle>
+          <CardDescription>{t('teachers.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <DataTable
@@ -63,7 +67,7 @@ function TeacherContent() {
             defaultFilters={TEACHER_DEFAULT_FILTERS}
             filterSchema={teacherFilterSchema}
             toolbar={<TeacherToolbar />}
-            searchPlaceholder="Search teachers..."
+            searchPlaceholder={t('common.search')}
             syncWithQueryParams
           />
         </CardContent>

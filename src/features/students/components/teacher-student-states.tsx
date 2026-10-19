@@ -3,6 +3,7 @@ import {
   IconDatabaseOff,
   IconReload,
 } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -64,11 +65,12 @@ export function TeacherStudentError({
   message,
   onRetry,
 }: TeacherStudentErrorProps) {
+  const { t } = useTranslation()
   return (
     <div className="flex w-full flex-col gap-6">
       <TeacherStudentHeading
-        title="Students"
-        description="Manage and monitor students in your homeroom class."
+        title={t('homeroomStudents.title')}
+        description={t('homeroomStudents.description')}
       />
       <Card>
         <CardContent>
@@ -77,13 +79,13 @@ export function TeacherStudentError({
               <EmptyMedia variant="icon">
                 <IconDatabaseOff />
               </EmptyMedia>
-              <EmptyTitle>Failed to load homeroom data</EmptyTitle>
+              <EmptyTitle>{t('errors.loadError')}</EmptyTitle>
               <EmptyDescription>{message}</EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
               <Button variant="outline" size="sm" onClick={onRetry}>
                 <IconReload />
-                <span>Try again</span>
+                <span>{t('common.tryAgain')}</span>
               </Button>
             </EmptyContent>
           </Empty>
@@ -94,11 +96,12 @@ export function TeacherStudentError({
 }
 
 export function NoHomeroomWarning() {
+  const { t } = useTranslation()
   return (
     <div className="flex w-full flex-col gap-6">
       <TeacherStudentHeading
-        title="Students"
-        description="Manage and monitor students in your homeroom class."
+        title={t('homeroomStudents.title')}
+        description={t('homeroomStudents.description')}
       />
       <Card>
         <CardContent>
@@ -107,10 +110,11 @@ export function NoHomeroomWarning() {
               <EmptyMedia variant="icon">
                 <IconAlertTriangle />
               </EmptyMedia>
-              <EmptyTitle>You are not a homeroom teacher yet</EmptyTitle>
+              <EmptyTitle>
+                {t('homeroomStudents.noHomeroomAssigned')}
+              </EmptyTitle>
               <EmptyDescription>
-                You have not been assigned as a homeroom teacher for the active
-                academic year. Please contact the school admin.
+                {t('homeroomStudents.noHomeroomDesc')}
               </EmptyDescription>
             </EmptyHeader>
           </Empty>

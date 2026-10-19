@@ -1,4 +1,5 @@
 import { IconMoon, IconSun } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/class-name'
@@ -9,6 +10,7 @@ interface ThemeSwitcherProps {
 }
 
 export function ThemeSwitcher({ className }: ThemeSwitcherProps) {
+  const { t } = useTranslation()
   const onToggle = useThemeStore((val) => val.toggle)
 
   return (
@@ -23,7 +25,7 @@ export function ThemeSwitcher({ className }: ThemeSwitcherProps) {
     >
       <IconSun className="scale-0 rotate-90 transition-transform! duration-500 ease-in-out dark:scale-100 dark:rotate-0" />
       <IconMoon className="absolute scale-100 rotate-0 transition-transform! duration-500 ease-in-out dark:scale-0 dark:-rotate-90" />
-      <span className="sr-only">Switch Theme</span>
+      <span className="sr-only">{t('common.switchTheme')}</span>
     </Button>
   )
 }

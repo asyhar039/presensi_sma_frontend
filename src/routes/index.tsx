@@ -1,5 +1,7 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
+import { LanguageSwitcher } from '@/components/composite/language-switcher'
 import { ThemeSwitcher } from '@/components/composite/theme-switcher'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
@@ -10,19 +12,20 @@ export const Route = createFileRoute('/')({
 })
 
 function RouteComponent() {
+  const { t } = useTranslation()
   const { user } = useAuth()
 
   return (
     <div className="flex h-full min-h-svh w-full flex-col items-center justify-center gap-6 p-6">
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        <LanguageSwitcher />
         <ThemeSwitcher />
       </div>
       <Typography as="h1" variant="h1">
-        Welcome to the SIP Apps
+        {t('landing.welcome')}
       </Typography>
-      <Typography as="p" variant="lead" className="text-center">
-        This is a simple attendance application that allows you to manage your
-        attendance easily and efficiently.
+      <Typography as="p" variant="lead" className="text-center max-w-lg">
+        {t('landing.description')}
       </Typography>
       {user ? (
         <Button
@@ -30,7 +33,7 @@ function RouteComponent() {
           render={<Link to="/dashboard" />}
           nativeButton={false}
         >
-          Go to Dashboard
+          {t('landing.goToDashboard')}
         </Button>
       ) : (
         <Button
@@ -38,7 +41,7 @@ function RouteComponent() {
           render={<Link to="/login" />}
           nativeButton={false}
         >
-          Sign in
+          {t('landing.signIn')}
         </Button>
       )}
     </div>

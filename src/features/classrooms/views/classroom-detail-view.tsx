@@ -1,5 +1,6 @@
 import { IconArrowLeft, IconPencil, IconSearch } from '@tabler/icons-react'
 import { useNavigate, useParams } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -83,25 +84,26 @@ function ClassroomDetailSkeleton() {
 type ClassroomDetailErrorProps = { onBack: () => void; onRetry: () => void }
 
 function ClassroomDetailError({ onBack, onRetry }: ClassroomDetailErrorProps) {
+  const { t } = useTranslation()
   return (
     <div className="flex flex-col gap-4">
       <Button variant="ghost" onClick={onBack} className="w-fit">
         <IconArrowLeft className="size-4" />
-        <span>Back</span>
+        <span>{t('common.back')}</span>
       </Button>
       <Empty className="min-h-[50vh]">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <IconSearch />
           </EmptyMedia>
-          <EmptyTitle>Classroom not found</EmptyTitle>
+          <EmptyTitle>{t('classrooms.classroomNotFound')}</EmptyTitle>
           <EmptyDescription>
-            This classroom could not be loaded. It may have been deleted.
+            {t('classrooms.classroomNotFoundDesc')}
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
           <Button variant="outline" onClick={onRetry}>
-            Try again
+            {t('common.tryAgain')}
           </Button>
         </EmptyContent>
       </Empty>
@@ -135,6 +137,7 @@ function toEditPayload(
 }
 
 function ClassroomDetailContent() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { classroomId } = useParams({
     from: '/dashboard/classrooms/$classroomId',
@@ -162,7 +165,7 @@ function ClassroomDetailContent() {
         <div className="flex flex-col gap-1">
           <Button variant="ghost" onClick={back} className="w-fit px-0">
             <IconArrowLeft className="size-4" />
-            <span>Back to classrooms</span>
+            <span>{t('classrooms.backToClassrooms')}</span>
           </Button>
           <h1 className="text-2xl font-bold tracking-tight">
             {classroom.name}
@@ -174,21 +177,25 @@ function ClassroomDetailContent() {
           className="w-full sm:w-auto"
         >
           <IconPencil />
-          <span>Edit classroom</span>
+          <span>{t('classrooms.editClassroom')}</span>
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Classroom Info</CardTitle>
-          <CardDescription>Basic classroom information.</CardDescription>
+          <CardTitle>{t('classrooms.classroomInfo')}</CardTitle>
+          <CardDescription>{t('classrooms.classroomInfoDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <ClassroomInfo name="name" label="Name" value={classroom.name} />
+            <ClassroomInfo
+              name="name"
+              label={t('common.name')}
+              value={classroom.name}
+            />
             <ClassroomInfo
               name="academic-year"
-              label="Academic Year"
+              label={t('studentDashboard.academicYear')}
               value={
                 classroom.academic_year
                   ? formatAcademicLabel(classroom.academic_year)
@@ -197,22 +204,24 @@ function ClassroomDetailContent() {
             />
             <ClassroomInfo
               name="homeroom"
-              label="Homeroom Teacher"
-              value={homeroom ? homeroom.user.name : 'Not assigned'}
+              label={t('classrooms.homeroomTeacher')}
+              value={
+                homeroom ? homeroom.user.name : t('classrooms.notAssigned')
+              }
             />
             <ClassroomInfo
               name="students"
-              label="Students"
+              label={t('students.title')}
               value={String(classroom.students_count)}
             />
             <ClassroomInfo
               name="created"
-              label="Created At"
+              label={t('common.createdAt')}
               value={formatDate(classroom.created_at, DATE_FORMAT.DATE)}
             />
             <ClassroomInfo
               name="updated"
-              label="Updated At"
+              label={t('common.updatedAt')}
               value={formatDate(classroom.updated_at, DATE_FORMAT.DATE)}
             />
           </div>

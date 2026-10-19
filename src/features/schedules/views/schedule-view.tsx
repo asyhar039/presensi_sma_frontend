@@ -6,6 +6,7 @@ import type {
 import type { WeekDay } from '@/features/settings/types/schedule-clock.types'
 
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 import { ScheduleDayTabs } from '@/features/schedules/components/schedule-day-tabs'
@@ -39,6 +40,7 @@ function useScheduleSelection(day: WeekDay, classroomId: number | null) {
 }
 
 export function ScheduleView() {
+  const { t } = useTranslation()
   const [yearId, setYearId] = useState('')
   const [classroomId, setClassroomId] = useState('')
   const [day, setDay] = useState<WeekDay>('monday')
@@ -85,10 +87,11 @@ export function ScheduleView() {
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold tracking-tight">Schedules</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          {t('schedules.title')}
+        </h1>
         <p className="text-sm text-muted-foreground">
-          Pick an academic year and class, then manage each day on the time
-          grid.
+          {t('schedules.subtitle')}
         </p>
       </div>
       <ScheduleFilterCard

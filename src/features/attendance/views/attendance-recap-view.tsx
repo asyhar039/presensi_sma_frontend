@@ -6,6 +6,7 @@ import type {
 
 import { useSearch } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { DataTable } from '@/components/data-table'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -40,6 +41,7 @@ function getSearchParam(param: string): string {
 function AttendanceRecapContent({
   isTeacher = false,
 }: AttendanceRecapContentProps) {
+  const { t } = useTranslation()
   const search = useSearch({ strict: false })
   const summaryColumns = useAttendanceSummaryColumns()
   const [isSummariesLoading, setIsSummariesLoading] = useState(false)
@@ -82,10 +84,10 @@ function AttendanceRecapContent({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold tracking-tight">
-            Rekap Presensi Kelas
+            {t('attendance.classRecap')}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Pantau dan analisis kehadiran siswa per kelas, bulan, dan semester.
+            {t('attendance.historySubtitle')}
           </p>
         </div>
       </div>
@@ -125,10 +127,10 @@ function AttendanceRecapContent({
             defaultFilters={ATTENDANCE_DEFAULT_FILTERS}
             filterSchema={attendanceFilterSchema}
             toolbar={<AttendanceToolbar isTeacher={isTeacher} />}
-            searchPlaceholder="Cari NIS atau nama siswa..."
+            searchPlaceholder={t('attendance.searchStudent')}
             syncWithQueryParams
-            emptyTitle="Tidak ada data presensi"
-            emptyDescription="Coba ubah filter atau pilih kelas lain."
+            emptyTitle={t('adminDashboard.noAttendanceData')}
+            emptyDescription={t('adminDashboard.noAttendanceActivity')}
           />
         </CardContent>
       </Card>

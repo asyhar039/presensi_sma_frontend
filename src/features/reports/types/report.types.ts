@@ -59,3 +59,19 @@ export interface IAttendanceMatrixResult {
   items: IAttendanceMatrixItem[]
   meta?: IAttendanceMatrixPaginationMeta
 }
+
+export interface IReportClassOption {
+  id: number
+  name: string
+}
+
+export interface IReportSubjectOption {
+  id: number | string
+  name: string
+  code?: string
+}
+
+export interface IReportYearOption {
+  value: string
+  label: string
+}

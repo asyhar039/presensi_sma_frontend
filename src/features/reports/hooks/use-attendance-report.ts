@@ -3,6 +3,9 @@ import type {
   IAttendanceMatrixPaginationMeta,
   IAttendanceReportFilterParams,
   IAttendanceReportSummary,
+  IReportClassOption,
+  IReportSubjectOption,
+  IReportYearOption,
 } from '@/features/reports/types/report.types'
 
 import { useCallback, useEffect, useState } from 'react'
@@ -21,19 +24,7 @@ import { getSubjects } from '@/features/subjects/services/subject-api'
 
 const DEFAULT_PAGE_SIZE = 10
 
-export interface YearOption {
-  value: string
-  label: string
-}
-
-export interface SubjectOption {
-  id: number | string
-  name: string
-  code?: string
-}
-
-// Fallback subjects if /subjects endpoint requires specific role/params or fails
-const DEFAULT_FALLBACK_SUBJECTS: SubjectOption[] = [
+const DEFAULT_FALLBACK_SUBJECTS: IReportSubjectOption[] = [
   { id: 'math', name: 'Matematika' },
   { id: 'phys', name: 'Fisika' },
   { id: 'chem', name: 'Kimia' },
@@ -55,13 +46,11 @@ export function useAttendanceReport() {
   const [currentPage, setCurrentPage] = useState(1)
 
   // Options States
-  const [classOptions, setClassOptions] = useState<
-    Array<{ id: number; name: string }>
-  >([])
-  const [subjectOptions, setSubjectOptions] = useState<SubjectOption[]>(
+  const [classOptions, setClassOptions] = useState<IReportClassOption[]>([])
+  const [subjectOptions, setSubjectOptions] = useState<IReportSubjectOption[]>(
     DEFAULT_FALLBACK_SUBJECTS,
   )
-  const [yearOptions, setYearOptions] = useState<YearOption[]>([])
+  const [yearOptions, setYearOptions] = useState<IReportYearOption[]>([])
 
   // Data States
   const [summaryData, setSummaryData] =
@@ -92,15 +81,10 @@ export function useAttendanceReport() {
         console.warn('Class options load note:', err)
       }
 
-      // 2. Load Subjects via API with fallback
+      // 2. Load Subjects via API with safe fallback
       try {
-        // Pass page and per_page explicitly
         const subjectsResult = await getSubjects({ page: 1, per_page: 50 })
-        if (
-          isMounted &&
-          subjectsResult.items &&
-          subjectsResult.items.length > 0
-        ) {
+        if (isMounted && subjectsResult.items?.length > 0) {
           setSubjectOptions(
             subjectsResult.items.map((sub) => ({
               id: sub.id,
@@ -109,28 +93,25 @@ export function useAttendanceReport() {
           )
         }
       } catch (err) {
-        // Backend returned 422 Unprocessable Entity (e.g. max per_page validation or requires search param)
-        // Keep fallback subjects gracefully without breaking the UI
-        console.warn(
-          'Using fallback subjects (API returned validation notice):',
-          err,
-        )
+        console.warn('Subject options load note (using fallback):', err)
       }
 
       // 3. Load Academic Years via API
       try {
         const yearsResult = await getAcademicYears({ page: 1, per_page: 20 })
         if (isMounted && yearsResult.items?.length > 0) {
-          const mappedYears: YearOption[] = yearsResult.items.map((item) => {
-            const label = formatAcademicLabel(item)
-            const startYear = item.odd_start_date
-              ? new Date(item.odd_start_date).getFullYear().toString()
-              : String(item.id)
-            return {
-              value: startYear,
-              label,
-            }
-          })
+          const mappedYears: IReportYearOption[] = yearsResult.items.map(
+            (item) => {
+              const label = formatAcademicLabel(item)
+              const startYear = item.odd_start_date
+                ? new Date(item.odd_start_date).getFullYear().toString()
+                : String(item.id)
+              return {
+                value: startYear,
+                label,
+              }
+            },
+          )
           setYearOptions(mappedYears)
 
           // Default to active academic year if present

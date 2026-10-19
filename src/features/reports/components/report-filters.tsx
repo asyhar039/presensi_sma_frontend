@@ -1,7 +1,8 @@
 import type {
-  SubjectOption,
-  YearOption,
-} from '@/features/reports/hooks/use-attendance-report'
+  IReportClassOption,
+  IReportSubjectOption,
+  IReportYearOption,
+} from '@/features/reports/types/report.types'
 
 import { IconFilter, IconRefresh } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
@@ -29,9 +30,9 @@ interface ReportFiltersProps {
   selectedClass: string
   selectedSubject: string
   selectedStatus: string
-  classOptions: Array<{ id: number; name: string }>
-  subjectOptions: SubjectOption[]
-  yearOptions: YearOption[]
+  classOptions: IReportClassOption[]
+  subjectOptions: IReportSubjectOption[]
+  yearOptions: IReportYearOption[]
   onMonthChange: (val: string) => void
   onYearChange: (val: string) => void
   onClassChange: (val: string) => void
@@ -183,7 +184,7 @@ export function ReportFilters({
               <SelectContent>
                 <SelectItem value="all">{t('reports.allSubjects')}</SelectItem>
                 {subjectOptions.map((subj) => (
-                  <SelectItem key={subj.id} value={String(subj.id)}>
+                  <SelectItem key={String(subj.id)} value={String(subj.id)}>
                     {subj.name} {subj.code ? `(${subj.code})` : ''}
                   </SelectItem>
                 ))}

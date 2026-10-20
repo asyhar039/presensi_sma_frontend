@@ -480,9 +480,79 @@
     "en": "English"
   },
   "landing": {
-    "welcome": "Selamat Datang di Presensi SMA",
-    "description": "Aplikasi presensi modern yang memudahkan pencatatan dan pengelolaan kehadiran siswa dan guru secara efektif.",
-    "goToDashboard": "Buka Dashboard",
-    "signIn": "Masuk"
+    "nav": {
+      "home": "Beranda",
+      "guide": "Panduan Penggunaan",
+      "about": "Tentang SIP",
+      "team": "Profil Pengembang",
+      "help": "Bantuan",
+      "login": "Masuk",
+      "dashboard": "Dashboard"
+    },
+    "hero": {
+      "badge": "Cepat • Praktis • Terintegrasi",
+      "title": "SIP",
+      "subtitle": "Sistem Informasi",
+      "subtitleHighlight": "Presensi",
+      "tagline": "Presensi siswa yang mudah, cepat dan terintegrasi",
+      "description": "Kelola kehadiran siswa per mata pelajaran, pantau rekap presensi dan akses laporan secara praktis dalam satu platform.",
+      "ctaStart": "Mulai Sekarang",
+      "ctaLearn": "Pelajari Fitur"
+    },
+    "features": {
+      "qrTitle": "Presensi QR Code",
+      "qrDesc": "Pencatatan kehadiran praktis",
+      "recapTitle": "Rekap Otomatis",
+      "recapDesc": "Data hadir, izin, sakit, terlambat",
+      "reportTitle": "Laporan Presensi",
+      "reportDesc": "Unduh laporan dengan mudah",
+      "accessTitle": "Akses Terarah",
+      "accessDesc": "Fitur sesuai peran pengguna"
+    },
+    "about": {
+      "badge": "Tentang Aplikasi",
+      "title": "Tentang",
+      "description": "SIP (Sistem Informasi Presensi) adalah aplikasi yang dikembangkan untuk mempermudah proses pencatatan kehadiran siswa secara digital. Dengan sistem ini, sekolah dapat mengelola presensi dengan lebih efisien, transparan dan akurat.",
+      "playful": "Absen dulu yukk!!",
+      "whyTitle": "Mengapa menggunakan SIP?",
+      "card1Title": "Praktis",
+      "card1Desc": "Presensi QR Code",
+      "card2Title": "Terintegrasi",
+      "card2Desc": "Fitur dalam satu sistem",
+      "card3Title": "Terstruktur",
+      "card3Desc": "Data kehadiran",
+      "goalTitle": "Tujuan SIP",
+      "goalDesc": "Mendukung pengelolaan presensi yang lebih praktis, teratur, dan mudah dipantau."
+    },
+    "guide": {
+      "badge": "Panduan",
+      "title": "Cara",
+      "titleHighlight": "Penggunaan",
+      "description": "Ikuti langkah-langkah berikut untuk mulai menggunakan SIP sesuai dengan peran anda.",
+      "learnMore": "Pelajari Lebih Lanjut",
+      "step1Title": "Scan QR",
+      "step1Desc": "Lakukan presensi dengan memindai QR Code",
+      "step2Title": "Ajukan Izin",
+      "step2Desc": "Kirim pengajuan izin melalui aplikasi",
+      "step3Title": "Cek Riwayat",
+      "step3Desc": "Lihat riwayat presensi Anda kapan saja",
+      "step4Title": "Selesai",
+      "step4Desc": "Data tersimpan otomatis di sistem"
+    },
+    "team": {
+      "badge": "Anggota Tim",
+      "title": "Tim Pengembang",
+      "description": "Setiap anggota tim memiliki peran penting dalam pengembangan SIP. Dengan keahlian yang berbeda, kami saling melengkapi untuk menghasilkan solusi yang berkualitas dan bermanfaat."
+    },
+    "help": {
+      "badge": "Bantuan",
+      "title": "Bantuan",
+      "description": "Temukan jawaban atas pertanyaan Anda atau hubungi tim kami jika memerlukan bantuan lebih lanjut.",
+      "contactUs": "Hubungi kami"
+    },
+    "footer": {
+      "supportBy": "Instansi Terkait :",
+      "copyright": "© Informatika PPG UNY 2026 • SIP • Sistem Informasi Presensi"
+    }
   }
 }

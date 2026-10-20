@@ -480,9 +480,79 @@
     "en": "English"
   },
   "landing": {
-    "welcome": "Welcome to SMA Attendance",
-    "description": "A modern attendance application designed to streamline presence tracking and school management effectively.",
-    "goToDashboard": "Go to Dashboard",
-    "signIn": "Sign In"
+    "nav": {
+      "home": "Home",
+      "guide": "User Guide",
+      "about": "About SIP",
+      "team": "Development Team",
+      "help": "Help",
+      "login": "Sign In",
+      "dashboard": "Dashboard"
+    },
+    "hero": {
+      "badge": "Fast • Practical • Integrated",
+      "title": "SIP",
+      "subtitle": "Information System for",
+      "subtitleHighlight": "Attendance",
+      "tagline": "Simple, fast, and integrated student attendance",
+      "description": "Manage student attendance per subject, monitor recaps, and access reports conveniently in one platform.",
+      "ctaStart": "Get Started",
+      "ctaLearn": "Explore Features"
+    },
+    "features": {
+      "qrTitle": "QR Code Attendance",
+      "qrDesc": "Convenient presence recording",
+      "recapTitle": "Automated Recap",
+      "recapDesc": "Presence, permission, sick, and late records",
+      "reportTitle": "Attendance Reports",
+      "reportDesc": "Download reports with ease",
+      "accessTitle": "Role-Based Access",
+      "accessDesc": "Features tailored to user roles"
+    },
+    "about": {
+      "badge": "About Application",
+      "title": "About",
+      "description": "SIP (Sistem Informasi Presensi) is an application developed to streamline the digital recording of student attendance. With this system, schools can manage attendance more efficiently, transparently, and accurately.",
+      "playful": "Let's check in now!!",
+      "whyTitle": "Why use SIP?",
+      "card1Title": "Practical",
+      "card1Desc": "QR Code Presence",
+      "card2Title": "Integrated",
+      "card2Desc": "Features in one system",
+      "card3Title": "Structured",
+      "card3Desc": "Attendance data",
+      "goalTitle": "SIP Objective",
+      "goalDesc": "Supporting more practical, orderly, and easily monitored attendance management."
+    },
+    "guide": {
+      "badge": "Guide",
+      "title": "How to",
+      "titleHighlight": "Use",
+      "description": "Follow these steps to start using SIP according to your assigned role.",
+      "learnMore": "Learn More",
+      "step1Title": "Scan QR",
+      "step1Desc": "Record attendance by scanning the QR Code",
+      "step2Title": "Request Permit",
+      "step2Desc": "Submit absence requests directly via the app",
+      "step3Title": "Check History",
+      "step3Desc": "Review your attendance history anytime",
+      "step4Title": "Complete",
+      "step4Desc": "Data is automatically stored in the system"
+    },
+    "team": {
+      "badge": "Team Members",
+      "title": "Development Team",
+      "description": "Every team member plays a crucial role in developing SIP. With diverse expertise, we complement each other to deliver high-quality, impactful solutions."
+    },
+    "help": {
+      "badge": "Help & Support",
+      "title": "Help",
+      "description": "Find answers to your questions or reach out to our team if you need further assistance.",
+      "contactUs": "Contact Us"
+    },
+    "footer": {
+      "supportBy": "Instansi Terkait :",
+      "copyright": "© Informatics PPG UNY 2026 • SIP • School Attendance Information System"
+    }
   }
 }

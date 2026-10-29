@@ -500,6 +500,14 @@
       "ctaLearn": "Explore Features"
     },
     "features": {
+      "aboutTitle": "About SIP",
+      "aboutDesc": "System info & objectives",
+      "guideTitle": "User Guide",
+      "guideDesc": "Step-by-step attendance flow",
+      "teamTitle": "Development Team",
+      "teamDesc": "Meet the team behind SIP",
+      "helpTitle": "Help",
+      "helpDesc": "Help center & contact us",
       "qrTitle": "QR Code Attendance",
       "qrDesc": "Convenient presence recording",
       "recapTitle": "Automated Recap",

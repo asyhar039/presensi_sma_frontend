@@ -500,6 +500,14 @@
       "ctaLearn": "Pelajari Fitur"
     },
     "features": {
+      "aboutTitle": "Tentang SIP",
+      "aboutDesc": "Informasi sistem & tujuan aplikasi",
+      "guideTitle": "Panduan Penggunaan",
+      "guideDesc": "Langkah & alur presensi",
+      "teamTitle": "Profil Pengembang",
+      "teamDesc": "Tim di balik pengembangan SIP",
+      "helpTitle": "Bantuan",
+      "helpDesc": "Pusat bantuan & kontak kami",
       "qrTitle": "Presensi QR Code",
       "qrDesc": "Pencatatan kehadiran praktis",
       "recapTitle": "Rekap Otomatis",

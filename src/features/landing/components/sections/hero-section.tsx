@@ -28,7 +28,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
     >
       {/* Background Texture */}
       <img
-        src="/latar main sip.svg"
+        src="/latarmainsip.svg"
         alt=""
         className="pointer-events-none absolute inset-0 size-full object-cover opacity-20"
       />
@@ -92,7 +92,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
               {/* Subtle Glow Backdrop */}
               <div className="absolute size-72 sm:size-96 rounded-full bg-blue-500/20 blur-3xl" />
               <img
-                src="/Main SIP.svg"
+                src="/MainSIP.svg"
                 alt="SIP 3D Ribbon Logo"
                 className="relative z-10 w-full max-w-sm sm:max-w-md object-contain drop-shadow-2xl"
               />

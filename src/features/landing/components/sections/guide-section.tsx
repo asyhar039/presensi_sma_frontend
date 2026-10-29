@@ -56,7 +56,7 @@ export function GuideSection({ onNavigate }: GuideSectionProps) {
                   </span>
                   <div className="flex h-20 w-20 items-center justify-center">
                     <img
-                      src="/image 6.svg"
+                      src="/image6.svg"
                       alt="Scan QR Code"
                       className="h-16 w-16 object-contain"
                     />
@@ -81,7 +81,7 @@ export function GuideSection({ onNavigate }: GuideSectionProps) {
                   </span>
                   <div className="flex h-20 w-20 items-center justify-center">
                     <img
-                      src="/image 7.svg"
+                      src="/image7.svg"
                       alt="Ajukan Izin"
                       className="h-16 w-16 object-contain"
                     />
@@ -122,7 +122,7 @@ export function GuideSection({ onNavigate }: GuideSectionProps) {
                   </span>
                   <div className="flex h-20 w-20 items-center justify-center">
                     <img
-                      src="/image 8.svg"
+                      src="/image8.svg"
                       alt="Cek Riwayat"
                       className="h-16 w-16 object-contain"
                     />

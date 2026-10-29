@@ -113,14 +113,14 @@ export function AboutSection() {
               <div className="relative w-full lg:-translate-x-15 xl:-translate-x-19 transition-transform">
                 {/* Laptop */}
                 <img
-                  src="/Komputer%20tentang%20sip.png"
+                  src="/Komputertentangsip.png"
                   alt="Komputer SIP"
                   className="w-full object-contain drop-shadow-2xl"
                 />
                 {/* Two Phones overlapping bottom-right of laptop */}
                 <div className="absolute -bottom-8 -right-3 sm:-bottom-10 sm:-right-6 w-36 sm:w-48 md:w-56 lg:w-60 z-20">
                   <img
-                    src="/phone%20tentang%20sip.png"
+                    src="/phonetentangsip.png"
                     alt="Ponsel SIP"
                     className="w-full object-contain drop-shadow-2xl"
                   />

@@ -3,7 +3,7 @@ import type { TeamMember } from '../types/landing.types'
 export const TEAM_MEMBERS: TeamMember[] = [
   {
     name: 'Abdur Rohim',
-    image: '/Abdur Rohim.svg',
+    image: '/AbdurRohim.svg',
     badges: [
       { text: 'Ketua', variant: 'light' },
       { text: 'Front End Developer', variant: 'dark' },
@@ -13,7 +13,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
   },
   {
     name: 'Robertus Adi Setiawan',
-    image: '/Robertus Adi Setiawan.svg',
+    image: '/RobertusAdiSetiawan.svg',
     badges: [
       { text: 'Wakil Ketua', variant: 'light' },
       { text: 'DevOps', variant: 'dark' },
@@ -23,19 +23,19 @@ export const TEAM_MEMBERS: TeamMember[] = [
   },
   {
     name: 'Triana Elisabet Sinaga',
-    image: '/Triana Elisabet Sinaga.svg',
+    image: '/TrianaElisabetSinaga.svg',
     badges: [{ text: 'Sekretaris', variant: 'light' }],
     description: 'Mendokumentasikan hasil diskusi dan perkembangan proyek.',
   },
   {
     name: 'Siti Munfarida',
-    image: '/Siti Munfarida.svg',
+    image: '/SitiMunfarida.svg',
     badges: [{ text: 'Bendahara', variant: 'light' }],
     description: 'Mengelola kebutuhan anggaran dan pencatatan keuangan proyek.',
   },
   {
     name: 'Ashar Qowim',
-    image: '/Ashar Qowim.svg',
+    image: '/AsharQowim.svg',
     badges: [
       { text: 'Tim Teknis', variant: 'light' },
       { text: 'DevOps', variant: 'dark' },
@@ -45,7 +45,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
   },
   {
     name: 'Maswa Arbaurnika',
-    image: '/Maswa Arbaurnika.svg',
+    image: '/MaswaArbaurnika.svg',
     badges: [
       { text: 'Tim Teknis', variant: 'light' },
       { text: 'Back End Developer', variant: 'dark' },
@@ -55,7 +55,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
   },
   {
     name: 'Resa Martyaningsih',
-    image: '/Resa Martyaningsih.svg',
+    image: '/ResaMartyaningsih.svg',
     badges: [
       { text: 'Tim Teknis', variant: 'light' },
       { text: 'UI/UX', variant: 'dark' },
@@ -65,7 +65,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
   },
   {
     name: 'Septania Salihati',
-    image: '/Septania Salihati.svg',
+    image: '/SeptaniaSalihati.svg',
     badges: [
       { text: 'Tim Teknis', variant: 'light' },
       { text: 'UI/UX', variant: 'dark' },

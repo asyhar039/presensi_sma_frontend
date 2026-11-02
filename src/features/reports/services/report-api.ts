@@ -4,6 +4,7 @@ import type {
   IAttendanceReportFilterParams,
   IAttendanceReportSummary,
 } from '@/features/reports/types/report.types'
+import type { ApiResponse } from '@/types/api.types'
 
 import { apiClient } from '@/services/api-client'
 
@@ -22,10 +23,10 @@ export async function getAttendanceReportSummary(
   >,
 ): Promise<IAttendanceReportSummary> {
   const cleaned = cleanParams(params)
-  const response = await apiClient.get<{
-    message: string
-    data: IAttendanceReportSummary
-  }>('/reports/attendance/summary', { params: cleaned })
+  const response = await apiClient.get<ApiResponse<IAttendanceReportSummary>>(
+    '/reports/attendance/summary',
+    { params: cleaned },
+  )
   return response.data.data
 }
 
@@ -36,16 +37,14 @@ export async function getAttendanceReportMatrix(
     format: 'compact',
     ...params,
   })
-  const response = await apiClient.get<{
-    message: string
-    data: unknown
-    meta?: IAttendanceMatrixPaginationMeta
-  }>('/reports/attendance/matrix', { params: cleaned })
+  const response = await apiClient.get<
+    ApiResponse<IAttendanceMatrixResult['items']> & {
+      meta?: IAttendanceMatrixPaginationMeta
+    }
+  >('/reports/attendance/matrix', { params: cleaned })
 
   const envelope = response.data
-  const items = Array.isArray(envelope.data)
-    ? (envelope.data as IAttendanceMatrixResult['items'])
-    : []
+  const items = Array.isArray(envelope.data) ? envelope.data : []
 
   return {
     items,
@@ -54,7 +53,7 @@ export async function getAttendanceReportMatrix(
 }
 
 export async function exportAttendanceReport(params: {
-  type: 'excel' | 'pdf' | 'csv' | string
+  type: 'excel' | 'pdf' | 'csv'
   month: string | number
   year: string | number
   classroom_id?: string | number
@@ -66,18 +65,28 @@ export async function exportAttendanceReport(params: {
   const response = await apiClient.get('/reports/attendance/export', {
     params: cleaned,
     responseType: 'blob',
+    headers: {
+      'Cache-Control': 'no-cache',
+      Pragma: 'no-cache',
+    },
   })
 
-  // Determine file extension and MIME type
-  const extension =
-    params.type === 'excel' ? 'xlsx' : params.type === 'pdf' ? 'pdf' : 'csv'
-
-  const mimeType =
-    params.type === 'excel'
-      ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      : params.type === 'pdf'
-        ? 'application/pdf'
-        : 'text/csv'
+  let extension: string
+  let mimeType: string
+  switch (params.type) {
+    case 'excel':
+      extension = 'xlsx'
+      mimeType =
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      break
+    case 'pdf':
+      extension = 'pdf'
+      mimeType = 'application/pdf'
+      break
+    default:
+      extension = 'csv'
+      mimeType = 'text/csv'
+  }
 
   const blob = new Blob([response.data], { type: mimeType })
   const url = window.URL.createObjectURL(blob)

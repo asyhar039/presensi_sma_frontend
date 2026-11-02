@@ -1,14 +1,12 @@
 import type {
-  IAttendanceMatrixItem,
-  IAttendanceMatrixPaginationMeta,
   IAttendanceReportFilterParams,
-  IAttendanceReportSummary,
   IReportClassOption,
   IReportSubjectOption,
   IReportYearOption,
 } from '@/features/reports/types/report.types'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
@@ -23,207 +21,152 @@ import {
 import { getSubjects } from '@/features/subjects/services/subject-api'
 
 const DEFAULT_PAGE_SIZE = 10
-
-const DEFAULT_FALLBACK_SUBJECTS: IReportSubjectOption[] = [
-  { id: 'math', name: 'Matematika' },
-  { id: 'phys', name: 'Fisika' },
-  { id: 'chem', name: 'Kimia' },
-  { id: 'bio', name: 'Biologi' },
+const FALLBACK_YEAR_OPTIONS: IReportYearOption[] = [
+  { value: '2026', label: '2026' },
+  { value: '2025', label: '2025' },
+  { value: '2024', label: '2024' },
 ]
 
 export function useAttendanceReport() {
   const { t } = useTranslation()
 
-  // Filter States
   const [dateRangeTab, setDateRangeTab] = useState('1-10')
   const [selectedMonth, setSelectedMonth] = useState('10')
   const [selectedYear, setSelectedYear] = useState('2026')
   const [selectedClass, setSelectedClass] = useState('all')
   const [selectedSubject, setSelectedSubject] = useState('all')
   const [selectedStatus, setSelectedStatus] = useState('all')
-
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1)
+  const hasInitializedAcademicYear = useRef(false)
 
-  // Options States
-  const [classOptions, setClassOptions] = useState<IReportClassOption[]>([])
-  const [subjectOptions, setSubjectOptions] = useState<IReportSubjectOption[]>(
-    DEFAULT_FALLBACK_SUBJECTS,
-  )
-  const [yearOptions, setYearOptions] = useState<IReportYearOption[]>([])
+  const classOptionsQuery = useQuery({
+    queryKey: ['report', 'class-options'],
+    queryFn: getClassOptions,
+  })
+  const subjectOptionsQuery = useQuery({
+    queryKey: ['report', 'subject-options'],
+    queryFn: () => getSubjects({ page: 1, per_page: 50 }),
+  })
+  const academicYearsQuery = useQuery({
+    queryKey: ['report', 'academic-year-options'],
+    queryFn: () => getAcademicYears({ page: 1, per_page: 20 }),
+  })
 
-  // Data States
-  const [summaryData, setSummaryData] =
-    useState<IAttendanceReportSummary | null>(null)
-  const [matrixStudents, setMatrixStudents] = useState<IAttendanceMatrixItem[]>(
-    [],
-  )
-  const [paginationMeta, setPaginationMeta] =
-    useState<IAttendanceMatrixPaginationMeta | null>(null)
+  const classOptions: IReportClassOption[] = classOptionsQuery.data ?? []
+  const subjectOptions: IReportSubjectOption[] =
+    subjectOptionsQuery.data?.items.map((subject) => ({
+      id: subject.id,
+      name: subject.name,
+    })) ?? []
+  const mappedYearOptions: IReportYearOption[] =
+    academicYearsQuery.data?.items.map((item) => ({
+      value: item.odd_start_date
+        ? new Date(item.odd_start_date).getFullYear().toString()
+        : String(item.id),
+      label: formatAcademicLabel(item),
+    })) ?? []
+  const yearOptions =
+    mappedYearOptions.length > 0 ? mappedYearOptions : FALLBACK_YEAR_OPTIONS
 
-  // Loading States
-  const [isLoadingSummary, setIsLoadingSummary] = useState(false)
-  const [isLoadingMatrix, setIsLoadingMatrix] = useState(false)
-  const [isExporting, setIsExporting] = useState(false)
-
-  // Fetch Dropdown Options (Classes, Subjects, Academic Years)
   useEffect(() => {
-    let isMounted = true
-
-    async function loadOptions() {
-      // 1. Load Classes
-      try {
-        const classes = await getClassOptions()
-        if (isMounted && classes?.length) {
-          setClassOptions(classes)
-        }
-      } catch (err) {
-        console.warn('Class options load note:', err)
-      }
-
-      // 2. Load Subjects via API with safe fallback
-      try {
-        const subjectsResult = await getSubjects({ page: 1, per_page: 50 })
-        if (isMounted && subjectsResult.items?.length > 0) {
-          setSubjectOptions(
-            subjectsResult.items.map((sub) => ({
-              id: sub.id,
-              name: sub.name,
-            })),
-          )
-        }
-      } catch (err) {
-        console.warn('Subject options load note (using fallback):', err)
-      }
-
-      // 3. Load Academic Years via API
-      try {
-        const yearsResult = await getAcademicYears({ page: 1, per_page: 20 })
-        if (isMounted && yearsResult.items?.length > 0) {
-          const mappedYears: IReportYearOption[] = yearsResult.items.map(
-            (item) => {
-              const label = formatAcademicLabel(item)
-              const startYear = item.odd_start_date
-                ? new Date(item.odd_start_date).getFullYear().toString()
-                : String(item.id)
-              return {
-                value: startYear,
-                label,
-              }
-            },
-          )
-          setYearOptions(mappedYears)
-
-          // Default to active academic year if present
-          const activeYear = yearsResult.items.find((y) => y.is_active)
-          if (activeYear) {
-            const activeStartYear = activeYear.odd_start_date
-              ? new Date(activeYear.odd_start_date).getFullYear().toString()
-              : '2026'
-            setSelectedYear(activeStartYear)
-          }
-        } else if (isMounted) {
-          setYearOptions([
-            { value: '2026', label: '2026' },
-            { value: '2025', label: '2025' },
-            { value: '2024', label: '2024' },
-          ])
-        }
-      } catch (err) {
-        console.warn('Academic years load note:', err)
-        if (isMounted) {
-          setYearOptions([
-            { value: '2026', label: '2026' },
-            { value: '2025', label: '2025' },
-            { value: '2024', label: '2024' },
-          ])
-        }
-      }
+    if (!academicYearsQuery.isSuccess || hasInitializedAcademicYear.current) {
+      return
     }
 
-    loadOptions()
-    return () => {
-      isMounted = false
+    hasInitializedAcademicYear.current = true
+    const activeYear = academicYearsQuery.data?.items.find(
+      (year) => year.is_active,
+    )
+    if (activeYear) {
+      const activeStartYear = activeYear.odd_start_date
+        ? new Date(activeYear.odd_start_date).getFullYear().toString()
+        : '2026'
+      setSelectedYear(activeStartYear)
     }
-  }, [])
+  }, [academicYearsQuery.data, academicYearsQuery.isSuccess])
 
-  // Fetch Summary Cards
-  const fetchSummary = useCallback(async () => {
-    setIsLoadingSummary(true)
-    try {
-      const data = await getAttendanceReportSummary({
+  const summaryQuery = useQuery({
+    queryKey: [
+      'report',
+      'attendance-summary',
+      {
         month: selectedMonth,
         year: selectedYear,
         classroom_id: selectedClass === 'all' ? 'all' : selectedClass,
-      })
-      setSummaryData(data)
-    } catch (err) {
-      console.warn('Fetch report summary note:', err)
-      setSummaryData(null)
-    } finally {
-      setIsLoadingSummary(false)
-    }
-  }, [selectedMonth, selectedYear, selectedClass])
-
-  // Fetch Attendance Matrix
-  const fetchMatrix = useCallback(async () => {
-    setIsLoadingMatrix(true)
-    try {
-      const params: IAttendanceReportFilterParams = {
+      },
+    ],
+    queryFn: () =>
+      getAttendanceReportSummary({
         month: selectedMonth,
         year: selectedYear,
-        classroom_id: selectedClass === 'all' ? undefined : selectedClass,
-        subject_id: selectedSubject === 'all' ? undefined : selectedSubject,
-        status: selectedStatus === 'all' ? undefined : selectedStatus,
-        date_range: dateRangeTab,
-        format: 'compact',
+        classroom_id: selectedClass === 'all' ? 'all' : selectedClass,
+      }),
+  })
+
+  const matrixParams: IAttendanceReportFilterParams = {
+    month: selectedMonth,
+    year: selectedYear,
+    classroom_id: selectedClass === 'all' ? undefined : selectedClass,
+    subject_id: selectedSubject === 'all' ? undefined : selectedSubject,
+    status: selectedStatus === 'all' ? undefined : selectedStatus,
+    date_range: dateRangeTab,
+    format: 'compact',
+    page: currentPage,
+    per_page: DEFAULT_PAGE_SIZE,
+  }
+  const matrixQuery = useQuery({
+    queryKey: ['report', 'attendance-matrix', matrixParams],
+    queryFn: () => getAttendanceReportMatrix(matrixParams),
+  })
+  const matrixStudents = matrixQuery.data?.items ?? []
+  const paginationMeta = matrixQuery.data
+    ? (matrixQuery.data.meta ?? {
         page: currentPage,
         per_page: DEFAULT_PAGE_SIZE,
-      }
-      const result = await getAttendanceReportMatrix(params)
-      setMatrixStudents(result.items)
-      if (result.meta) {
-        setPaginationMeta(result.meta)
-      } else {
-        setPaginationMeta({
-          page: currentPage,
-          per_page: DEFAULT_PAGE_SIZE,
-          total: result.items.length,
-          total_pages: Math.ceil(result.items.length / DEFAULT_PAGE_SIZE) || 1,
-        })
-      }
-    } catch (err) {
-      console.warn('Fetch attendance matrix note:', err)
+        total: matrixStudents.length,
+        total_pages: Math.ceil(matrixStudents.length / DEFAULT_PAGE_SIZE) || 1,
+      })
+    : null
+
+  useEffect(() => {
+    if (matrixQuery.isError) {
+      console.warn('Fetch attendance matrix note:', matrixQuery.error)
       toast.error(t('attendance.failedLoadAttendance'))
-      setMatrixStudents([])
-    } finally {
-      setIsLoadingMatrix(false)
+    }
+  }, [matrixQuery.error, matrixQuery.isError, t])
+
+  useEffect(() => {
+    if (classOptionsQuery.isError) {
+      console.warn('Class options load note:', classOptionsQuery.error)
+    }
+    if (subjectOptionsQuery.isError) {
+      console.warn('Subject options load note:', subjectOptionsQuery.error)
+    }
+    if (academicYearsQuery.isError) {
+      console.warn('Academic years load note:', academicYearsQuery.error)
+    }
+    if (summaryQuery.isError) {
+      console.warn('Fetch report summary note:', summaryQuery.error)
     }
   }, [
-    selectedMonth,
-    selectedYear,
-    selectedClass,
-    selectedSubject,
-    selectedStatus,
-    dateRangeTab,
-    currentPage,
-    t,
+    academicYearsQuery.error,
+    academicYearsQuery.isError,
+    classOptionsQuery.error,
+    classOptionsQuery.isError,
+    subjectOptionsQuery.error,
+    subjectOptionsQuery.isError,
+    summaryQuery.error,
+    summaryQuery.isError,
   ])
 
-  useEffect(() => {
-    fetchSummary()
-  }, [fetchSummary])
+  const exportMutation = useMutation({
+    mutationFn: exportAttendanceReport,
+  })
 
-  useEffect(() => {
-    fetchMatrix()
-  }, [fetchMatrix])
-
-  // Export Action
-  const handleExport = async (type: string) => {
-    setIsExporting(true)
+  const handleExport = async (type: 'excel' | 'pdf' | 'csv') => {
     toast.info(t('reports.exportingMessage', { type: type.toUpperCase() }))
     try {
-      await exportAttendanceReport({
+      await exportMutation.mutateAsync({
         type,
         month: selectedMonth,
         year: selectedYear,
@@ -236,12 +179,9 @@ export function useAttendanceReport() {
     } catch (err) {
       console.error('Export failed:', err)
       toast.error(t('common.error'))
-    } finally {
-      setIsExporting(false)
     }
   }
 
-  // Reset Filters
   const handleResetFilters = () => {
     setSelectedMonth('10')
     setSelectedYear(yearOptions[0]?.value || '2026')
@@ -284,7 +224,6 @@ export function useAttendanceReport() {
   }
 
   return {
-    // States
     dateRangeTab,
     selectedMonth,
     selectedYear,
@@ -296,14 +235,12 @@ export function useAttendanceReport() {
     classOptions,
     subjectOptions,
     yearOptions,
-    summaryData,
+    summaryData: summaryQuery.data ?? null,
     matrixStudents,
     paginationMeta,
-    isLoadingSummary,
-    isLoadingMatrix,
-    isExporting,
-
-    // Handlers
+    isLoadingSummary: summaryQuery.isLoading,
+    isLoadingMatrix: matrixQuery.isLoading,
+    isExporting: exportMutation.isPending,
     handleDateRangeChange,
     handleMonthChange,
     handleYearChange,

@@ -223,7 +223,7 @@ export function ReportView() {
             <IconSchool className="size-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">X MIPA 1</div>
+            <div className="text-2xl font-bold">X E-1</div>
             <p className="text-xs text-muted-foreground pt-1">
               {t('attendance.attendancePercentage')} (98.2%)
             </p>

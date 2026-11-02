@@ -33,8 +33,10 @@ import { getAttendanceRecords } from '@/features/attendance/services/attendance-
 export function AdminDashboardView() {
   const { t } = useTranslation()
   const { user } = useAuth()
+
   const { totalStudents, totalTeachers, attendancePercentage, isLoading } =
     useAdminStats()
+
   const columns = useAttendanceColumns()
 
   const currentDate = useMemo(() => dayjs().format('dddd, D MMMM YYYY'), [])
@@ -72,18 +74,21 @@ export function AdminDashboardView() {
 
   return (
     <div className="flex w-full flex-col gap-6">
+      {/* Header Dashboard */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold tracking-tight">
             {t('adminDashboard.welcome')} {user?.name ? `, ${user.name}` : ''}
           </h1>
         </div>
+
         <div className="flex flex-col gap-1">
           <p className="text-sm text-muted-foreground">{user?.name}</p>
           <p className="text-sm text-muted-foreground">{currentDate}</p>
         </div>
       </div>
 
+      {/* Statistik Dashboard */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <Card key={stat.title}>
@@ -92,12 +97,14 @@ export function AdminDashboardView() {
                 {stat.title}
               </CardTitle>
             </CardHeader>
+
             <CardContent>
               <div className={`rounded-lg ${stat.bgColor} p-4`}>
                 <div className={`text-3xl font-bold ${stat.color}`}>
                   {isLoading ? <Skeleton className="h-10 w-24" /> : stat.value}
                 </div>
-                <p className="text-xs text-muted-foreground pt-2">
+
+                <p className="pt-2 text-xs text-muted-foreground">
                   {stat.description}
                 </p>
               </div>
@@ -106,7 +113,9 @@ export function AdminDashboardView() {
         ))}
       </div>
 
+      {/* Tabel Presensi dan Komposisi Kehadiran */}
       <div className="grid items-start gap-6 lg:grid-cols-12">
+        {/* Live Presensi Siswa */}
         <div className="space-y-6 lg:col-span-8">
           <Card>
             <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -115,34 +124,60 @@ export function AdminDashboardView() {
                   <span className="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
                   {t('adminDashboard.liveAttendance')}
                 </CardTitle>
+
                 <CardDescription>
                   {t('adminDashboard.liveAttendanceDesc')}
                 </CardDescription>
               </div>
+
               <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
                 <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
                 {t('adminDashboard.realtimeUpdate')}
               </div>
             </CardHeader>
+
             <CardContent>
               <DataTable
                 columns={columns}
                 queryKey={attendanceKeys.lists()}
                 queryFn={async (params) => {
                   const apiParams: IAttendanceParams = {}
-                  if (params.classroom_id)
+
+                  if (params.classroom_id) {
                     apiParams.classroom_id = Number(params.classroom_id)
-                  if (params.month) apiParams.month = Number(params.month)
-                  if (params.semester)
+                  }
+
+                  if (params.month) {
+                    apiParams.month = Number(params.month)
+                  }
+
+                  if (params.semester) {
                     apiParams.semester = String(params.semester)
-                  if (params.status && params.status !== 'all')
+                  }
+
+                  if (params.status && params.status !== 'all') {
                     apiParams.status = params.status as AttendanceStatus
-                  if (params.search) apiParams.search = String(params.search)
-                  if (params.page) apiParams.page = Number(params.page)
-                  if (params.per_page)
+                  }
+
+                  if (params.search) {
+                    apiParams.search = String(params.search)
+                  }
+
+                  if (params.page) {
+                    apiParams.page = Number(params.page)
+                  }
+
+                  if (params.per_page) {
                     apiParams.per_page = Number(params.per_page)
-                  if (params.sortBy) apiParams.sortBy = String(params.sortBy)
-                  if (params.order) apiParams.order = String(params.order)
+                  }
+
+                  if (params.sortBy) {
+                    apiParams.sortBy = String(params.sortBy)
+                  }
+
+                  if (params.order) {
+                    apiParams.order = String(params.order)
+                  }
 
                   return getAttendanceRecords(apiParams)
                 }}
@@ -164,6 +199,7 @@ export function AdminDashboardView() {
           </Card>
         </div>
 
+        {/* Komposisi Kehadiran */}
         <div className="space-y-6 lg:col-span-4">
           <Card>
             <CardHeader>
@@ -172,52 +208,64 @@ export function AdminDashboardView() {
                 {t('adminDashboard.attendanceCompositionDesc')}
               </CardDescription>
             </CardHeader>
+
             <CardContent>
               <div className="space-y-4">
+                {/* Hadir */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span>{t('adminDashboard.present')}</span>
                     <span className="font-semibold">91.0%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+
+                  <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
                     <div
-                      className="bg-green-500 h-2 rounded-full"
+                      className="h-2 rounded-full bg-green-500"
                       style={{ width: '91%' }}
                     />
                   </div>
                 </div>
+
+                {/* Izin */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span>{t('adminDashboard.permission')}</span>
                     <span className="font-semibold">4.5%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+
+                  <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
                     <div
-                      className="bg-yellow-500 h-2 rounded-full"
+                      className="h-2 rounded-full bg-yellow-500"
                       style={{ width: '4.5%' }}
                     />
                   </div>
                 </div>
+
+                {/* Sakit */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span>{t('adminDashboard.sick')}</span>
                     <span className="font-semibold">3.0%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+
+                  <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
                     <div
-                      className="bg-orange-500 h-2 rounded-full"
+                      className="h-2 rounded-full bg-orange-500"
                       style={{ width: '3%' }}
                     />
                   </div>
                 </div>
+
+                {/* Alpa */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span>{t('adminDashboard.absent')}</span>
                     <span className="font-semibold">1.5%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+
+                  <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
                     <div
-                      className="bg-red-500 h-2 rounded-full"
+                      className="h-2 rounded-full bg-red-500"
                       style={{ width: '1.5%' }}
                     />
                   </div>

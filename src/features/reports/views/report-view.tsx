@@ -47,7 +47,6 @@ export function ReportView() {
 
   return (
     <div className="flex w-full flex-col gap-6">
-      {/* Page Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold tracking-tight">
@@ -90,10 +89,8 @@ export function ReportView() {
         </div>
       </div>
 
-      {/* Summary Stat Cards */}
       <ReportSummaryCards summary={summaryData} isLoading={isLoadingSummary} />
 
-      {/* Filter Bar with Dynamic Options */}
       <ReportFilters
         selectedMonth={selectedMonth}
         selectedYear={selectedYear}
@@ -111,7 +108,6 @@ export function ReportView() {
         onReset={handleResetFilters}
       />
 
-      {/* Attendance Matrix Table */}
       <ReportMatrixTable
         students={matrixStudents}
         isLoading={isLoadingMatrix}

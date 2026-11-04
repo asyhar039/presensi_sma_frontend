@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { classroomsQueryOptions } from '@/features/classrooms/lib/classroom-query-options'
-import { permitStatisticsQueryOptions } from '@/features/permits/lib/permit-query-options'
 import { getAttendanceReportSummary } from '@/features/reports/services/report-api'
 import { getStudents } from '@/features/students/services/student-api'
 import { subjectsQueryOptions } from '@/features/subjects/lib/subject-query-options'
@@ -49,22 +48,18 @@ export function useAdminStats() {
       }),
   })
 
-  const permitStatisticsQuery = useQuery(permitStatisticsQueryOptions())
-
   return {
     totalStudents: studentsQuery.data?.meta.total ?? null,
     totalTeachers: teachersQuery.data?.meta.total ?? null,
     totalSubjects: subjectsQuery.data?.meta.total ?? null,
     totalClassrooms: classroomsQuery.data?.meta.total ?? null,
     attendanceReport: attendanceReportQuery.data ?? null,
-    permitStatistics: permitStatisticsQuery.data ?? null,
     loading: {
       students: studentsQuery.isLoading,
       teachers: teachersQuery.isLoading,
       subjects: subjectsQuery.isLoading,
       classrooms: classroomsQuery.isLoading,
       attendanceReport: attendanceReportQuery.isLoading,
-      permitStatistics: permitStatisticsQuery.isLoading,
     },
     errors: {
       students: studentsQuery.isError,
@@ -72,7 +67,6 @@ export function useAdminStats() {
       subjects: subjectsQuery.isError,
       classrooms: classroomsQuery.isError,
       attendanceReport: attendanceReportQuery.isError,
-      permitStatistics: permitStatisticsQuery.isError,
     },
   }
 }

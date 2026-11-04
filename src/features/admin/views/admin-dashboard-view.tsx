@@ -39,7 +39,6 @@ export function AdminDashboardView() {
     totalSubjects,
     totalClassrooms,
     attendanceReport,
-    permitStatistics,
     loading,
     errors,
   } = useAdminStats()
@@ -99,42 +98,6 @@ export function AdminDashboardView() {
     },
   ]
 
-  const permitMetrics = [
-    { label: t('permits.totalToday'), value: permitStatistics?.total_today },
-    {
-      label: t('permits.pendingValidation'),
-      value: permitStatistics?.pending_validation,
-    },
-    {
-      label: t('adminDashboard.sickThisMonth'),
-      value: permitStatistics?.sick_this_month,
-    },
-    {
-      label: t('adminDashboard.leaveSchoolThisMonth'),
-      value: permitStatistics?.leave_school_this_month,
-    },
-    {
-      label: t('adminDashboard.leaveInThisMonth'),
-      value: permitStatistics?.leave_in_this_month,
-    },
-  ]
-  const reportInsights = [
-    {
-      label: t('reports.effectiveDays'),
-      value: attendanceReport?.effective_days,
-    },
-    {
-      label: t('adminDashboard.chronicAbsentees'),
-      value: attendanceReport?.chronic_absent_count,
-    },
-  ]
-  const bestClassroom =
-    attendanceReport?.best_classroom?.name ??
-    attendanceReport?.best_classroom_name
-  const bestClassroomRate =
-    attendanceReport?.best_classroom?.attendance_rate ??
-    attendanceReport?.best_classroom_rate
-
   return (
     <div className="flex w-full flex-col gap-6">
       {/* Header Dashboard */}
@@ -180,174 +143,85 @@ export function AdminDashboardView() {
         ))}
       </div>
 
-      {/* Tabel Presensi dan Komposisi Kehadiran */}
-      <div className="grid items-start gap-6 lg:grid-cols-12">
-        {/* Live Presensi Siswa */}
-        <div className="space-y-6 lg:col-span-8">
-          <Card>
-            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="space-y-1">
-                <CardTitle className="flex items-center gap-2">
-                  <span className="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                  {t('adminDashboard.liveAttendance')}
-                </CardTitle>
+      <Card>
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-1">
+            <CardTitle className="flex items-center gap-2">
+              <span className="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              {t('adminDashboard.liveAttendance')}
+            </CardTitle>
+            <CardDescription>
+              {t('adminDashboard.liveAttendanceDesc')}
+            </CardDescription>
+          </div>
 
-                <CardDescription>
-                  {t('adminDashboard.liveAttendanceDesc')}
-                </CardDescription>
-              </div>
+          <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+            {t('adminDashboard.realtimeUpdate')}
+          </div>
+        </CardHeader>
 
-              <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-                <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                {t('adminDashboard.realtimeUpdate')}
-              </div>
-            </CardHeader>
+        <CardContent>
+          <DataTable
+            columns={columns}
+            queryKey={attendanceKeys.lists()}
+            queryFn={async (params) => {
+              const apiParams: IAttendanceParams = {}
 
-            <CardContent>
-              <DataTable
-                columns={columns}
-                queryKey={attendanceKeys.lists()}
-                queryFn={async (params) => {
-                  const apiParams: IAttendanceParams = {}
+              if (params.classroom_id) {
+                apiParams.classroom_id = Number(params.classroom_id)
+              }
 
-                  if (params.classroom_id) {
-                    apiParams.classroom_id = Number(params.classroom_id)
-                  }
+              if (params.month) {
+                apiParams.month = Number(params.month)
+              }
 
-                  if (params.month) {
-                    apiParams.month = Number(params.month)
-                  }
+              if (params.semester) {
+                apiParams.semester = String(params.semester)
+              }
 
-                  if (params.semester) {
-                    apiParams.semester = String(params.semester)
-                  }
+              if (params.status && params.status !== 'all') {
+                apiParams.status = params.status as AttendanceStatus
+              }
 
-                  if (params.status && params.status !== 'all') {
-                    apiParams.status = params.status as AttendanceStatus
-                  }
+              if (params.search) {
+                apiParams.search = String(params.search)
+              }
 
-                  if (params.search) {
-                    apiParams.search = String(params.search)
-                  }
+              if (params.page) {
+                apiParams.page = Number(params.page)
+              }
 
-                  if (params.page) {
-                    apiParams.page = Number(params.page)
-                  }
+              if (params.per_page) {
+                apiParams.per_page = Number(params.per_page)
+              }
 
-                  if (params.per_page) {
-                    apiParams.per_page = Number(params.per_page)
-                  }
+              if (params.sortBy) {
+                apiParams.sortBy = String(params.sortBy)
+              }
 
-                  if (params.sortBy) {
-                    apiParams.sortBy = String(params.sortBy)
-                  }
+              if (params.order) {
+                apiParams.order = String(params.order)
+              }
 
-                  if (params.order) {
-                    apiParams.order = String(params.order)
-                  }
-
-                  return getAttendanceRecords(apiParams)
-                }}
-                allowedSortBy={ATTENDANCE_SORT_BY}
-                defaultSortBy={ATTENDANCE_DEFAULT_SORT_BY}
-                defaultOrder={ATTENDANCE_DEFAULT_ORDER}
-                perPageOptions={ATTENDANCE_PER_PAGE_OPTIONS}
-                defaultFilters={ATTENDANCE_DEFAULT_FILTERS}
-                filterSchema={attendanceFilterSchema}
-                enableSearch={false}
-                toolbar={null}
-                footer={null}
-                emptyTitle={t('adminDashboard.noAttendanceData')}
-                emptyDescription={t('adminDashboard.noAttendanceActivity')}
-                errorMessage={t('adminDashboard.failedLoadAttendance')}
-                syncWithQueryParams
-              />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Komposisi Kehadiran */}
-        <div className="space-y-6 lg:col-span-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('adminDashboard.attendanceSummary')}</CardTitle>
-              <CardDescription>
-                {t('adminDashboard.attendanceSummaryDesc')}
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent>
-              {loading.attendanceReport ? (
-                <Skeleton className="h-24 w-full" />
-              ) : errors.attendanceReport ? (
-                <p className="text-sm text-muted-foreground">
-                  {t('adminDashboard.failedLoadData')}
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {reportInsights.map((metric) => (
-                    <div
-                      key={metric.label}
-                      className="flex items-center justify-between gap-4 text-sm"
-                    >
-                      <span className="text-muted-foreground">
-                        {metric.label}
-                      </span>
-                      <span className="font-semibold">
-                        {metric.value ?? '—'}
-                      </span>
-                    </div>
-                  ))}
-                  <div className="flex items-center justify-between gap-4 text-sm">
-                    <span className="text-muted-foreground">
-                      {t('adminDashboard.bestClassroom')}
-                    </span>
-                    <span className="text-right font-semibold">
-                      {bestClassroom
-                        ? `${bestClassroom}${bestClassroomRate != null ? ` (${bestClassroomRate.toFixed(1)}%)` : ''}`
-                        : '—'}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('adminDashboard.permitSummary')}</CardTitle>
-              <CardDescription>
-                {t('adminDashboard.permitSummaryDesc')}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loading.permitStatistics ? (
-                <Skeleton className="h-32 w-full" />
-              ) : errors.permitStatistics ? (
-                <p className="text-sm text-muted-foreground">
-                  {t('adminDashboard.failedLoadData')}
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  {permitMetrics.map((metric) => (
-                    <div
-                      key={metric.label}
-                      className="flex items-center justify-between gap-4 text-sm"
-                    >
-                      <span className="text-muted-foreground">
-                        {metric.label}
-                      </span>
-                      <span className="font-semibold">
-                        {metric.value ?? '—'}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+              return getAttendanceRecords(apiParams)
+            }}
+            allowedSortBy={ATTENDANCE_SORT_BY}
+            defaultSortBy={ATTENDANCE_DEFAULT_SORT_BY}
+            defaultOrder={ATTENDANCE_DEFAULT_ORDER}
+            perPageOptions={ATTENDANCE_PER_PAGE_OPTIONS}
+            defaultFilters={ATTENDANCE_DEFAULT_FILTERS}
+            filterSchema={attendanceFilterSchema}
+            enableSearch={false}
+            toolbar={null}
+            footer={null}
+            emptyTitle={t('adminDashboard.noAttendanceData')}
+            emptyDescription={t('adminDashboard.noAttendanceActivity')}
+            errorMessage={t('adminDashboard.failedLoadAttendance')}
+            syncWithQueryParams
+          />
+        </CardContent>
+      </Card>
     </div>
   )
 }

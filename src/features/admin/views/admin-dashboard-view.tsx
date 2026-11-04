@@ -33,8 +33,16 @@ import { getAttendanceRecords } from '@/features/attendance/services/attendance-
 export function AdminDashboardView() {
   const { t } = useTranslation()
   const { user } = useAuth()
-  const { totalStudents, totalTeachers, attendancePercentage, isLoading } =
-    useAdminStats()
+  const {
+    totalStudents,
+    totalTeachers,
+    totalSubjects,
+    totalClassrooms,
+    attendanceReport,
+    permitStatistics,
+    loading,
+    errors,
+  } = useAdminStats()
   const columns = useAttendanceColumns()
 
   const currentDate = useMemo(() => dayjs().format('dddd, D MMMM YYYY'), [])
@@ -42,33 +50,90 @@ export function AdminDashboardView() {
   const stats = [
     {
       title: t('adminDashboard.totalStudents'),
-      value: totalStudents,
+      value: errors.students ? null : totalStudents,
+      isLoading: loading.students,
+      hasError: errors.students,
       description: t('adminDashboard.totalStudentsDesc'),
       color: 'text-blue-600',
       bgColor: 'bg-blue-50 dark:bg-blue-950',
     },
     {
       title: t('adminDashboard.totalTeachers'),
-      value: totalTeachers,
+      value: errors.teachers ? null : totalTeachers,
+      isLoading: loading.teachers,
+      hasError: errors.teachers,
       description: t('adminDashboard.totalTeachersDesc'),
       color: 'text-green-600',
       bgColor: 'bg-green-50 dark:bg-green-950',
     },
     {
       title: t('adminDashboard.attendancePercentage'),
-      value: `${attendancePercentage.toFixed(1)}%`,
+      value: errors.attendanceReport
+        ? null
+        : attendanceReport
+          ? `${attendanceReport.average_attendance.toFixed(1)}%`
+          : null,
+      isLoading: loading.attendanceReport,
+      hasError: errors.attendanceReport,
       description: t('adminDashboard.attendancePercentageDesc'),
       color: 'text-purple-600',
       bgColor: 'bg-purple-50 dark:bg-purple-950',
     },
     {
-      title: t('adminDashboard.activeSubjects'),
-      value: 10,
-      description: t('adminDashboard.activeSubjectsDesc'),
+      title: t('adminDashboard.totalSubjects'),
+      value: errors.subjects ? null : totalSubjects,
+      isLoading: loading.subjects,
+      hasError: errors.subjects,
+      description: t('adminDashboard.totalSubjectsDesc'),
       color: 'text-orange-600',
       bgColor: 'bg-orange-50 dark:bg-orange-950',
     },
+    {
+      title: t('adminDashboard.totalClassrooms'),
+      value: errors.classrooms ? null : totalClassrooms,
+      isLoading: loading.classrooms,
+      hasError: errors.classrooms,
+      description: t('adminDashboard.totalClassroomsDesc'),
+      color: 'text-cyan-600',
+      bgColor: 'bg-cyan-50 dark:bg-cyan-950',
+    },
   ]
+
+  const permitMetrics = [
+    { label: t('permits.totalToday'), value: permitStatistics?.total_today },
+    {
+      label: t('permits.pendingValidation'),
+      value: permitStatistics?.pending_validation,
+    },
+    {
+      label: t('adminDashboard.sickThisMonth'),
+      value: permitStatistics?.sick_this_month,
+    },
+    {
+      label: t('adminDashboard.leaveSchoolThisMonth'),
+      value: permitStatistics?.leave_school_this_month,
+    },
+    {
+      label: t('adminDashboard.leaveInThisMonth'),
+      value: permitStatistics?.leave_in_this_month,
+    },
+  ]
+  const reportInsights = [
+    {
+      label: t('reports.effectiveDays'),
+      value: attendanceReport?.effective_days,
+    },
+    {
+      label: t('adminDashboard.chronicAbsentees'),
+      value: attendanceReport?.chronic_absent_count,
+    },
+  ]
+  const bestClassroom =
+    attendanceReport?.best_classroom?.name ??
+    attendanceReport?.best_classroom_name
+  const bestClassroomRate =
+    attendanceReport?.best_classroom?.attendance_rate ??
+    attendanceReport?.best_classroom_rate
 
   return (
     <div className="flex w-full flex-col gap-6">
@@ -84,7 +149,7 @@ export function AdminDashboardView() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {stats.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -95,10 +160,16 @@ export function AdminDashboardView() {
             <CardContent>
               <div className={`rounded-lg ${stat.bgColor} p-4`}>
                 <div className={`text-3xl font-bold ${stat.color}`}>
-                  {isLoading ? <Skeleton className="h-10 w-24" /> : stat.value}
+                  {stat.isLoading ? (
+                    <Skeleton className="h-10 w-24" />
+                  ) : (
+                    (stat.value ?? '—')
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground pt-2">
-                  {stat.description}
+                  {stat.hasError
+                    ? t('adminDashboard.failedLoadData')
+                    : stat.description}
                 </p>
               </div>
             </CardContent>
@@ -167,62 +238,79 @@ export function AdminDashboardView() {
         <div className="space-y-6 lg:col-span-4">
           <Card>
             <CardHeader>
-              <CardTitle>{t('adminDashboard.attendanceComposition')}</CardTitle>
+              <CardTitle>{t('adminDashboard.attendanceSummary')}</CardTitle>
               <CardDescription>
-                {t('adminDashboard.attendanceCompositionDesc')}
+                {t('adminDashboard.attendanceSummaryDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>{t('adminDashboard.present')}</span>
-                    <span className="font-semibold">91.0%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+              {loading.attendanceReport ? (
+                <Skeleton className="h-24 w-full" />
+              ) : errors.attendanceReport ? (
+                <p className="text-sm text-muted-foreground">
+                  {t('adminDashboard.failedLoadData')}
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {reportInsights.map((metric) => (
                     <div
-                      className="bg-green-500 h-2 rounded-full"
-                      style={{ width: '91%' }}
-                    />
+                      key={metric.label}
+                      className="flex items-center justify-between gap-4 text-sm"
+                    >
+                      <span className="text-muted-foreground">
+                        {metric.label}
+                      </span>
+                      <span className="font-semibold">
+                        {metric.value ?? '—'}
+                      </span>
+                    </div>
+                  ))}
+                  <div className="flex items-center justify-between gap-4 text-sm">
+                    <span className="text-muted-foreground">
+                      {t('adminDashboard.bestClassroom')}
+                    </span>
+                    <span className="text-right font-semibold">
+                      {bestClassroom
+                        ? `${bestClassroom}${bestClassroomRate != null ? ` (${bestClassroomRate.toFixed(1)}%)` : ''}`
+                        : '—'}
+                    </span>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>{t('adminDashboard.permission')}</span>
-                    <span className="font-semibold">4.5%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('adminDashboard.permitSummary')}</CardTitle>
+              <CardDescription>
+                {t('adminDashboard.permitSummaryDesc')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loading.permitStatistics ? (
+                <Skeleton className="h-32 w-full" />
+              ) : errors.permitStatistics ? (
+                <p className="text-sm text-muted-foreground">
+                  {t('adminDashboard.failedLoadData')}
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {permitMetrics.map((metric) => (
                     <div
-                      className="bg-yellow-500 h-2 rounded-full"
-                      style={{ width: '4.5%' }}
-                    />
-                  </div>
+                      key={metric.label}
+                      className="flex items-center justify-between gap-4 text-sm"
+                    >
+                      <span className="text-muted-foreground">
+                        {metric.label}
+                      </span>
+                      <span className="font-semibold">
+                        {metric.value ?? '—'}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>{t('adminDashboard.sick')}</span>
-                    <span className="font-semibold">3.0%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                    <div
-                      className="bg-orange-500 h-2 rounded-full"
-                      style={{ width: '3%' }}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>{t('adminDashboard.absent')}</span>
-                    <span className="font-semibold">1.5%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                    <div
-                      className="bg-red-500 h-2 rounded-full"
-                      style={{ width: '1.5%' }}
-                    />
-                  </div>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>

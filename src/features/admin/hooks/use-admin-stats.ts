@@ -1,10 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { getAttendanceSummary } from '@/features/attendance/services/attendance-api'
+import { classroomsQueryOptions } from '@/features/classrooms/lib/classroom-query-options'
+import { permitStatisticsQueryOptions } from '@/features/permits/lib/permit-query-options'
+import { getAttendanceReportSummary } from '@/features/reports/services/report-api'
 import { getStudents } from '@/features/students/services/student-api'
+import { subjectsQueryOptions } from '@/features/subjects/lib/subject-query-options'
 import { getTeachers } from '@/features/teachers/services/teacher-api'
 
 export function useAdminStats() {
+  const month = new Date().getMonth() + 1
+  const year = new Date().getFullYear()
+
   const studentsQuery = useQuery({
     queryKey: ['students', { per_page: 1 }],
     queryFn: () =>
@@ -23,34 +29,50 @@ export function useAdminStats() {
       }),
   })
 
-  const attendanceSummaryQuery = useQuery({
-    queryKey: ['attendance-summary'],
+  const subjectsQuery = useQuery(subjectsQueryOptions({ page: 1, per_page: 1 }))
+
+  const classroomsQuery = useQuery(
+    classroomsQueryOptions({ page: 1, per_page: 1 }),
+  )
+
+  const attendanceReportQuery = useQuery({
+    queryKey: [
+      'report',
+      'attendance-summary',
+      { month, year, classroom_id: 'all' },
+    ],
     queryFn: () =>
-      getAttendanceSummary({
-        classroom_id: 1,
-        month: new Date().getMonth() + 1,
-        semester: 'ganjil',
+      getAttendanceReportSummary({
+        month,
+        year,
+        classroom_id: 'all',
       }),
   })
 
-  const totalStudents = studentsQuery.data?.meta.total ?? 0
-  const totalTeachers = teachersQuery.data?.meta.total ?? 0
-  const attendanceSummary = attendanceSummaryQuery.data
-
-  const attendancePercentage = attendanceSummary
-    ? attendanceSummary.average_attendance
-    : 0
-
-  const isLoading =
-    studentsQuery.isLoading ||
-    teachersQuery.isLoading ||
-    attendanceSummaryQuery.isLoading
+  const permitStatisticsQuery = useQuery(permitStatisticsQueryOptions())
 
   return {
-    totalStudents,
-    totalTeachers,
-    attendancePercentage,
-    attendanceSummary,
-    isLoading,
+    totalStudents: studentsQuery.data?.meta.total ?? null,
+    totalTeachers: teachersQuery.data?.meta.total ?? null,
+    totalSubjects: subjectsQuery.data?.meta.total ?? null,
+    totalClassrooms: classroomsQuery.data?.meta.total ?? null,
+    attendanceReport: attendanceReportQuery.data ?? null,
+    permitStatistics: permitStatisticsQuery.data ?? null,
+    loading: {
+      students: studentsQuery.isLoading,
+      teachers: teachersQuery.isLoading,
+      subjects: subjectsQuery.isLoading,
+      classrooms: classroomsQuery.isLoading,
+      attendanceReport: attendanceReportQuery.isLoading,
+      permitStatistics: permitStatisticsQuery.isLoading,
+    },
+    errors: {
+      students: studentsQuery.isError,
+      teachers: teachersQuery.isError,
+      subjects: subjectsQuery.isError,
+      classrooms: classroomsQuery.isError,
+      attendanceReport: attendanceReportQuery.isError,
+      permitStatistics: permitStatisticsQuery.isError,
+    },
   }
 }

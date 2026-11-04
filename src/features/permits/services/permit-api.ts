@@ -115,15 +115,5 @@ export async function getPermits(
 }
 
 export async function getPermitStatistics(): Promise<IPermitStatistics> {
-  try {
-    return await api.get<IPermitStatistics>('/permits/statistics')
-  } catch {
-    return {
-      total_today: 5,
-      pending_validation: 2,
-      sick_this_month: 12,
-      leave_school_this_month: 8,
-      leave_in_this_month: 4,
-    }
-  }
+  return api.get<IPermitStatistics>('/permits/statistics')
 }

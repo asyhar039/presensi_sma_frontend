@@ -33,10 +33,15 @@ import { getAttendanceRecords } from '@/features/attendance/services/attendance-
 export function AdminDashboardView() {
   const { t } = useTranslation()
   const { user } = useAuth()
-
-  const { totalStudents, totalTeachers, attendancePercentage, isLoading } =
-    useAdminStats()
-
+  const {
+    totalStudents,
+    totalTeachers,
+    totalSubjects,
+    totalClassrooms,
+    attendanceReport,
+    loading,
+    errors,
+  } = useAdminStats()
   const columns = useAttendanceColumns()
 
   const currentDate = useMemo(() => dayjs().format('dddd, D MMMM YYYY'), [])
@@ -44,31 +49,52 @@ export function AdminDashboardView() {
   const stats = [
     {
       title: t('adminDashboard.totalStudents'),
-      value: totalStudents,
+      value: errors.students ? null : totalStudents,
+      isLoading: loading.students,
+      hasError: errors.students,
       description: t('adminDashboard.totalStudentsDesc'),
       color: 'text-blue-600',
       bgColor: 'bg-blue-50 dark:bg-blue-950',
     },
     {
       title: t('adminDashboard.totalTeachers'),
-      value: totalTeachers,
+      value: errors.teachers ? null : totalTeachers,
+      isLoading: loading.teachers,
+      hasError: errors.teachers,
       description: t('adminDashboard.totalTeachersDesc'),
       color: 'text-green-600',
       bgColor: 'bg-green-50 dark:bg-green-950',
     },
     {
       title: t('adminDashboard.attendancePercentage'),
-      value: `${attendancePercentage.toFixed(1)}%`,
+      value: errors.attendanceReport
+        ? null
+        : attendanceReport
+          ? `${attendanceReport.average_attendance.toFixed(1)}%`
+          : null,
+      isLoading: loading.attendanceReport,
+      hasError: errors.attendanceReport,
       description: t('adminDashboard.attendancePercentageDesc'),
       color: 'text-purple-600',
       bgColor: 'bg-purple-50 dark:bg-purple-950',
     },
     {
-      title: t('adminDashboard.activeSubjects'),
-      value: 10,
-      description: t('adminDashboard.activeSubjectsDesc'),
+      title: t('adminDashboard.totalSubjects'),
+      value: errors.subjects ? null : totalSubjects,
+      isLoading: loading.subjects,
+      hasError: errors.subjects,
+      description: t('adminDashboard.totalSubjectsDesc'),
       color: 'text-orange-600',
       bgColor: 'bg-orange-50 dark:bg-orange-950',
+    },
+    {
+      title: t('adminDashboard.totalClassrooms'),
+      value: errors.classrooms ? null : totalClassrooms,
+      isLoading: loading.classrooms,
+      hasError: errors.classrooms,
+      description: t('adminDashboard.totalClassroomsDesc'),
+      color: 'text-cyan-600',
+      bgColor: 'bg-cyan-50 dark:bg-cyan-950',
     },
   ]
 
@@ -88,8 +114,7 @@ export function AdminDashboardView() {
         </div>
       </div>
 
-      {/* Statistik Dashboard */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {stats.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -101,11 +126,16 @@ export function AdminDashboardView() {
             <CardContent>
               <div className={`rounded-lg ${stat.bgColor} p-4`}>
                 <div className={`text-3xl font-bold ${stat.color}`}>
-                  {isLoading ? <Skeleton className="h-10 w-24" /> : stat.value}
+                  {stat.isLoading ? (
+                    <Skeleton className="h-10 w-24" />
+                  ) : (
+                    (stat.value ?? '—')
+                  )}
                 </div>
-
-                <p className="pt-2 text-xs text-muted-foreground">
-                  {stat.description}
+                <p className="text-xs text-muted-foreground pt-2">
+                  {stat.hasError
+                    ? t('adminDashboard.failedLoadData')
+                    : stat.description}
                 </p>
               </div>
             </CardContent>
@@ -113,168 +143,85 @@ export function AdminDashboardView() {
         ))}
       </div>
 
-      {/* Tabel Presensi dan Komposisi Kehadiran */}
-      <div className="grid items-start gap-6 lg:grid-cols-12">
-        {/* Live Presensi Siswa */}
-        <div className="space-y-6 lg:col-span-8">
-          <Card>
-            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="space-y-1">
-                <CardTitle className="flex items-center gap-2">
-                  <span className="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                  {t('adminDashboard.liveAttendance')}
-                </CardTitle>
+      <Card>
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-1">
+            <CardTitle className="flex items-center gap-2">
+              <span className="size-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              {t('adminDashboard.liveAttendance')}
+            </CardTitle>
+            <CardDescription>
+              {t('adminDashboard.liveAttendanceDesc')}
+            </CardDescription>
+          </div>
 
-                <CardDescription>
-                  {t('adminDashboard.liveAttendanceDesc')}
-                </CardDescription>
-              </div>
+          <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+            {t('adminDashboard.realtimeUpdate')}
+          </div>
+        </CardHeader>
 
-              <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-                <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                {t('adminDashboard.realtimeUpdate')}
-              </div>
-            </CardHeader>
+        <CardContent>
+          <DataTable
+            columns={columns}
+            queryKey={attendanceKeys.lists()}
+            queryFn={async (params) => {
+              const apiParams: IAttendanceParams = {}
 
-            <CardContent>
-              <DataTable
-                columns={columns}
-                queryKey={attendanceKeys.lists()}
-                queryFn={async (params) => {
-                  const apiParams: IAttendanceParams = {}
+              if (params.classroom_id) {
+                apiParams.classroom_id = Number(params.classroom_id)
+              }
 
-                  if (params.classroom_id) {
-                    apiParams.classroom_id = Number(params.classroom_id)
-                  }
+              if (params.month) {
+                apiParams.month = Number(params.month)
+              }
 
-                  if (params.month) {
-                    apiParams.month = Number(params.month)
-                  }
+              if (params.semester) {
+                apiParams.semester = String(params.semester)
+              }
 
-                  if (params.semester) {
-                    apiParams.semester = String(params.semester)
-                  }
+              if (params.status && params.status !== 'all') {
+                apiParams.status = params.status as AttendanceStatus
+              }
 
-                  if (params.status && params.status !== 'all') {
-                    apiParams.status = params.status as AttendanceStatus
-                  }
+              if (params.search) {
+                apiParams.search = String(params.search)
+              }
 
-                  if (params.search) {
-                    apiParams.search = String(params.search)
-                  }
+              if (params.page) {
+                apiParams.page = Number(params.page)
+              }
 
-                  if (params.page) {
-                    apiParams.page = Number(params.page)
-                  }
+              if (params.per_page) {
+                apiParams.per_page = Number(params.per_page)
+              }
 
-                  if (params.per_page) {
-                    apiParams.per_page = Number(params.per_page)
-                  }
+              if (params.sortBy) {
+                apiParams.sortBy = String(params.sortBy)
+              }
 
-                  if (params.sortBy) {
-                    apiParams.sortBy = String(params.sortBy)
-                  }
+              if (params.order) {
+                apiParams.order = String(params.order)
+              }
 
-                  if (params.order) {
-                    apiParams.order = String(params.order)
-                  }
-
-                  return getAttendanceRecords(apiParams)
-                }}
-                allowedSortBy={ATTENDANCE_SORT_BY}
-                defaultSortBy={ATTENDANCE_DEFAULT_SORT_BY}
-                defaultOrder={ATTENDANCE_DEFAULT_ORDER}
-                perPageOptions={ATTENDANCE_PER_PAGE_OPTIONS}
-                defaultFilters={ATTENDANCE_DEFAULT_FILTERS}
-                filterSchema={attendanceFilterSchema}
-                enableSearch={false}
-                toolbar={null}
-                footer={null}
-                emptyTitle={t('adminDashboard.noAttendanceData')}
-                emptyDescription={t('adminDashboard.noAttendanceActivity')}
-                errorMessage={t('adminDashboard.failedLoadAttendance')}
-                syncWithQueryParams
-              />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Komposisi Kehadiran */}
-        <div className="space-y-6 lg:col-span-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('adminDashboard.attendanceComposition')}</CardTitle>
-              <CardDescription>
-                {t('adminDashboard.attendanceCompositionDesc')}
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent>
-              <div className="space-y-4">
-                {/* Hadir */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>{t('adminDashboard.present')}</span>
-                    <span className="font-semibold">91.0%</span>
-                  </div>
-
-                  <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-                    <div
-                      className="h-2 rounded-full bg-green-500"
-                      style={{ width: '91%' }}
-                    />
-                  </div>
-                </div>
-
-                {/* Izin */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>{t('adminDashboard.permission')}</span>
-                    <span className="font-semibold">4.5%</span>
-                  </div>
-
-                  <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-                    <div
-                      className="h-2 rounded-full bg-yellow-500"
-                      style={{ width: '4.5%' }}
-                    />
-                  </div>
-                </div>
-
-                {/* Sakit */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>{t('adminDashboard.sick')}</span>
-                    <span className="font-semibold">3.0%</span>
-                  </div>
-
-                  <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-                    <div
-                      className="h-2 rounded-full bg-orange-500"
-                      style={{ width: '3%' }}
-                    />
-                  </div>
-                </div>
-
-                {/* Alpa */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>{t('adminDashboard.absent')}</span>
-                    <span className="font-semibold">1.5%</span>
-                  </div>
-
-                  <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-                    <div
-                      className="h-2 rounded-full bg-red-500"
-                      style={{ width: '1.5%' }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+              return getAttendanceRecords(apiParams)
+            }}
+            allowedSortBy={ATTENDANCE_SORT_BY}
+            defaultSortBy={ATTENDANCE_DEFAULT_SORT_BY}
+            defaultOrder={ATTENDANCE_DEFAULT_ORDER}
+            perPageOptions={ATTENDANCE_PER_PAGE_OPTIONS}
+            defaultFilters={ATTENDANCE_DEFAULT_FILTERS}
+            filterSchema={attendanceFilterSchema}
+            enableSearch={false}
+            toolbar={null}
+            footer={null}
+            emptyTitle={t('adminDashboard.noAttendanceData')}
+            emptyDescription={t('adminDashboard.noAttendanceActivity')}
+            errorMessage={t('adminDashboard.failedLoadAttendance')}
+            syncWithQueryParams
+          />
+        </CardContent>
+      </Card>
     </div>
   )
 }
